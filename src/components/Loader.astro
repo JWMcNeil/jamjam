@@ -1,9 +1,39 @@
 ---
 
-
 ---
 
-<div class="flex flex-col min-h-screen justify-center">
-     <div class="flex justify-center font-sans text-platinum text-7xl font-bold">jamjam.dev</div>
+<div id="test" class="flex justify-center align-center">
+     <!-- Fallback static logo -->
+     <!-- <div class="flex justify-center font-sans text-platinum text-7xl font-bold">jamjam.dev</div> -->
   
+     <div class="flex justify-center items-center font-sans h-screen text-platinum text-7xl font-bold">
+          <div id="logo">jam</div>
+          <div id="logo">jam</div>
+          <div id="logo">.</div>
+          <div id="logo">dev</div>
+          
+     </div>     
 </div>
+
+<script>
+import { animate, stagger } from 'motion';
+
+animate(
+  "#logo",
+  { 
+     opacity: 1, transform:'none', },
+  {
+    delay: stagger(0.5),
+    duration: 1,
+    easing: [.22, .03, .26, 1]
+  }
+)
+
+</script>
+
+<style>
+
+     #logo {
+          opacity: 0;
+     }
+</style>
