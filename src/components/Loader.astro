@@ -1,18 +1,20 @@
 ---
-
+import Button from "./Button.astro";
 ---
 
-<div id="test" class="flex justify-center align-center">
+<div id="test" class="flex flex-col justify-center align-center pt-72 ">
      <!-- Fallback static logo -->
      <!-- <div class="flex justify-center font-sans text-platinum text-7xl font-bold">jamjam.dev</div> -->
   
-     <div class="flex justify-center items-center font-sans h-screen text-platinum text-7xl font-bold">
+     <div id="jamjamLogo" class="flex justify-center items-center font-sans text-platinum text-4xl font-bold md:text-7xl">
           <div id="logo">jam</div>
           <div id="logo">jam</div>
           <div id="logo">.</div>
           <div id="logo">dev</div>
-          
-     </div>     
+     </div> 
+     <div id="logo" class="flex justify-center mt-12">
+          <Button />
+     </div>
 </div>
 
 <script>
@@ -23,11 +25,12 @@ animate(
   { 
      opacity: 1, transform:'none', },
   {
-    delay: stagger(0.5),
+    delay: stagger(0.6),
     duration: 1,
-    easing: [.22, .03, .26, 1]
+    easing: [.22, .03, .26, 1, 2]
   }
 )
+
 
 </script>
 

@@ -13,6 +13,7 @@ export default {
         'wrapper': '#070707',
         'platinum': "#DBDBDB",
         'accent': '#91DB43',
+        'darkGray': '#0c0c0c',
       },
       borderWidth: {
       DEFAULT: '1px',
