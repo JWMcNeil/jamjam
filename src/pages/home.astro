@@ -1,11 +1,27 @@
 ---
+import HomeCard from "../components/HomeCard.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-
 
 ---
 <BaseLayout>
     
     <p class="text-gray-300 pt-10">This is home...</p>
+    
+    <HomeCard 
+    title="Hi, my name is Jamie!"
+    content="I build modern websites with a focus on sustainability. Happy to build with no code platforms such as Webflow, or create fully custom static sites with frameworks like Astro."
+    
+    />
+
+    <HomeCard 
+    title="Webflow design + development"
+    content="My go to no code / low code tool is Webflow. This is a compelling option for most clients, with an easy to use client editor, CMS and asset management, its hard to go wrong!"
+    />
+
+    <HomeCard 
+    title="Astro +"
+    content="So far in my journey of building the most sustainable websites I can, Astro has proven to come out on top. If your looking for the lightest and eco-friendly of websites, this is the way."
+    />
 
 </BaseLayout>
 

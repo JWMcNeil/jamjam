@@ -1,16 +1,18 @@
 ---
+const { title, content, src, alt} = Astro.props;
 
 
 ---
 
-<div class="border border-platinum/10">
+<div class="border border-platinum/10 mt-28">
     <!-- inner frame -->
     <div class="border border-platinum/10">
         <!-- place image -->
-        <img src="" alt="">
+        <img src={src} alt={alt}>
     </div>
     <!-- content -->
-    <div class="border-l border-platinum/10">
-        
+    <div class="p-8 border-l border-platinum/10">
+        <h2 class="font-serif  text-platinum">{title}</h2>
+        <p class="font-sans text-sm text-platinum/50">{content}</p>
     </div>
 </div>
