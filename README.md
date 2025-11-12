@@ -1,0 +1,3 @@
+# JamJam Portfolio & Blog
+
+Will update this soon...
