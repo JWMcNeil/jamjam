@@ -12,6 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
+import { useBreadcrumbOverride } from '@/providers/Breadcrumb'
 
 function formatBreadcrumbLabel(segment: string): string {
   // Decode URI component and replace hyphens/underscores with spaces
@@ -22,6 +23,7 @@ function formatBreadcrumbLabel(segment: string): string {
 
 export function BreadcrumbCollapsed() {
   const pathname = usePathname()
+  const { override } = useBreadcrumbOverride()
 
   // Split pathname into segments, filtering out empty strings
   const segments = pathname.split('/').filter(Boolean)
@@ -61,14 +63,23 @@ export function BreadcrumbCollapsed() {
       const isLast = index === segments.length - 1
       const href = '/' + segments.slice(0, index + 1).join('/')
 
+      // Apply breadcrumb override if it exists for this segment index
+      let displayLabel = formatBreadcrumbLabel(segment)
+      let displayHref = href
+
+      if (override && override.segmentIndex === index && !isLast) {
+        displayLabel = override.label
+        displayHref = override.href
+      }
+
       breadcrumbItems.push(
         <BreadcrumbSeparator key={`sep-${index}`} className="hidden md:flex" />,
         <BreadcrumbItem key={`item-${index}`} className="min-w-0 hidden md:inline-flex">
           {isLast ? (
-            <BreadcrumbPage>{formatBreadcrumbLabel(segment)}</BreadcrumbPage>
+            <BreadcrumbPage>{displayLabel}</BreadcrumbPage>
           ) : (
             <BreadcrumbLink asChild>
-              <Link href={href}>{formatBreadcrumbLabel(segment)}</Link>
+              <Link href={displayHref}>{displayLabel}</Link>
             </BreadcrumbLink>
           )}
         </BreadcrumbItem>,

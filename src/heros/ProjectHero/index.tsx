@@ -1,18 +1,13 @@
-import { formatDateTime } from 'src/utilities/formatDateTime'
 import React from 'react'
 
 import type { Project } from '@/payload-types'
 
 import { Media } from '@/components/Media'
-import { formatAuthors } from '@/utilities/formatAuthors'
 
 export const ProjectHero: React.FC<{
   project: Project
 }> = ({ project }) => {
-  const { categories, heroImage, populatedAuthors, publishedAt, projectType, title } = project
-
-  const hasAuthors =
-    populatedAuthors && populatedAuthors.length > 0 && formatAuthors(populatedAuthors) !== ''
+  const { categories, heroImage, projectType, title } = project
 
   const projectTypeLabels = {
     web: 'Web',
@@ -53,7 +48,7 @@ export const ProjectHero: React.FC<{
             <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl">{title}</h1>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4 md:gap-16">
+          {/* <div className="flex flex-col md:flex-row gap-4 md:gap-16">
             {hasAuthors && (
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
@@ -70,7 +65,7 @@ export const ProjectHero: React.FC<{
                 <time dateTime={publishedAt}>{formatDateTime(publishedAt)}</time>
               </div>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="min-h-[80vh] select-none">
@@ -82,4 +77,3 @@ export const ProjectHero: React.FC<{
     </div>
   )
 }
-
