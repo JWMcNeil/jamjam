@@ -26,6 +26,7 @@
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@heroicons/react": "^2.2.0",
+    "@mux/mux-player-react": "^3.8.0",
     "@payloadcms/admin-bar": "3.61.1",
     "@payloadcms/db-sqlite": "3.61.1",
     "@payloadcms/live-preview-react": "3.61.1",

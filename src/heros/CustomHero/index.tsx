@@ -123,60 +123,30 @@ export const CustomHero: React.FC<CustomHeroType> = ({
         // Type assertion needed until Payload types are regenerated
         const cardWithPositions = card as typeof card & {
           positions?: {
-            xs?: { normalizedX?: number | null; normalizedY?: number | null }
-            sm?: { normalizedX?: number | null; normalizedY?: number | null }
-            md?: { normalizedX?: number | null; normalizedY?: number | null }
-            lg?: { normalizedX?: number | null; normalizedY?: number | null }
-            xl?: { normalizedX?: number | null; normalizedY?: number | null }
-            '2xl'?: { normalizedX?: number | null; normalizedY?: number | null }
-            '3xl'?: { normalizedX?: number | null; normalizedY?: number | null }
+            mobile?: { normalizedX?: number | null; normalizedY?: number | null }
+            tablet?: { normalizedX?: number | null; normalizedY?: number | null }
+            desktop?: { normalizedX?: number | null; normalizedY?: number | null }
           }
-          normalizedX?: number | null
-          normalizedY?: number | null
         }
 
         const positions = cardWithPositions.positions
           ? {
-              ...(cardWithPositions.positions.xs && {
-                xs: {
-                  normalizedX: cardWithPositions.positions.xs.normalizedX ?? undefined,
-                  normalizedY: cardWithPositions.positions.xs.normalizedY ?? undefined,
+              ...(cardWithPositions.positions.mobile && {
+                mobile: {
+                  normalizedX: cardWithPositions.positions.mobile.normalizedX ?? undefined,
+                  normalizedY: cardWithPositions.positions.mobile.normalizedY ?? undefined,
                 },
               }),
-              ...(cardWithPositions.positions.sm && {
-                sm: {
-                  normalizedX: cardWithPositions.positions.sm.normalizedX ?? undefined,
-                  normalizedY: cardWithPositions.positions.sm.normalizedY ?? undefined,
+              ...(cardWithPositions.positions.tablet && {
+                tablet: {
+                  normalizedX: cardWithPositions.positions.tablet.normalizedX ?? undefined,
+                  normalizedY: cardWithPositions.positions.tablet.normalizedY ?? undefined,
                 },
               }),
-              ...(cardWithPositions.positions.md && {
-                md: {
-                  normalizedX: cardWithPositions.positions.md.normalizedX ?? undefined,
-                  normalizedY: cardWithPositions.positions.md.normalizedY ?? undefined,
-                },
-              }),
-              ...(cardWithPositions.positions.lg && {
-                lg: {
-                  normalizedX: cardWithPositions.positions.lg.normalizedX ?? undefined,
-                  normalizedY: cardWithPositions.positions.lg.normalizedY ?? undefined,
-                },
-              }),
-              ...(cardWithPositions.positions.xl && {
-                xl: {
-                  normalizedX: cardWithPositions.positions.xl.normalizedX ?? undefined,
-                  normalizedY: cardWithPositions.positions.xl.normalizedY ?? undefined,
-                },
-              }),
-              ...(cardWithPositions.positions['2xl'] && {
-                '2xl': {
-                  normalizedX: cardWithPositions.positions['2xl'].normalizedX ?? undefined,
-                  normalizedY: cardWithPositions.positions['2xl'].normalizedY ?? undefined,
-                },
-              }),
-              ...(cardWithPositions.positions['3xl'] && {
-                '3xl': {
-                  normalizedX: cardWithPositions.positions['3xl'].normalizedX ?? undefined,
-                  normalizedY: cardWithPositions.positions['3xl'].normalizedY ?? undefined,
+              ...(cardWithPositions.positions.desktop && {
+                desktop: {
+                  normalizedX: cardWithPositions.positions.desktop.normalizedX ?? undefined,
+                  normalizedY: cardWithPositions.positions.desktop.normalizedY ?? undefined,
                 },
               }),
             }
@@ -186,16 +156,6 @@ export const CustomHero: React.FC<CustomHeroType> = ({
           id: cardId,
           title: card.title,
           ...(imageUrl && { image: imageUrl }),
-          ...(card.initialX !== null && card.initialX !== undefined && { initialX: card.initialX }),
-          ...(card.initialY !== null && card.initialY !== undefined && { initialY: card.initialY }),
-          ...(cardWithPositions.normalizedX !== null &&
-            cardWithPositions.normalizedX !== undefined && {
-              normalizedX: cardWithPositions.normalizedX,
-            }),
-          ...(cardWithPositions.normalizedY !== null &&
-            cardWithPositions.normalizedY !== undefined && {
-              normalizedY: cardWithPositions.normalizedY,
-            }),
           ...(positions && Object.keys(positions).length > 0 && { positions }),
         }
         return cardData

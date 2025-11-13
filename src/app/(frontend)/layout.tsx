@@ -47,12 +47,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           /> */}
 
           <div className="flex flex-col min-h-screen">
-            <div className="sticky top-0 z-20">
+            <div className="mb-[5.5rem]">
               <Header />
             </div>
             <div className="w-[90vw] max-w-[120rem] mx-auto flex flex-1 min-h-0 pt-0">
               <Sidebar />
-              <main className="md:ml-16 flex-1">{children}</main>
+              <main className="md:ml-[3.5rem] flex-1">{children}</main>
             </div>
           </div>
         </Providers>

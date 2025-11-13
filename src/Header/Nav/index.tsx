@@ -10,6 +10,93 @@ import { CMSLink } from '@/components/Link'
 import Link from 'next/link'
 import { SearchIcon, Menu, X } from 'lucide-react'
 
+const mobileNavItems = [
+  {
+    link: {
+      type: 'reference' as const,
+      label: 'Home',
+      url: '/',
+      reference: null,
+      newTab: null,
+      appearance: null,
+      size: null,
+      icon: null,
+    },
+  },
+  {
+    link: {
+      type: 'reference' as const,
+      label: 'Posts',
+      url: '/posts',
+      reference: null,
+      newTab: null,
+      appearance: null,
+      size: null,
+      icon: null,
+    },
+  },
+  {
+    link: {
+      type: 'reference' as const,
+      label: 'Projects',
+      url: '/projects',
+      reference: null,
+      newTab: null,
+      appearance: null,
+      size: null,
+      icon: null,
+    },
+  },
+  {
+    link: {
+      type: 'reference' as const,
+      label: 'Web',
+      url: '/web',
+      reference: null,
+      newTab: null,
+      appearance: null,
+      size: null,
+      icon: null,
+    },
+  },
+  {
+    link: {
+      type: 'reference' as const,
+      label: 'Photography',
+      url: '/photography',
+      reference: null,
+      newTab: null,
+      appearance: null,
+      size: null,
+      icon: null,
+    },
+  },
+  {
+    link: {
+      type: 'reference' as const,
+      label: 'Videography',
+      url: '/videography',
+      reference: null,
+      newTab: null,
+      appearance: null,
+      size: null,
+      icon: null,
+    },
+  },
+  {
+    link: {
+      type: 'reference' as const,
+      label: 'Contact',
+      url: '/contact',
+      reference: null,
+      newTab: null,
+      appearance: null,
+      size: null,
+      icon: null,
+    },
+  },
+]
+
 export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
   const navItems = data?.navItems || []
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -79,15 +166,15 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
               className="fixed inset-0 flex items-center justify-center h-svh z-[110] md:hidden pointer-events-none"
             >
               <div
-                className="flex flex-col items-center justify-center  h-1/2 w-full space-y-8  max-w-sm px-4 pointer-events-auto"
+                className="flex flex-col items-center justify-center  h-full w-full gap-8  max-w-sm px-4 pointer-events-auto"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Navigation Links */}
-                {navItems.map(({ link }, i) => {
+                {mobileNavItems.map(({ link }, i) => {
                   return (
                     <div
                       key={i}
-                      className="w-full flex justify-center animate-fade-in-up"
+                      className="w-full flex justify-center animate-fade-in-up h-10"
                       style={{
                         animationDelay: `${i * 0.1}s`,
                         animationFillMode: 'both',
@@ -96,7 +183,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
                       <CMSLink
                         {...link}
                         appearance={'outline'}
-                        className="text-muted-foreground hover:text-foreground w-full"
+                        className="text-muted-foreground hover:text-foreground w-full h-10"
                       />
                     </div>
                   )

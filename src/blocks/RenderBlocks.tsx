@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 
-import type { Page } from '@/payload-types'
+import type { Page, Project } from '@/payload-types'
 
 import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
@@ -10,6 +10,9 @@ import { DraggableCardsBlock } from '@/blocks/DraggableCards/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { GridBlock } from '@/blocks/Grid/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import { ImageMasonryGrid } from '@/blocks/ImageMasonryGrid/Component'
+import { VideoPlayer } from '@/blocks/VideoPlayer/Component'
+import { Carousel } from '@/blocks/Carousel/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -20,10 +23,13 @@ const blockComponents = {
   formBlock: FormBlock,
   grid: GridBlock,
   mediaBlock: MediaBlock,
+  imageMasonryGrid: ImageMasonryGrid,
+  videoPlayer: VideoPlayer,
+  carousel: Carousel,
 }
 
 export const RenderBlocks: React.FC<{
-  blocks: Page['layout'][0][]
+  blocks: Page['layout'][0][] | Project['layout'][0][]
 }> = (props) => {
   const { blocks } = props
 

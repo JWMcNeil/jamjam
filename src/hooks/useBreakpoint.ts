@@ -1,43 +1,31 @@
 /**
  * Hook to detect current breakpoint based on window width
- * Uses Tailwind breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px), 2xl (1536px), 3xl (1920px)
+ * Uses 3 breakpoints: mobile (< 768px), tablet (768px - 1023px), desktop (≥ 1024px)
  */
 
 import { useState, useEffect } from 'react'
 
-export type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
+export type Breakpoint = 'mobile' | 'tablet' | 'desktop'
 
 const breakpoints: Record<Breakpoint, number> = {
-  xs: 0,
-  sm: 640,
-  md: 768,
-  lg: 1024,
-  xl: 1280,
-  '2xl': 1536,
-  '3xl': 1920,
+  mobile: 0,
+  tablet: 768,
+  desktop: 1024,
 }
 
 export const useBreakpoint = (): Breakpoint => {
-  const [breakpoint, setBreakpoint] = useState<Breakpoint>('xs')
+  const [breakpoint, setBreakpoint] = useState<Breakpoint>('mobile')
 
   useEffect(() => {
     const updateBreakpoint = () => {
       const width = window.innerWidth
 
-      if (width >= breakpoints['3xl']) {
-        setBreakpoint('3xl')
-      } else if (width >= breakpoints['2xl']) {
-        setBreakpoint('2xl')
-      } else if (width >= breakpoints.xl) {
-        setBreakpoint('xl')
-      } else if (width >= breakpoints.lg) {
-        setBreakpoint('lg')
-      } else if (width >= breakpoints.md) {
-        setBreakpoint('md')
-      } else if (width >= breakpoints.sm) {
-        setBreakpoint('sm')
+      if (width >= breakpoints.desktop) {
+        setBreakpoint('desktop')
+      } else if (width >= breakpoints.tablet) {
+        setBreakpoint('tablet')
       } else {
-        setBreakpoint('xs')
+        setBreakpoint('mobile')
       }
     }
 
@@ -53,13 +41,9 @@ export const useBreakpoint = (): Breakpoint => {
  * Get the appropriate breakpoint for a given width
  */
 export const getBreakpointForWidth = (width: number): Breakpoint => {
-  if (width >= breakpoints['3xl']) return '3xl'
-  if (width >= breakpoints['2xl']) return '2xl'
-  if (width >= breakpoints.xl) return 'xl'
-  if (width >= breakpoints.lg) return 'lg'
-  if (width >= breakpoints.md) return 'md'
-  if (width >= breakpoints.sm) return 'sm'
-  return 'xs'
+  if (width >= breakpoints.desktop) return 'desktop'
+  if (width >= breakpoints.tablet) return 'tablet'
+  return 'mobile'
 }
 
 /**

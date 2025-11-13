@@ -10,6 +10,7 @@ import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
+import { Projects } from './collections/Projects'
 import { Users } from './collections/Users'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
@@ -23,6 +24,10 @@ const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
+    meta: {
+      titleSuffix: ' - jamjam.dev',
+      description: 'jamjam.dev',
+    },
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below.
@@ -40,7 +45,7 @@ export default buildConfig({
         {
           label: 'Mobile',
           name: 'mobile',
-          width: 375,
+          width: 390,
           height: 667,
         },
         {
@@ -68,7 +73,7 @@ export default buildConfig({
     // Run migrations instead: pnpm payload migrate
     push: true,
   }),
-  collections: [Pages, Posts, Media, Categories, Users],
+  collections: [Pages, Posts, Media, Categories, Users, Projects],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, Sidebar],
   plugins: [

@@ -31,7 +31,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
 
   return (
     <header {...(theme ? { 'data-theme': theme } : {})}>
-      <div className="w-[90vw] max-w-[120rem] mx-auto">
+      <div className="w-[90vw] max-w-[120rem] mx-auto z-[150] fixed top-0 left-0 right-0">
         <div className="bg-background h-full w-full p-4"></div>
         <div className="flex border border-border h-14 rounded-t-lg backdrop-blur-lg ">
           <Link

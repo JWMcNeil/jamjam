@@ -6,13 +6,9 @@ export type BreakpointPosition = {
 }
 
 export type BreakpointPositions = {
-  xs?: BreakpointPosition
-  sm?: BreakpointPosition
-  md?: BreakpointPosition
-  lg?: BreakpointPosition
-  xl?: BreakpointPosition
-  '2xl'?: BreakpointPosition
-  '3xl'?: BreakpointPosition
+  mobile?: BreakpointPosition
+  tablet?: BreakpointPosition
+  desktop?: BreakpointPosition
 }
 
 export type DraggableCardData = {
@@ -20,9 +16,5 @@ export type DraggableCardData = {
   title: string
   icon?: ReactNode
   image?: string
-  initialX?: number
-  initialY?: number
-  normalizedX?: number // Legacy - use positions instead
-  normalizedY?: number // Legacy - use positions instead
   positions?: BreakpointPositions // Breakpoint-specific positions
 }

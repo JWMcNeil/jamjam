@@ -49,15 +49,11 @@ const getPositionForBreakpoint = (
   breakpoint: Breakpoint,
 ): { normalizedX?: number; normalizedY?: number } => {
   if (!card.positions) {
-    // Fallback to legacy normalized coordinates
-    return {
-      normalizedX: card.normalizedX,
-      normalizedY: card.normalizedY,
-    }
+    return {}
   }
 
   // Breakpoint priority order (largest to smallest)
-  const breakpointOrder: Breakpoint[] = ['3xl', '2xl', 'xl', 'lg', 'md', 'sm', 'xs']
+  const breakpointOrder: Breakpoint[] = ['desktop', 'tablet', 'mobile']
   const currentIndex = breakpointOrder.indexOf(breakpoint)
 
   // Try current breakpoint and all smaller ones
@@ -69,11 +65,60 @@ const getPositionForBreakpoint = (
     }
   }
 
-  // Fallback to legacy normalized coordinates
-  return {
-    normalizedX: card.normalizedX,
-    normalizedY: card.normalizedY,
+  return {}
+}
+
+// Check if a position collides with existing positions
+const checkCollision = (
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  existingPositions: Array<{ x: number; y: number; width: number; height: number }>,
+  padding: number = 20,
+): boolean => {
+  for (const pos of existingPositions) {
+    if (
+      x < pos.x + pos.width + padding &&
+      x + width + padding > pos.x &&
+      y < pos.y + pos.height + padding &&
+      y + height + padding > pos.y
+    ) {
+      return true // Collision detected
+    }
   }
+  return false
+}
+
+// Generate non-overlapping random position
+const generateNonOverlappingPosition = (
+  containerWidth: number,
+  containerHeight: number,
+  cardWidth: number,
+  cardHeight: number,
+  existingPositions: Array<{ x: number; y: number; width: number; height: number }>,
+  maxAttempts: number = 100,
+): { x: number; y: number } => {
+  const padding = 20
+  const maxX = Math.max(0, containerWidth - cardWidth)
+  const maxY = Math.max(0, containerHeight - cardHeight)
+
+  // Try random positions
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const x = Math.random() * maxX
+    const y = Math.random() * maxY
+
+    if (!checkCollision(x, y, cardWidth, cardHeight, existingPositions, padding)) {
+      return { x, y }
+    }
+  }
+
+  // Fallback: stack vertically
+  const lastY =
+    existingPositions.length > 0
+      ? Math.max(...existingPositions.map((p) => p.y + p.height)) + padding
+      : 0
+  return { x: 0, y: Math.min(lastY, maxY) }
 }
 
 export const DraggableZone: React.FC<DraggableZoneProps> = ({
@@ -104,70 +149,54 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
     return () => window.removeEventListener('resize', updateSize)
   }, [])
 
-  // Deterministic hash function to generate consistent positions from card ID
-  const hashString = (str: string): number => {
-    let hash = 0
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i)
-      hash = (hash << 5) - hash + char
-      hash = hash & hash // Convert to 32-bit integer
-    }
-    return Math.abs(hash)
-  }
+  const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({})
 
-  // Generate deterministic position from card ID
-  const getDeterministicPosition = (id: string, axis: 'x' | 'y'): number => {
-    const hash = hashString(id + axis)
-    // Use modulo to get a value between 0 and 200
-    return hash % 200
-  }
-
-  const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>(() => {
-    // Initial state - will be updated when breakpoint and container size are known
-    const initial: Record<string, { x: number; y: number }> = {}
-    cards.forEach((card) => {
-      // Use deterministic positions initially, will be updated by useEffect
-      initial[card.id] = {
-        x: card.initialX ?? getDeterministicPosition(card.id, 'x'),
-        y: card.initialY ?? getDeterministicPosition(card.id, 'y'),
-      }
-    })
-    return initial
-  })
-
-  // Update positions when container size or breakpoint changes (for normalized coordinates)
+  // Update positions when container size or breakpoint changes
   useEffect(() => {
     if (containerSize.width === 0 || containerSize.height === 0) return
 
     setPositions((prev) => {
       const updated: Record<string, { x: number; y: number }> = {}
+      const existingPositions: Array<{ x: number; y: number; width: number; height: number }> = []
+
       cards.forEach((card) => {
-        const current = prev[card.id] || { x: 0, y: 0 }
         const breakpointPosition = getPositionForBreakpoint(card, currentBreakpoint)
 
-        // If card has normalized coordinates for current breakpoint, recalculate pixel position
-        if (breakpointPosition.normalizedX !== undefined) {
-          updated[card.id] = {
-            x: normalizedToPixels(breakpointPosition.normalizedX, containerSize.width, cardWidth),
-            y:
-              breakpointPosition.normalizedY !== undefined
-                ? normalizedToPixels(
-                    breakpointPosition.normalizedY,
-                    containerSize.height,
-                    cardHeight,
-                  )
-                : current.y,
-          }
-        } else if (breakpointPosition.normalizedY !== undefined) {
-          updated[card.id] = {
-            x: current.x,
-            y: normalizedToPixels(breakpointPosition.normalizedY, containerSize.height, cardHeight),
-          }
+        // If card has normalized coordinates for current breakpoint, use them
+        if (
+          breakpointPosition.normalizedX !== undefined ||
+          breakpointPosition.normalizedY !== undefined
+        ) {
+          const x =
+            breakpointPosition.normalizedX !== undefined
+              ? normalizedToPixels(breakpointPosition.normalizedX, containerSize.width, cardWidth)
+              : (prev[card.id]?.x ?? 0)
+          const y =
+            breakpointPosition.normalizedY !== undefined
+              ? normalizedToPixels(breakpointPosition.normalizedY, containerSize.height, cardHeight)
+              : (prev[card.id]?.y ?? 0)
+
+          updated[card.id] = { x, y }
+          existingPositions.push({ x, y, width: cardWidth, height: cardHeight })
         } else {
-          // Keep existing position if no normalized coordinates for this breakpoint
-          updated[card.id] = current
+          // No explicit position - generate auto-position with collision avoidance
+          const autoPosition = generateNonOverlappingPosition(
+            containerSize.width,
+            containerSize.height,
+            cardWidth,
+            cardHeight,
+            existingPositions,
+          )
+          updated[card.id] = autoPosition
+          existingPositions.push({
+            x: autoPosition.x,
+            y: autoPosition.y,
+            width: cardWidth,
+            height: cardHeight,
+          })
         }
       })
+
       return updated
     })
   }, [containerSize.width, containerSize.height, cards, cardWidth, cardHeight, currentBreakpoint])

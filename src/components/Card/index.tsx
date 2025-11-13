@@ -4,25 +4,33 @@ import useClickableCard from '@/utilities/useClickableCard'
 import Link from 'next/link'
 import React, { Fragment } from 'react'
 
-import type { Post } from '@/payload-types'
+import type { Post, Project } from '@/payload-types'
 
 import { Media } from '@/components/Media'
 
-export type CardPostData = Pick<Post, 'slug' | 'categories' | 'meta' | 'title'>
+export type CardPostData = Pick<Post, 'slug' | 'categories' | 'meta' | 'title' | 'heroImage'>
+export type CardProjectData = Pick<Project, 'slug' | 'categories' | 'meta' | 'title' | 'heroImage'>
+export type CardData = CardPostData | CardProjectData
 
 export const Card: React.FC<{
   alignItems?: 'center'
   className?: string
-  doc?: CardPostData
-  relationTo?: 'posts'
+  doc?: CardData
+  relationTo?: 'posts' | 'projects'
   showCategories?: boolean
   title?: string
 }> = (props) => {
   const { card, link } = useClickableCard({})
   const { className, doc, relationTo, showCategories, title: titleFromProps } = props
 
-  const { slug, categories, meta, title } = doc || {}
+  const { slug, categories, meta, title, heroImage } = doc || {}
   const { description, image: metaImage } = meta || {}
+
+  // Prefer heroImage over meta.image for card display
+  // heroImage can be a number (ID) or an object (populated Media), so check if it's an object
+  const displayImage =
+    (heroImage && typeof heroImage === 'object' ? heroImage : null) ||
+    (metaImage && typeof metaImage === 'object' ? metaImage : null)
 
   const hasCategories = categories && Array.isArray(categories) && categories.length > 0
   const titleToUse = titleFromProps || title
@@ -38,8 +46,10 @@ export const Card: React.FC<{
       ref={card.ref}
     >
       <div className="relative w-full ">
-        {!metaImage && <div className="">No image</div>}
-        {metaImage && typeof metaImage !== 'string' && <Media resource={metaImage} size="33vw" />}
+        {!displayImage && <div className="">No image</div>}
+        {displayImage && typeof displayImage !== 'string' && (
+          <Media resource={displayImage} size="33vw" />
+        )}
       </div>
       <div className="p-4">
         {showCategories && hasCategories && (

@@ -51,46 +51,22 @@ export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) =
       // Extract breakpoint positions if they exist
       const positions = card.positions
         ? {
-            ...(card.positions.xs && {
-              xs: {
-                normalizedX: card.positions.xs.normalizedX ?? undefined,
-                normalizedY: card.positions.xs.normalizedY ?? undefined,
+            ...(card.positions.mobile && {
+              mobile: {
+                normalizedX: card.positions.mobile.normalizedX ?? undefined,
+                normalizedY: card.positions.mobile.normalizedY ?? undefined,
               },
             }),
-            ...(card.positions.sm && {
-              sm: {
-                normalizedX: card.positions.sm.normalizedX ?? undefined,
-                normalizedY: card.positions.sm.normalizedY ?? undefined,
+            ...(card.positions.tablet && {
+              tablet: {
+                normalizedX: card.positions.tablet.normalizedX ?? undefined,
+                normalizedY: card.positions.tablet.normalizedY ?? undefined,
               },
             }),
-            ...(card.positions.md && {
-              md: {
-                normalizedX: card.positions.md.normalizedX ?? undefined,
-                normalizedY: card.positions.md.normalizedY ?? undefined,
-              },
-            }),
-            ...(card.positions.lg && {
-              lg: {
-                normalizedX: card.positions.lg.normalizedX ?? undefined,
-                normalizedY: card.positions.lg.normalizedY ?? undefined,
-              },
-            }),
-            ...(card.positions.xl && {
-              xl: {
-                normalizedX: card.positions.xl.normalizedX ?? undefined,
-                normalizedY: card.positions.xl.normalizedY ?? undefined,
-              },
-            }),
-            ...(card.positions['2xl'] && {
-              '2xl': {
-                normalizedX: card.positions['2xl'].normalizedX ?? undefined,
-                normalizedY: card.positions['2xl'].normalizedY ?? undefined,
-              },
-            }),
-            ...(card.positions['3xl'] && {
-              '3xl': {
-                normalizedX: card.positions['3xl'].normalizedX ?? undefined,
-                normalizedY: card.positions['3xl'].normalizedY ?? undefined,
+            ...(card.positions.desktop && {
+              desktop: {
+                normalizedX: card.positions.desktop.normalizedX ?? undefined,
+                normalizedY: card.positions.desktop.normalizedY ?? undefined,
               },
             }),
           }
@@ -100,12 +76,6 @@ export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) =
         id: cardId,
         title: card.title,
         ...(imageUrl && { image: imageUrl }),
-        ...(card.initialX !== null && card.initialX !== undefined && { initialX: card.initialX }),
-        ...(card.initialY !== null && card.initialY !== undefined && { initialY: card.initialY }),
-        ...(card.normalizedX !== null &&
-          card.normalizedX !== undefined && { normalizedX: card.normalizedX }),
-        ...(card.normalizedY !== null &&
-          card.normalizedY !== undefined && { normalizedY: card.normalizedY }),
         ...(positions && Object.keys(positions).length > 0 && { positions }),
       }
       return cardData

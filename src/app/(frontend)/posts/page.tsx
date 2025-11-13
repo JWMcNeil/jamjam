@@ -49,7 +49,7 @@ export default async function Page() {
 
       <div className="container">
         {posts.totalPages > 1 && posts.page && (
-          <Pagination page={posts.page} totalPages={posts.totalPages} />
+          <Pagination page={posts.page} totalPages={posts.totalPages} basePath="/posts" />
         )}
       </div>
     </div>
@@ -58,6 +58,6 @@ export default async function Page() {
 
 export function generateMetadata(): Metadata {
   return {
-    title: `Payload Website Template Posts`,
+    title: `JamJamDev Posts`,
   }
 }
