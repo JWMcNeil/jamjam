@@ -7,6 +7,7 @@ import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { ContentCardBlock } from '@/blocks/ContentCard/Component'
 import { DraggableCardsBlock } from '@/blocks/DraggableCards/Component'
+import { TechStackCanvasBlock } from '@/blocks/TechStackCanvas/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { GridBlock } from '@/blocks/Grid/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
@@ -20,6 +21,7 @@ const blockComponents = {
   contentCard: ContentCardBlock,
   cta: CallToActionBlock,
   draggableCards: DraggableCardsBlock,
+  techStackCanvas: TechStackCanvasBlock,
   formBlock: FormBlock,
   grid: GridBlock,
   mediaBlock: MediaBlock,

@@ -1,15 +1,15 @@
 import type { Block } from 'payload'
 
-export const DraggableCards: Block = {
-  slug: 'draggableCards',
-  interfaceName: 'DraggableCardsBlock',
+export const TechStackCanvas: Block = {
+  slug: 'techStackCanvas',
+  interfaceName: 'TechStackCanvasBlock',
   fields: [
     {
       name: 'title',
       type: 'text',
       label: 'Block Title',
       admin: {
-        description: 'Optional title to display above the draggable cards',
+        description: 'Optional title to display above the tech stack canvas',
       },
     },
     {
@@ -17,7 +17,7 @@ export const DraggableCards: Block = {
       type: 'textarea',
       label: 'Description',
       admin: {
-        description: 'Optional description to display above the draggable cards',
+        description: 'Optional description to display above the tech stack canvas',
       },
     },
     {
@@ -28,7 +28,7 @@ export const DraggableCards: Block = {
       minRows: 1,
       admin: {
         description:
-          'Add draggable cards. Each card can have a title and an image (SVG or regular image).',
+          'Add tech stack cards. Each card can have a title, image, and category for filtering.',
       },
       fields: [
         {
@@ -50,8 +50,9 @@ export const DraggableCards: Block = {
           name: 'category',
           type: 'select',
           label: 'Category',
+          required: true,
           admin: {
-            description: 'Optional category for organizing cards. Used for filtering and grouping.',
+            description: 'Category for organizing and filtering cards.',
           },
           options: [
             {
@@ -156,15 +157,15 @@ export const DraggableCards: Block = {
       name: 'containerWidth',
       type: 'select',
       label: 'Container Width',
-      defaultValue: 'full',
+      defaultValue: 'container',
       options: [
-        {
-          label: 'Full Width',
-          value: 'full',
-        },
         {
           label: 'Container',
           value: 'container',
+        },
+        {
+          label: 'Full Width',
+          value: 'full',
         },
       ],
     },
@@ -174,17 +175,18 @@ export const DraggableCards: Block = {
       label: 'Container Height (px)',
       defaultValue: 600,
       admin: {
-        description: 'Minimum height of the draggable container in pixels',
+        description: 'Minimum height of the tech stack canvas in pixels',
       },
       min: 300,
       max: 2000,
     },
   ],
   graphQL: {
-    singularName: 'DraggableCardsBlock',
+    singularName: 'TechStackCanvasBlock',
   },
   labels: {
-    plural: 'Draggable Cards',
-    singular: 'Draggable Cards',
+    plural: 'Tech Stack Canvas',
+    singular: 'Tech Stack Canvas',
   },
 }
+

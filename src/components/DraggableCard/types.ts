@@ -11,10 +11,13 @@ export type BreakpointPositions = {
   desktop?: BreakpointPosition
 }
 
+export type TechCategory = 'frontend' | 'backend' | 'database' | 'infrastructure' | 'tooling'
+
 export type DraggableCardData = {
   id: string
   title: string
   icon?: ReactNode
   image?: string
+  category?: TechCategory
   positions?: BreakpointPositions // Breakpoint-specific positions
 }

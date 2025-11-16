@@ -8,6 +8,7 @@ import { Carousel } from '../../blocks/Carousel/config'
 import { Content } from '../../blocks/Content/config'
 import { ContentCard } from '../../blocks/ContentCard/config'
 import { DraggableCards } from '../../blocks/DraggableCards/config'
+import { TechStackCanvas } from '../../blocks/TechStackCanvas/config'
 import { FormBlock } from '../../blocks/Form/config'
 import { Grid } from '../../blocks/Grid/config'
 import { ImageMasonryGrid } from '../../blocks/ImageMasonryGrid/config'
@@ -112,6 +113,7 @@ export const Projects: CollectionConfig<'projects'> = {
                 Content,
                 ContentCard,
                 DraggableCards,
+                TechStackCanvas,
                 Grid,
                 MediaBlock,
                 Archive,

@@ -2,10 +2,15 @@ import { cn } from '@/utilities/ui'
 import React from 'react'
 import RichText from '@/components/RichText'
 
-import type { ContentBlock as ContentBlockProps, ContentCardBlock } from '@/payload-types'
+import type {
+  ContentBlock as ContentBlockProps,
+  ContentCardBlock,
+  TechStackCanvasBlock,
+} from '@/payload-types'
 
 import { CMSLink } from '../../components/Link'
 import { ContentCardBlock as ContentCardBlockComponent } from '@/blocks/ContentCard/Component'
+import { TechStackCanvasBlock as TechStackCanvasBlockComponent } from '@/blocks/TechStackCanvas/Component'
 
 export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
   const { columns } = props
@@ -23,7 +28,12 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
         <div className="grid grid-cols-4 lg:grid-cols-12 gap-y-8 gap-x-16">
           {columns.map((col, index) => {
             const { enableLink, link, richText, size } = col
-            const contentCard = (col as any).contentCard as ContentCardBlock[] | undefined
+            const contentCard = (col as typeof col & {
+              contentCard?: ContentCardBlock[]
+            }).contentCard
+            const techStackCanvas = (col as typeof col & {
+              techStackCanvas?: TechStackCanvasBlock[]
+            }).techStackCanvas
 
             return (
               <div
@@ -39,6 +49,17 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                       return (
                         <div key={block.id || blockIndex}>
                           <ContentCardBlockComponent {...block} />
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+                {techStackCanvas && techStackCanvas.length > 0 && (
+                  <div className="mt-4">
+                    {techStackCanvas.map((block: TechStackCanvasBlock, blockIndex: number) => {
+                      return (
+                        <div key={block.id || blockIndex}>
+                          <TechStackCanvasBlockComponent {...block} />
                         </div>
                       )
                     })}

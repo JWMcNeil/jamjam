@@ -10,6 +10,7 @@ import {
 
 import { link } from '@/fields/link'
 import { ContentCard } from '@/blocks/ContentCard/config'
+import { TechStackCanvas } from '@/blocks/TechStackCanvas/config'
 
 const columnFields: Field[] = [
   {
@@ -71,6 +72,15 @@ const columnFields: Field[] = [
     blocks: [ContentCard],
     admin: {
       description: 'Optionally add a content card to this column',
+    },
+  },
+  {
+    name: 'techStackCanvas',
+    type: 'blocks',
+    label: 'Tech Stack Canvas',
+    blocks: [TechStackCanvas],
+    admin: {
+      description: 'Optionally add a tech stack canvas to this column',
     },
   },
 ]

@@ -1,14 +1,20 @@
 'use client'
 
 import React from 'react'
-import type { DraggableCardsBlock as DraggableCardsBlockProps } from '@/payload-types'
-import { DraggableZoneClientWrapper } from '@/components/DraggableZone/ClientWrapper'
+import type { TechStackCanvasBlock as TechStackCanvasBlockProps } from '@/payload-types'
+import { TechStackCanvasClientWrapper } from '@/components/TechStackCanvas/ClientWrapper'
 import type { DraggableCardData } from '@/components/DraggableCard/types'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 import type { Media as MediaType } from '@/payload-types'
 
-export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) => {
-  const { title, description, cards, containerWidth = 'full', containerHeight = 600 } = props
+export const TechStackCanvasBlock: React.FC<TechStackCanvasBlockProps> = (props) => {
+  const {
+    title,
+    description,
+    cards,
+    containerWidth = 'container',
+    containerHeight = 600,
+  } = props
 
   if (!cards || cards.length === 0) {
     return null
@@ -28,7 +34,6 @@ export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) =
 
         // Handle different media structures
         if (typeof card.image === 'object') {
-          // Could be direct media object or nested structure
           if ('value' in card.image) {
             media = card.image.value as MediaType
           } else {
@@ -86,14 +91,14 @@ export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) =
   const widthClass = containerWidth === 'container' ? 'container' : 'w-full'
 
   return (
-    <div className={`${widthClass} py-16`}>
+    <div className={widthClass}>
       {(title || description) && (
         <div className="mb-8">
           {title && <h2 className="text-3xl font-bold mb-4">{title}</h2>}
           {description && <p className="text-muted-foreground">{description}</p>}
         </div>
       )}
-      <DraggableZoneClientWrapper
+      <TechStackCanvasClientWrapper
         cards={draggableCards}
         width="w-full"
         height={`min-h-[${containerHeight}px]`}
@@ -102,3 +107,4 @@ export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) =
     </div>
   )
 }
+

@@ -7,6 +7,7 @@ import { CallToAction } from '../../blocks/CallToAction/config'
 import { Content } from '../../blocks/Content/config'
 import { ContentCard } from '../../blocks/ContentCard/config'
 import { DraggableCards } from '../../blocks/DraggableCards/config'
+import { TechStackCanvas } from '../../blocks/TechStackCanvas/config'
 import { FormBlock } from '../../blocks/Form/config'
 import { Grid } from '../../blocks/Grid/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
@@ -75,7 +76,7 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, ContentCard, DraggableCards, Grid, MediaBlock, Archive, FormBlock],
+              blocks: [CallToAction, Content, ContentCard, DraggableCards, TechStackCanvas, Grid, MediaBlock, Archive, FormBlock],
               required: true,
               admin: {
                 initCollapsed: true,
