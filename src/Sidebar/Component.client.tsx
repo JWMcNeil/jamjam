@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import type { Sidebar } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
+import { Tooltip } from '@/components/ui/tooltip'
 
 interface SidebarClientProps {
   data: Sidebar
@@ -40,11 +41,21 @@ export const SidebarClient: React.FC<SidebarClientProps> = ({ data }) => {
         className="flex flex-col items-center py-4 gap-4 min-h-96  flex-1"
       >
         {visibleNavItems.map(({ link }, i) => {
-          return (
-            <CMSLink key={i} {...link} className="text-muted-foreground hover:text-foreground">
+          const linkElement = (
+            <CMSLink {...link} className="text-muted-foreground hover:text-foreground">
               {/* Icon or label can be added here */}
             </CMSLink>
           )
+
+          if (link?.label) {
+            return (
+              <Tooltip key={i} content={link.label} position="right">
+                {linkElement}
+              </Tooltip>
+            )
+          }
+
+          return <React.Fragment key={i}>{linkElement}</React.Fragment>
         })}
       </nav>
       <div className="bg-[repeating-linear-gradient(45deg,#303030,#303030_3.5px,#080808_3.5px,#080808_17.5px)] w-full h-1/2 border-y border-border overflow-hidden"></div>

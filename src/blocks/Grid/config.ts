@@ -1,5 +1,6 @@
 import type { Block } from 'payload'
 
+import { Content } from '@/blocks/Content/config'
 import { ContentCard } from '@/blocks/ContentCard/config'
 
 export const Grid: Block = {
@@ -12,11 +13,12 @@ export const Grid: Block = {
       label: 'Content Cards',
       required: true,
       minRows: 1,
-      blocks: [ContentCard],
+      blocks: [ContentCard, Content],
       admin: {
-        description: 'Add multiple content cards to display in a grid layout',
+        description: 'Add multiple content cards or content blocks to display in a grid layout',
       },
     },
+
     {
       name: 'columns',
       type: 'select',

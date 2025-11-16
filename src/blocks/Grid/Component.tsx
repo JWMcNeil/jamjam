@@ -1,7 +1,8 @@
 import React from 'react'
 
-import type { GridBlock as GridBlockProps, ContentCardBlock } from '@/payload-types'
+import type { GridBlock as GridBlockProps, ContentCardBlock, ContentBlock } from '@/payload-types'
 
+import { ContentBlock as ContentBlockComponent } from '@/blocks/Content/Component'
 import { ContentCardBlock as ContentCardBlockComponent } from '@/blocks/ContentCard/Component'
 
 export const GridBlock: React.FC<GridBlockProps> = (props) => {
@@ -23,10 +24,20 @@ export const GridBlock: React.FC<GridBlockProps> = (props) => {
   return (
     <div className="container my-16">
       <div className={`grid ${gridClass} gap-8`}>
-        {contentCards.map((card: ContentCardBlock, index: number) => {
+        {contentCards.map((block: ContentCardBlock | ContentBlock, index: number) => {
+          const { blockType } = block
+
+          if (blockType === 'content') {
+            return (
+              <div key={block.id || index}>
+                <ContentBlockComponent {...(block as ContentBlock)} />
+              </div>
+            )
+          }
+
           return (
-            <div key={card.id || index}>
-              <ContentCardBlockComponent {...card} />
+            <div key={block.id || index}>
+              <ContentCardBlockComponent {...(block as ContentCardBlock)} />
             </div>
           )
         })}

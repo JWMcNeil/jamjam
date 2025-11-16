@@ -19,6 +19,8 @@ import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 
+import icon16 from '../public/jamjam-icon-16.png'
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -27,6 +29,13 @@ export default buildConfig({
     meta: {
       titleSuffix: ' - jamjam.dev',
       description: 'jamjam.dev',
+      icons: [
+        {
+          rel: 'icon',
+          type: 'image/png',
+          url: icon16.src,
+        },
+      ],
     },
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.

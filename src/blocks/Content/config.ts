@@ -5,9 +5,11 @@ import {
   HeadingFeature,
   InlineToolbarFeature,
   lexicalEditor,
+  UnorderedListFeature,
 } from '@payloadcms/richtext-lexical'
 
 import { link } from '@/fields/link'
+import { ContentCard } from '@/blocks/ContentCard/config'
 
 const columnFields: Field[] = [
   {
@@ -43,6 +45,7 @@ const columnFields: Field[] = [
           HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
           FixedToolbarFeature(),
           InlineToolbarFeature(),
+          UnorderedListFeature(),
         ]
       },
     }),
@@ -61,6 +64,15 @@ const columnFields: Field[] = [
       },
     },
   }),
+  {
+    name: 'contentCard',
+    type: 'blocks',
+    label: 'Content Card',
+    blocks: [ContentCard],
+    admin: {
+      description: 'Optionally add a content card to this column',
+    },
+  },
 ]
 
 export const Content: Block = {

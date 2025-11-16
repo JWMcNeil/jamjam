@@ -68,7 +68,7 @@ export const ProjectHero: React.FC<{
           </div> */}
         </div>
       </div>
-      <div className="min-h-[80vh] select-none">
+      <div className="min-h-[40vh] select-none">
         {heroImage && typeof heroImage !== 'string' && (
           <Media fill priority imgClassName="-z-10 object-cover" resource={heroImage} />
         )}

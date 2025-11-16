@@ -23,30 +23,7 @@ const mobileNavItems = [
       icon: null,
     },
   },
-  {
-    link: {
-      type: 'reference' as const,
-      label: 'Posts',
-      url: '/posts',
-      reference: null,
-      newTab: null,
-      appearance: null,
-      size: null,
-      icon: null,
-    },
-  },
-  {
-    link: {
-      type: 'reference' as const,
-      label: 'Projects',
-      url: '/projects',
-      reference: null,
-      newTab: null,
-      appearance: null,
-      size: null,
-      icon: null,
-    },
-  },
+
   {
     link: {
       type: 'reference' as const,
@@ -76,6 +53,30 @@ const mobileNavItems = [
       type: 'reference' as const,
       label: 'Videography',
       url: '/videography',
+      reference: null,
+      newTab: null,
+      appearance: null,
+      size: null,
+      icon: null,
+    },
+  },
+  {
+    link: {
+      type: 'reference' as const,
+      label: 'Posts',
+      url: '/posts',
+      reference: null,
+      newTab: null,
+      appearance: null,
+      size: null,
+      icon: null,
+    },
+  },
+  {
+    link: {
+      type: 'reference' as const,
+      label: 'About',
+      url: '/about',
       reference: null,
       newTab: null,
       appearance: null,
