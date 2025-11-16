@@ -270,6 +270,10 @@ export interface Page {
          */
         image?: (number | null) | Media;
         /**
+         * Select the size of the card (small, medium, or large).
+         */
+        size?: ('sm' | 'md' | 'lg') | null;
+        /**
          * Set positions for different screen sizes. Positions are stored as normalized values (0-1) for responsiveness. Cards without positions will be automatically spaced.
          */
         positions?: {
@@ -299,6 +303,7 @@ export interface Page {
     | ContentBlock
     | ContentCardBlock
     | DraggableCardsBlock
+    | TechStackCanvasBlock
     | GridBlock
     | MediaBlock
     | ArchiveBlock
@@ -530,6 +535,7 @@ export interface Project {
     | ContentBlock
     | ContentCardBlock
     | DraggableCardsBlock
+    | TechStackCanvasBlock
     | GridBlock
     | MediaBlock
     | ArchiveBlock
@@ -672,6 +678,14 @@ export interface ContentBlock {
            */
           size?: 'default' | null;
         };
+        /**
+         * Optionally add a content card to this column
+         */
+        contentCard?: ContentCardBlock[] | null;
+        /**
+         * Optionally add a tech stack canvas to this column
+         */
+        techStackCanvas?: TechStackCanvasBlock[] | null;
         id?: string | null;
       }[]
     | null;
@@ -739,6 +753,64 @@ export interface ContentCardBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TechStackCanvasBlock".
+ */
+export interface TechStackCanvasBlock {
+  /**
+   * Optional title to display above the tech stack canvas
+   */
+  title?: string | null;
+  /**
+   * Optional description to display above the tech stack canvas
+   */
+  description?: string | null;
+  /**
+   * Add tech stack cards. Each card can have a title, image, and category for filtering.
+   */
+  cards: {
+    title: string;
+    /**
+     * Upload an image or SVG file. This will be displayed in the card.
+     */
+    image?: (number | null) | Media;
+    /**
+     * Category for organizing and filtering cards.
+     */
+    category: 'frontend' | 'backend' | 'database' | 'infrastructure' | 'tooling';
+    /**
+     * Select the size of the card (small, medium, or large).
+     */
+    size?: ('sm' | 'md' | 'lg') | null;
+    /**
+     * Set positions for different screen sizes. Positions are stored as normalized values (0-1) for responsiveness. Cards without positions will be automatically spaced.
+     */
+    positions?: {
+      mobile?: {
+        normalizedX?: number | null;
+        normalizedY?: number | null;
+      };
+      tablet?: {
+        normalizedX?: number | null;
+        normalizedY?: number | null;
+      };
+      desktop?: {
+        normalizedX?: number | null;
+        normalizedY?: number | null;
+      };
+    };
+    id?: string | null;
+  }[];
+  containerWidth?: ('container' | 'full') | null;
+  /**
+   * Minimum height of the tech stack canvas in pixels
+   */
+  containerHeight?: number | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'techStackCanvas';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "DraggableCardsBlock".
  */
 export interface DraggableCardsBlock {
@@ -759,6 +831,14 @@ export interface DraggableCardsBlock {
      * Upload an image or SVG file. This will be displayed in the card.
      */
     image?: (number | null) | Media;
+    /**
+     * Optional category for organizing cards. Used for filtering and grouping.
+     */
+    category?: ('frontend' | 'backend' | 'database' | 'infrastructure' | 'tooling') | null;
+    /**
+     * Select the size of the card (small, medium, or large).
+     */
+    size?: ('sm' | 'md' | 'lg') | null;
     /**
      * Set positions for different screen sizes. Positions are stored as normalized values (0-1) for responsiveness. Cards without positions will be automatically spaced.
      */
@@ -793,9 +873,9 @@ export interface DraggableCardsBlock {
  */
 export interface GridBlock {
   /**
-   * Add multiple content cards to display in a grid layout
+   * Add multiple content cards or content blocks to display in a grid layout
    */
-  contentCards: ContentCardBlock[];
+  contentCards: (ContentCardBlock | ContentBlock)[];
   /**
    * Number of columns in the grid (responsive: fewer columns on smaller screens)
    */
@@ -1488,6 +1568,7 @@ export interface PagesSelect<T extends boolean = true> {
                 | {
                     title?: T;
                     image?: T;
+                    size?: T;
                     positions?:
                       | T
                       | {
@@ -1522,6 +1603,7 @@ export interface PagesSelect<T extends boolean = true> {
         content?: T | ContentBlockSelect<T>;
         contentCard?: T | ContentCardBlockSelect<T>;
         draggableCards?: T | DraggableCardsBlockSelect<T>;
+        techStackCanvas?: T | TechStackCanvasBlockSelect<T>;
         grid?: T | GridBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
@@ -1588,6 +1670,16 @@ export interface ContentBlockSelect<T extends boolean = true> {
               appearance?: T;
               size?: T;
             };
+        contentCard?:
+          | T
+          | {
+              contentCard?: T | ContentCardBlockSelect<T>;
+            };
+        techStackCanvas?:
+          | T
+          | {
+              techStackCanvas?: T | TechStackCanvasBlockSelect<T>;
+            };
         id?: T;
       };
   id?: T;
@@ -1632,6 +1724,49 @@ export interface ContentCardBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TechStackCanvasBlock_select".
+ */
+export interface TechStackCanvasBlockSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  cards?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        category?: T;
+        size?: T;
+        positions?:
+          | T
+          | {
+              mobile?:
+                | T
+                | {
+                    normalizedX?: T;
+                    normalizedY?: T;
+                  };
+              tablet?:
+                | T
+                | {
+                    normalizedX?: T;
+                    normalizedY?: T;
+                  };
+              desktop?:
+                | T
+                | {
+                    normalizedX?: T;
+                    normalizedY?: T;
+                  };
+            };
+        id?: T;
+      };
+  containerWidth?: T;
+  containerHeight?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "DraggableCardsBlock_select".
  */
 export interface DraggableCardsBlockSelect<T extends boolean = true> {
@@ -1642,6 +1777,8 @@ export interface DraggableCardsBlockSelect<T extends boolean = true> {
     | {
         title?: T;
         image?: T;
+        category?: T;
+        size?: T;
         positions?:
           | T
           | {
@@ -1680,6 +1817,7 @@ export interface GridBlockSelect<T extends boolean = true> {
     | T
     | {
         contentCard?: T | ContentCardBlockSelect<T>;
+        content?: T | ContentBlockSelect<T>;
       };
   columns?: T;
   id?: T;
@@ -1901,6 +2039,7 @@ export interface ProjectsSelect<T extends boolean = true> {
         content?: T | ContentBlockSelect<T>;
         contentCard?: T | ContentCardBlockSelect<T>;
         draggableCards?: T | DraggableCardsBlockSelect<T>;
+        techStackCanvas?: T | TechStackCanvasBlockSelect<T>;
         grid?: T | GridBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;

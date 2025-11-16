@@ -14,8 +14,22 @@ import { cn } from '@/utilities/ui'
 import React, { useRef, useState, useEffect } from 'react'
 
 import { DraggableCard } from '@/components/DraggableCard'
-import type { DraggableCardData } from '@/components/DraggableCard/types'
+import type { DraggableCardData, CardSize } from '@/components/DraggableCard/types'
 import { useBreakpoint, type Breakpoint } from '@/hooks/useBreakpoint'
+
+// Card dimension estimates based on size (width, height)
+const getCardDimensions = (size: CardSize = 'md'): { width: number; height: number } => {
+  switch (size) {
+    case 'sm':
+      return { width: 125, height: 160 } // ~100-150px width, title bar + content
+    case 'md':
+      return { width: 200, height: 220 } // ~150-250px width, title bar + content
+    case 'lg':
+      return { width: 275, height: 280 } // ~200-350px width, title bar + content
+    default:
+      return { width: 200, height: 220 }
+  }
+}
 
 type DraggableZoneProps = {
   cards: DraggableCardData[]
@@ -130,8 +144,6 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
-  const cardWidth = 200 // Fixed card width
-  const cardHeight = 200 // Approximate card height (title bar ~40px + content ~160px)
   const currentBreakpoint = useBreakpoint()
 
   useEffect(() => {
@@ -160,6 +172,7 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
       const existingPositions: Array<{ x: number; y: number; width: number; height: number }> = []
 
       cards.forEach((card) => {
+        const cardDimensions = getCardDimensions(card.size)
         const breakpointPosition = getPositionForBreakpoint(card, currentBreakpoint)
 
         // If card has normalized coordinates for current breakpoint, use them
@@ -169,37 +182,37 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
         ) {
           const x =
             breakpointPosition.normalizedX !== undefined
-              ? normalizedToPixels(breakpointPosition.normalizedX, containerSize.width, cardWidth)
+              ? normalizedToPixels(breakpointPosition.normalizedX, containerSize.width, cardDimensions.width)
               : (prev[card.id]?.x ?? 0)
           const y =
             breakpointPosition.normalizedY !== undefined
-              ? normalizedToPixels(breakpointPosition.normalizedY, containerSize.height, cardHeight)
+              ? normalizedToPixels(breakpointPosition.normalizedY, containerSize.height, cardDimensions.height)
               : (prev[card.id]?.y ?? 0)
 
           updated[card.id] = { x, y }
-          existingPositions.push({ x, y, width: cardWidth, height: cardHeight })
+          existingPositions.push({ x, y, width: cardDimensions.width, height: cardDimensions.height })
         } else {
           // No explicit position - generate auto-position with collision avoidance
           const autoPosition = generateNonOverlappingPosition(
             containerSize.width,
             containerSize.height,
-            cardWidth,
-            cardHeight,
+            cardDimensions.width,
+            cardDimensions.height,
             existingPositions,
           )
           updated[card.id] = autoPosition
           existingPositions.push({
             x: autoPosition.x,
             y: autoPosition.y,
-            width: cardWidth,
-            height: cardHeight,
+            width: cardDimensions.width,
+            height: cardDimensions.height,
           })
         }
       })
 
       return updated
     })
-  }, [containerSize.width, containerSize.height, cards, cardWidth, cardHeight, currentBreakpoint])
+  }, [containerSize.width, containerSize.height, cards, currentBreakpoint])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -227,17 +240,21 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
       const newX = current.x + delta.x
       const newY = current.y + delta.y
 
+      // Find the card to get its dimensions
+      const card = cards.find((c) => c.id === active.id)
+      const cardDimensions = getCardDimensions(card?.size)
+
       // Constrain within container bounds
-      const maxX = Math.max(0, containerSize.width - cardWidth)
-      const maxY = Math.max(0, containerSize.height - cardHeight)
+      const maxX = Math.max(0, containerSize.width - cardDimensions.width)
+      const maxY = Math.max(0, containerSize.height - cardDimensions.height)
 
       const constrainedX = Math.max(0, Math.min(newX, maxX))
       const constrainedY = Math.max(0, Math.min(newY, maxY))
 
       // Convert to normalized coordinates for potential saving
       // This could be passed to a callback or saved via API
-      const normalizedX = pixelsToNormalized(constrainedX, containerSize.width, cardWidth)
-      const normalizedY = pixelsToNormalized(constrainedY, containerSize.height, cardHeight)
+      const normalizedX = pixelsToNormalized(constrainedX, containerSize.width, cardDimensions.width)
+      const normalizedY = pixelsToNormalized(constrainedY, containerSize.height, cardDimensions.height)
 
       // Store normalized coordinates in a way that can be accessed later
       // You could emit an event or call a callback here to save positions
@@ -285,7 +302,6 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
             <DraggableCard
               key={card.id}
               card={card}
-              className="w-[200px]"
               style={{
                 left: `${position.x}px`,
                 top: `${position.y}px`,

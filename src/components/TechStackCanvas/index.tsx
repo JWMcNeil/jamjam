@@ -151,11 +151,11 @@ const generateNonOverlappingPosition = (
 ): { x: number; y: number } => {
   const padding = 20
   const maxX = Math.max(0, containerWidth - cardWidth)
-  
+
   // If zone is provided, constrain Y to zone bounds
   let minY = 0
   let maxY = Math.max(0, containerHeight - cardHeight)
-  
+
   if (zone) {
     minY = Math.max(0, zone.top)
     maxY = Math.min(maxY, zone.top + zone.height - cardHeight)
@@ -364,11 +364,11 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
           const x =
             breakpointPosition.normalizedX !== undefined
               ? normalizedToPixels(breakpointPosition.normalizedX, containerSize.width, cardWidth)
-              : prev[card.id]?.x ?? 0
+              : (prev[card.id]?.x ?? 0)
           const y =
             breakpointPosition.normalizedY !== undefined
               ? normalizedToPixels(breakpointPosition.normalizedY, containerSize.height, cardHeight)
-              : prev[card.id]?.y ?? 0
+              : (prev[card.id]?.y ?? 0)
 
           updated[card.id] = { x, y }
           if (cardCategory !== 'uncategorized') {
@@ -381,9 +381,7 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
           }
         } else {
           // Find the zone for this card's category
-          const zone = card.category
-            ? zones.find((z) => z.category === card.category)
-            : undefined
+          const zone = card.category ? zones.find((z) => z.category === card.category) : undefined
 
           const existingPositions =
             cardCategory !== 'uncategorized'
@@ -412,7 +410,16 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
 
       return updated
     })
-  }, [containerSize.width, containerSize.height, cards, cardWidth, cardHeight, currentBreakpoint, zones, resetTrigger])
+  }, [
+    containerSize.width,
+    containerSize.height,
+    cards,
+    cardWidth,
+    cardHeight,
+    currentBreakpoint,
+    zones,
+    resetTrigger,
+  ])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -492,57 +499,48 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
         {/* Category Tabs */}
         <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setSelectedCategory('all')}
-          className={cn(
-            'px-4 py-2 rounded-md text-sm font-medium transition-colors duration-300 ease-in-out',
-            selectedCategory === 'all'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted text-muted-foreground hover:bg-muted/80',
-          )}
-        >
-          All
-        </button>
-        {CATEGORIES.map(({ value, label }) => {
-          const tabColors = TAB_COLORS[value]
-          return (
-            <button
-              key={value}
-              onClick={() => setSelectedCategory(value)}
-              className={cn(
-                'px-4 py-2 rounded-md text-sm font-medium transition-colors duration-300 ease-in-out',
-                selectedCategory === value
-                  ? `${tabColors.bg} ${tabColors.text}`
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
-              )}
-            >
-              {label}
-            </button>
-          )
-        })}
+          <button
+            onClick={() => setSelectedCategory('all')}
+            className={cn(
+              'px-4 py-2 rounded-md text-sm font-medium transition-colors duration-300 ease-in-out',
+              selectedCategory === 'all'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80',
+            )}
+          >
+            All
+          </button>
+          {CATEGORIES.map(({ value, label }) => {
+            const tabColors = TAB_COLORS[value]
+            return (
+              <button
+                key={value}
+                onClick={() => setSelectedCategory(value)}
+                className={cn(
+                  'px-4 py-2 rounded-md text-sm font-medium transition-colors duration-300 ease-in-out',
+                  selectedCategory === value
+                    ? `${tabColors.bg} ${tabColors.text}`
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80',
+                )}
+              >
+                {label}
+              </button>
+            )
+          })}
         </div>
 
         {/* Controls Right Side */}
         <div className="flex items-center gap-4">
           {/* Show Zones Switch */}
           <div className="flex items-center gap-2">
-            <Switch
-              id="show-zones"
-              checked={showZones}
-              onCheckedChange={setShowZones}
-            />
+            <Switch id="show-zones" checked={showZones} onCheckedChange={setShowZones} />
             <Label htmlFor="show-zones" className="text-sm cursor-pointer">
               Show Zones
             </Label>
           </div>
 
           {/* Reset Button */}
-          <Button
-            onClick={handleReset}
-            variant="outline"
-            size="sm"
-            aria-label="Reset positions"
-          >
+          <Button onClick={handleReset} variant="outline" size="sm" aria-label="Reset positions">
             <RotateCcw className="h-4 w-4" />
             <span className="text-sm">Reset</span>
           </Button>
@@ -567,7 +565,7 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
         >
           {/* Dotted Grid Background */}
           <div
-            className="absolute inset-0 opacity-30"
+            className="absolute inset-0 opacity-30 border border-border rounded-md"
             style={{
               backgroundImage: `radial-gradient(circle, hsl(var(--foreground)) 1px, transparent 1px)`,
               backgroundSize: '20px 20px',
@@ -601,7 +599,7 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
               <DraggableCard
                 key={card.id}
                 card={card}
-                className="w-[200px] transition-opacity duration-300 ease-in-out"
+                className="w-[200px] transition-opacity duration-300 ease-in-out m-4"
                 style={{
                   left: `${position.x}px`,
                   top: `${position.y}px`,
@@ -615,4 +613,3 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
     </div>
   )
 }
-

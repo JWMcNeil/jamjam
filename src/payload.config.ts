@@ -29,13 +29,6 @@ export default buildConfig({
     meta: {
       titleSuffix: ' - jamjam.dev',
       description: 'jamjam.dev',
-      icons: [
-        {
-          rel: 'icon',
-          type: 'image/png',
-          url: icon16.src,
-        },
-      ],
     },
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
@@ -76,7 +69,7 @@ export default buildConfig({
   editor: defaultLexical,
   db: sqliteAdapter({
     client: {
-      url: process.env.DATABASE_URI || '',
+      url: process.env.DATABASE_URI || `file:${path.resolve(dirname, '../jamjam.db')}`,
     },
     // Temporarily disable push to avoid freezing on column deletion
     // Run migrations instead: pnpm payload migrate

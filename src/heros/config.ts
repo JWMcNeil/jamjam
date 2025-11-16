@@ -241,6 +241,29 @@ export const hero: Field = {
               },
             },
             {
+              name: 'size',
+              type: 'select',
+              label: 'Card Size',
+              defaultValue: 'md',
+              admin: {
+                description: 'Select the size of the card (small, medium, or large).',
+              },
+              options: [
+                {
+                  label: 'Small',
+                  value: 'sm',
+                },
+                {
+                  label: 'Medium',
+                  value: 'md',
+                },
+                {
+                  label: 'Large',
+                  value: 'lg',
+                },
+              ],
+            },
+            {
               name: 'positions',
               type: 'group',
               label: 'Responsive Positions',

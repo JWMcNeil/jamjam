@@ -8,13 +8,7 @@ import { getMediaUrl } from '@/utilities/getMediaUrl'
 import type { Media as MediaType } from '@/payload-types'
 
 export const TechStackCanvasBlock: React.FC<TechStackCanvasBlockProps> = (props) => {
-  const {
-    title,
-    description,
-    cards,
-    containerWidth = 'container',
-    containerHeight = 600,
-  } = props
+  const { title, description, cards, containerWidth = 'container', containerHeight = 600 } = props
 
   if (!cards || cards.length === 0) {
     return null
@@ -82,6 +76,7 @@ export const TechStackCanvasBlock: React.FC<TechStackCanvasBlockProps> = (props)
         title: card.title,
         ...(imageUrl && { image: imageUrl }),
         ...(card.category && { category: card.category as DraggableCardData['category'] }),
+        ...(card.size && { size: card.size as DraggableCardData['size'] }),
         ...(positions && Object.keys(positions).length > 0 && { positions }),
       }
       return cardData
@@ -107,4 +102,3 @@ export const TechStackCanvasBlock: React.FC<TechStackCanvasBlockProps> = (props)
     </div>
   )
 }
-

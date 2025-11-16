@@ -77,6 +77,7 @@ export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) =
         title: card.title,
         ...(imageUrl && { image: imageUrl }),
         ...(card.category && { category: card.category as DraggableCardData['category'] }),
+        ...(card.size && { size: card.size as DraggableCardData['size'] }),
         ...(positions && Object.keys(positions).length > 0 && { positions }),
       }
       return cardData

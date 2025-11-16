@@ -30,4 +30,3 @@ export const TechStackCanvasClientWrapper: React.FC<TechStackCanvasClientWrapper
 ) => {
   return <TechStackCanvas {...props} />
 }
-

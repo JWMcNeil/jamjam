@@ -12,6 +12,7 @@ export type BreakpointPositions = {
 }
 
 export type TechCategory = 'frontend' | 'backend' | 'database' | 'infrastructure' | 'tooling'
+export type CardSize = 'sm' | 'md' | 'lg'
 
 export type DraggableCardData = {
   id: string
@@ -19,5 +20,6 @@ export type DraggableCardData = {
   icon?: ReactNode
   image?: string
   category?: TechCategory
+  size?: CardSize
   positions?: BreakpointPositions // Breakpoint-specific positions
 }

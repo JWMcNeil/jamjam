@@ -127,6 +127,7 @@ export const CustomHero: React.FC<CustomHeroType> = ({
             tablet?: { normalizedX?: number | null; normalizedY?: number | null }
             desktop?: { normalizedX?: number | null; normalizedY?: number | null }
           }
+          size?: 'sm' | 'md' | 'lg' | null
         }
 
         const positions = cardWithPositions.positions
@@ -156,6 +157,7 @@ export const CustomHero: React.FC<CustomHeroType> = ({
           id: cardId,
           title: card.title,
           ...(imageUrl && { image: imageUrl }),
+          ...(cardWithPositions.size && { size: cardWithPositions.size as DraggableCardData['size'] }),
           ...(positions && Object.keys(positions).length > 0 && { positions }),
         }
         return cardData
