@@ -13,6 +13,7 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { iconOptions } from '@/utilities/icons'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | JamJamDev` : 'JamJamDev'
@@ -61,7 +62,7 @@ export const plugins: Plugin[] = [
     },
     formOverrides: {
       fields: ({ defaultFields }) => {
-        return defaultFields.map((field) => {
+        const updatedFields = defaultFields.map((field) => {
           if ('name' in field && field.name === 'confirmationMessage') {
             return {
               ...field,
@@ -78,6 +79,63 @@ export const plugins: Plugin[] = [
           }
           return field
         })
+
+        // Add chips field type as a new block
+        const chipsBlock = {
+          slug: 'chips',
+          labels: {
+            singular: 'Chips',
+            plural: 'Chips',
+          },
+          fields: [
+            {
+              name: 'name',
+              type: 'text',
+              required: true,
+              label: 'Field Name',
+            },
+            {
+              name: 'label',
+              type: 'text',
+              label: 'Label',
+            },
+            {
+              name: 'required',
+              type: 'checkbox',
+              label: 'Required',
+            },
+            {
+              name: 'options',
+              type: 'array',
+              label: 'Options',
+              required: true,
+              minRows: 1,
+              fields: [
+                {
+                  name: 'label',
+                  type: 'text',
+                  required: true,
+                  label: 'Label',
+                },
+                {
+                  name: 'icon',
+                  type: 'select',
+                  required: true,
+                  label: 'Icon',
+                  options: [...iconOptions],
+                },
+              ],
+            },
+          ],
+        }
+
+        // Find the fields field and add chips to its blocks
+        const fieldsField = updatedFields.find((field) => field.name === 'fields')
+        if (fieldsField && 'blocks' in fieldsField && Array.isArray(fieldsField.blocks)) {
+          fieldsField.blocks.push(chipsBlock)
+        }
+
+        return updatedFields
       },
     },
   }),

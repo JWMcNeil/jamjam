@@ -1063,6 +1063,76 @@ export interface Form {
             blockName?: string | null;
             blockType: 'textarea';
           }
+        | {
+            name: string;
+            label?: string | null;
+            required?: boolean | null;
+            options: {
+              label: string;
+              icon:
+                | 'HomeIcon'
+                | 'UserIcon'
+                | 'UsersIcon'
+                | 'DocumentIcon'
+                | 'DocumentsIcon'
+                | 'FolderIcon'
+                | 'MagnifyingGlassIcon'
+                | 'Cog6ToothIcon'
+                | 'BellIcon'
+                | 'HeartIcon'
+                | 'StarIcon'
+                | 'BookmarkIcon'
+                | 'CalendarIcon'
+                | 'ClockIcon'
+                | 'ChartBarIcon'
+                | 'Squares2X2Icon'
+                | 'Bars3Icon'
+                | 'Bars3BottomLeftIcon'
+                | 'ArrowRightIcon'
+                | 'ArrowLeftIcon'
+                | 'ArrowUpIcon'
+                | 'ArrowDownIcon'
+                | 'ChevronRightIcon'
+                | 'ChevronLeftIcon'
+                | 'PlusIcon'
+                | 'MinusIcon'
+                | 'XMarkIcon'
+                | 'CheckIcon'
+                | 'InformationCircleIcon'
+                | 'ExclamationTriangleIcon'
+                | 'QuestionMarkCircleIcon'
+                | 'LockClosedIcon'
+                | 'LockOpenIcon'
+                | 'KeyIcon'
+                | 'ShieldCheckIcon'
+                | 'EyeIcon'
+                | 'EyeSlashIcon'
+                | 'PencilIcon'
+                | 'TrashIcon'
+                | 'ShareIcon'
+                | 'LinkIcon'
+                | 'PhotoIcon'
+                | 'VideoCameraIcon'
+                | 'MusicalNoteIcon'
+                | 'EnvelopeIcon'
+                | 'PhoneIcon'
+                | 'GlobeAltIcon'
+                | 'MapPinIcon'
+                | 'ShoppingCartIcon'
+                | 'CreditCardIcon'
+                | 'TagIcon'
+                | 'FireIcon'
+                | 'BoltIcon'
+                | 'SunIcon'
+                | 'MoonIcon'
+                | 'CloudIcon'
+                | 'SignalIcon';
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'chips';
+          }
       )[]
     | null;
   submitButtonLabel?: string | null;
@@ -2229,6 +2299,22 @@ export interface FormsSelect<T extends boolean = true> {
               width?: T;
               defaultValue?: T;
               required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        chips?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              required?: T;
+              options?:
+                | T
+                | {
+                    label?: T;
+                    icon?: T;
+                    id?: T;
+                  };
               id?: T;
               blockName?: T;
             };

@@ -1,4 +1,5 @@
 import { Checkbox } from './Checkbox'
+import { Chips } from './Chips'
 import { Country } from './Country'
 import { Email } from './Email'
 import { Message } from './Message'
@@ -10,6 +11,7 @@ import { Textarea } from './Textarea'
 
 export const fields = {
   checkbox: Checkbox,
+  chips: Chips,
   country: Country,
   email: Email,
   message: Message,

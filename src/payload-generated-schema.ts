@@ -3219,6 +3219,110 @@ export const forms_blocks_textarea = sqliteTable(
   ],
 )
 
+export const forms_blocks_chips_options = sqliteTable(
+  'forms_blocks_chips_options',
+  {
+    _order: integer('_order').notNull(),
+    _parentID: text('_parent_id').notNull(),
+    id: text('id').primaryKey(),
+    label: text('label').notNull(),
+    icon: text('icon', {
+      enum: [
+        'HomeIcon',
+        'UserIcon',
+        'UsersIcon',
+        'DocumentIcon',
+        'DocumentsIcon',
+        'FolderIcon',
+        'MagnifyingGlassIcon',
+        'Cog6ToothIcon',
+        'BellIcon',
+        'HeartIcon',
+        'StarIcon',
+        'BookmarkIcon',
+        'CalendarIcon',
+        'ClockIcon',
+        'ChartBarIcon',
+        'Squares2X2Icon',
+        'Bars3Icon',
+        'Bars3BottomLeftIcon',
+        'ArrowRightIcon',
+        'ArrowLeftIcon',
+        'ArrowUpIcon',
+        'ArrowDownIcon',
+        'ChevronRightIcon',
+        'ChevronLeftIcon',
+        'PlusIcon',
+        'MinusIcon',
+        'XMarkIcon',
+        'CheckIcon',
+        'InformationCircleIcon',
+        'ExclamationTriangleIcon',
+        'QuestionMarkCircleIcon',
+        'LockClosedIcon',
+        'LockOpenIcon',
+        'KeyIcon',
+        'ShieldCheckIcon',
+        'EyeIcon',
+        'EyeSlashIcon',
+        'PencilIcon',
+        'TrashIcon',
+        'ShareIcon',
+        'LinkIcon',
+        'PhotoIcon',
+        'VideoCameraIcon',
+        'MusicalNoteIcon',
+        'EnvelopeIcon',
+        'PhoneIcon',
+        'GlobeAltIcon',
+        'MapPinIcon',
+        'ShoppingCartIcon',
+        'CreditCardIcon',
+        'TagIcon',
+        'FireIcon',
+        'BoltIcon',
+        'SunIcon',
+        'MoonIcon',
+        'CloudIcon',
+        'SignalIcon',
+      ],
+    }).notNull(),
+  },
+  (columns) => [
+    index('forms_blocks_chips_options_order_idx').on(columns._order),
+    index('forms_blocks_chips_options_parent_id_idx').on(columns._parentID),
+    foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [forms_blocks_chips.id],
+      name: 'forms_blocks_chips_options_parent_id_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
+export const forms_blocks_chips = sqliteTable(
+  'forms_blocks_chips',
+  {
+    _order: integer('_order').notNull(),
+    _parentID: integer('_parent_id').notNull(),
+    _path: text('_path').notNull(),
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    label: text('label'),
+    required: integer('required', { mode: 'boolean' }),
+    blockName: text('block_name'),
+  },
+  (columns) => [
+    index('forms_blocks_chips_order_idx').on(columns._order),
+    index('forms_blocks_chips_parent_id_idx').on(columns._parentID),
+    index('forms_blocks_chips_path_idx').on(columns._path),
+    foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [forms.id],
+      name: 'forms_blocks_chips_parent_id_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
 export const forms_emails = sqliteTable(
   'forms_emails',
   {
@@ -5500,6 +5604,26 @@ export const relations_forms_blocks_textarea = relations(forms_blocks_textarea, 
     relationName: '_blocks_textarea',
   }),
 }))
+export const relations_forms_blocks_chips_options = relations(
+  forms_blocks_chips_options,
+  ({ one }) => ({
+    _parentID: one(forms_blocks_chips, {
+      fields: [forms_blocks_chips_options._parentID],
+      references: [forms_blocks_chips.id],
+      relationName: 'options',
+    }),
+  }),
+)
+export const relations_forms_blocks_chips = relations(forms_blocks_chips, ({ one, many }) => ({
+  _parentID: one(forms, {
+    fields: [forms_blocks_chips._parentID],
+    references: [forms.id],
+    relationName: '_blocks_chips',
+  }),
+  options: many(forms_blocks_chips_options, {
+    relationName: 'options',
+  }),
+}))
 export const relations_forms_emails = relations(forms_emails, ({ one }) => ({
   _parentID: one(forms, {
     fields: [forms_emails._parentID],
@@ -5534,6 +5658,9 @@ export const relations_forms = relations(forms, ({ many }) => ({
   }),
   _blocks_textarea: many(forms_blocks_textarea, {
     relationName: '_blocks_textarea',
+  }),
+  _blocks_chips: many(forms_blocks_chips, {
+    relationName: '_blocks_chips',
   }),
   emails: many(forms_emails, {
     relationName: 'emails',
@@ -5934,6 +6061,8 @@ type DatabaseSchema = {
   forms_blocks_state: typeof forms_blocks_state
   forms_blocks_text: typeof forms_blocks_text
   forms_blocks_textarea: typeof forms_blocks_textarea
+  forms_blocks_chips_options: typeof forms_blocks_chips_options
+  forms_blocks_chips: typeof forms_blocks_chips
   forms_emails: typeof forms_emails
   forms: typeof forms
   form_submissions_submission_data: typeof form_submissions_submission_data
@@ -6069,6 +6198,8 @@ type DatabaseSchema = {
   relations_forms_blocks_state: typeof relations_forms_blocks_state
   relations_forms_blocks_text: typeof relations_forms_blocks_text
   relations_forms_blocks_textarea: typeof relations_forms_blocks_textarea
+  relations_forms_blocks_chips_options: typeof relations_forms_blocks_chips_options
+  relations_forms_blocks_chips: typeof relations_forms_blocks_chips
   relations_forms_emails: typeof relations_forms_emails
   relations_forms: typeof relations_forms
   relations_form_submissions_submission_data: typeof relations_form_submissions_submission_data
