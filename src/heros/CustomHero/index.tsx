@@ -130,21 +130,21 @@ export const CustomHero: React.FC<CustomHeroType> = ({
           size?: 'sm' | 'md' | 'lg' | null
         }
 
-        const positions = cardWithPositions.positions
+        const positions = cardWithPositions.positions && typeof cardWithPositions.positions === 'object'
           ? {
-              ...(cardWithPositions.positions.mobile && {
+              ...(cardWithPositions.positions.mobile && typeof cardWithPositions.positions.mobile === 'object' && {
                 mobile: {
                   normalizedX: cardWithPositions.positions.mobile.normalizedX ?? undefined,
                   normalizedY: cardWithPositions.positions.mobile.normalizedY ?? undefined,
                 },
               }),
-              ...(cardWithPositions.positions.tablet && {
+              ...(cardWithPositions.positions.tablet && typeof cardWithPositions.positions.tablet === 'object' && {
                 tablet: {
                   normalizedX: cardWithPositions.positions.tablet.normalizedX ?? undefined,
                   normalizedY: cardWithPositions.positions.tablet.normalizedY ?? undefined,
                 },
               }),
-              ...(cardWithPositions.positions.desktop && {
+              ...(cardWithPositions.positions.desktop && typeof cardWithPositions.positions.desktop === 'object' && {
                 desktop: {
                   normalizedX: cardWithPositions.positions.desktop.normalizedX ?? undefined,
                   normalizedY: cardWithPositions.positions.desktop.normalizedY ?? undefined,

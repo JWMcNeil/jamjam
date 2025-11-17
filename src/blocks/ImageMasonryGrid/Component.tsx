@@ -43,26 +43,34 @@ export const ImageMasonryGrid: React.FC<Props> = (props) => {
       return false
     })
 
-    return filtered.map((item) => {
-      const image = item.image as {
-        url: string | null
-        alt?: string | null
-        width?: number | null
-        height?: number | null
-        updatedAt?: string | null
-      }
-      const imageId = item.id || image.url || Math.random().toString()
-      const imageUrl = getMediaUrl(image.url, image.updatedAt)
+    return filtered
+      .map((item) => {
+        const image = item.image as {
+          url: string | null
+          alt?: string | null
+          width?: number | null
+          height?: number | null
+          updatedAt?: string | null
+        }
+        const imageId = item.id || image.url || Math.random().toString()
+        const imageUrl = getMediaUrl(image.url, image.updatedAt)
 
-      return {
-        id: imageId,
-        src: imageUrl,
-        alt: image.alt || item.caption || '',
-        caption: item.caption,
-        width: image.width || 400,
-        height: image.height || 300,
-      }
-    })
+        // Normalize empty strings to null and skip images with empty URLs
+        const normalizedUrl = imageUrl && imageUrl.trim() !== '' ? imageUrl : null
+        if (!normalizedUrl) {
+          return null
+        }
+
+        return {
+          id: imageId,
+          src: normalizedUrl,
+          alt: image.alt || item.caption || '',
+          caption: item.caption,
+          width: image.width || 400,
+          height: image.height || 300,
+        }
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null)
   }, [images])
 
   // Debug: Log if images exist but preparedImages is empty
@@ -114,41 +122,51 @@ export const ImageMasonryGrid: React.FC<Props> = (props) => {
       )}
     >
       <div className={cn(columnClasses, gapClasses[gapValue as keyof typeof gapClasses])}>
-        {preparedImages.map((photo) => (
-          <div
-            key={photo.id}
-            className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 break-inside-avoid mb-4"
-          >
-            {imageLoadingStates[photo.id] && (
-              <div className="absolute inset-0 bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center z-10">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
-              </div>
-            )}
-            <NextImage
-              className="w-full h-auto rounded-lg transition-transform duration-500 group-hover:scale-105 block m-0 p-0"
-              src={photo.src}
-              alt={photo.alt}
-              width={photo.width}
-              height={photo.height}
-              loading="lazy"
-              onLoad={() => handleImageLoad(photo.id)}
-              onError={(e) => {
-                console.error('Failed to load image:', photo.src)
-                handleImageError(photo.id)
-                // Fallback to a placeholder if image fails to load
-                const target = e.target as HTMLImageElement
-                target.src = `https://via.placeholder.com/400x300/cccccc/666666?text=${encodeURIComponent(photo.alt)}`
-              }}
-            />
-            {photo.caption && (
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <p className="text-white text-sm font-medium leading-relaxed">{photo.caption}</p>
-              </div>
-            )}
-            {/* Overlay effect */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 rounded-lg"></div>
-          </div>
-        ))}
+        {preparedImages.map((photo) => {
+          // Skip rendering if src is null or empty (defensive check)
+          // Ensure we never pass empty strings - normalize to null
+          const src = photo.src && photo.src.trim() !== '' ? photo.src : null
+          if (!src) {
+            return null
+          }
+
+          return (
+            <div
+              key={photo.id}
+              className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 break-inside-avoid mb-4"
+            >
+              {imageLoadingStates[photo.id] && (
+                <div className="absolute inset-0 bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center z-10">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
+                </div>
+              )}
+              <NextImage
+                alt={photo.alt}
+                className=" h-auto rounded-lg transition-transform duration-500 group-hover:scale-105 block m-0 p-0"
+                height={photo.height}
+                loading="lazy"
+                src={src}
+                unoptimized
+                width={photo.width}
+                onLoad={() => handleImageLoad(photo.id)}
+                onError={(e) => {
+                  console.error('Failed to load image:', photo.src)
+                  handleImageError(photo.id)
+                  // Fallback to a placeholder if image fails to load
+                  const target = e.target as HTMLImageElement
+                  target.src = `https://via.placeholder.com/400x300/cccccc/666666?text=${encodeURIComponent(photo.alt)}`
+                }}
+              />
+              {photo.caption && (
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
+                  <p className="text-white text-sm font-medium leading-relaxed">{photo.caption}</p>
+                </div>
+              )}
+              {/* Overlay effect */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 rounded-lg pointer-events-none"></div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

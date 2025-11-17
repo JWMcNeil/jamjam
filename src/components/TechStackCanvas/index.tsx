@@ -49,31 +49,56 @@ const ZONE_COLORS: Record<TechCategory, string> = {
 }
 
 // Tab colors for each category (matching zone colors)
-const TAB_COLORS: Record<TechCategory, { bg: string; text: string; hover: string }> = {
+const TAB_COLORS: Record<
+  TechCategory,
+  {
+    bg: string
+    text: string
+    hover: string
+    border: string
+    outlineText: string
+    outlineBg: string
+  }
+> = {
   frontend: {
     bg: 'bg-blue-500',
     text: 'text-white',
     hover: 'hover:bg-blue-600',
+    border: 'border-blue-500',
+    outlineText: 'text-blue-500',
+    outlineBg: 'bg-blue-500/10',
   },
   backend: {
     bg: 'bg-purple-500',
     text: 'text-white',
     hover: 'hover:bg-purple-600',
+    border: 'border-purple-500',
+    outlineText: 'text-purple-500',
+    outlineBg: 'bg-purple-500/10',
   },
   database: {
     bg: 'bg-green-500',
     text: 'text-white',
     hover: 'hover:bg-green-600',
+    border: 'border-green-500',
+    outlineText: 'text-green-500',
+    outlineBg: 'bg-green-500/10',
   },
   infrastructure: {
     bg: 'bg-orange-500',
     text: 'text-white',
     hover: 'hover:bg-orange-600',
+    border: 'border-orange-500',
+    outlineText: 'text-orange-500',
+    outlineBg: 'bg-orange-500/10',
   },
   tooling: {
     bg: 'bg-pink-500',
     text: 'text-white',
     hover: 'hover:bg-pink-600',
+    border: 'border-pink-500',
+    outlineText: 'text-pink-500',
+    outlineBg: 'bg-pink-500/10',
   },
 }
 
@@ -502,10 +527,10 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
           <button
             onClick={() => setSelectedCategory('all')}
             className={cn(
-              'px-4 py-2 rounded-md text-sm font-medium transition-colors duration-300 ease-in-out',
+              'px-4 py-2 rounded text-sm font-medium transition-colors duration-300 ease-in-out border',
               selectedCategory === 'all'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80',
+                ? 'border-primary text-primary bg-primary/10'
+                : 'border-border text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground bg-transparent',
             )}
           >
             All
@@ -517,10 +542,10 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
                 key={value}
                 onClick={() => setSelectedCategory(value)}
                 className={cn(
-                  'px-4 py-2 rounded-md text-sm font-medium transition-colors duration-300 ease-in-out',
+                  'px-4 py-2 rounded text-sm font-medium transition-colors duration-300 ease-in-out border',
                   selectedCategory === value
-                    ? `${tabColors.bg} ${tabColors.text}`
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80',
+                    ? `${tabColors.border} ${tabColors.outlineText} ${tabColors.outlineBg}`
+                    : 'border-border text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground bg-transparent',
                 )}
               >
                 {label}
@@ -541,7 +566,7 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
 
           {/* Reset Button */}
           <Button onClick={handleReset} variant="outline" size="sm" aria-label="Reset positions">
-            <RotateCcw className="h-4 w-4" />
+            <RotateCcw className="h-4 w-4 mr-2" />
             <span className="text-sm">Reset</span>
           </Button>
         </div>
@@ -574,21 +599,41 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
 
           {/* Category Zones */}
           {showZones &&
-            zones.map((zone) => (
-              <div
-                key={zone.category}
-                className={cn(
-                  'absolute left-0 right-0 transition-all duration-300 ease-in-out border-t border-b',
-                  isZoneHighlighted(zone.category)
-                    ? 'bg-primary/15 border-primary/30'
-                    : ZONE_COLORS[zone.category],
-                )}
-                style={{
-                  top: `${zone.top}px`,
-                  height: `${zone.height}px`,
-                }}
-              />
-            ))}
+            zones.map((zone) => {
+              const isHighlighted = isZoneHighlighted(zone.category)
+              const categoryInfo = CATEGORIES.find((cat) => cat.value === zone.category)
+              const label = categoryInfo?.label || zone.category
+
+              // Use selected tab's color when highlighted, otherwise use zone's default color
+              let zoneColors: string
+              if (isHighlighted && selectedCategory !== 'all') {
+                const tabColor = TAB_COLORS[selectedCategory]
+                // Extract color from border class (e.g., 'border-blue-500' -> 'blue-500')
+                const borderColor = tabColor.border.replace('border-', '')
+                zoneColors = `${tabColor.outlineBg} border-${borderColor}/30`
+              } else {
+                zoneColors = ZONE_COLORS[zone.category]
+              }
+
+              return (
+                <div
+                  key={zone.category}
+                  className={cn(
+                    'absolute left-0 right-0 transition-all duration-300 ease-in-out border-t border-b',
+                    zoneColors,
+                  )}
+                  style={{
+                    top: `${zone.top}px`,
+                    height: `${zone.height}px`,
+                  }}
+                >
+                  {/* Zone Label */}
+                  <div className="absolute top-2 left-4 px-2 py-1 text-xs font-medium rounded bg-background/80 backdrop-blur-sm border border-border/50">
+                    {label}
+                  </div>
+                </div>
+              )
+            })}
 
           {/* Draggable Cards */}
           {cards.map((card) => {

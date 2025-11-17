@@ -273,9 +273,6 @@ export interface Page {
          * Select the size of the card (small, medium, or large).
          */
         size?: ('sm' | 'md' | 'lg') | null;
-        /**
-         * Set positions for different screen sizes. Positions are stored as normalized values (0-1) for responsiveness. Cards without positions will be automatically spaced.
-         */
         positions?: {
           mobile?: {
             normalizedX?: number | null;
@@ -781,22 +778,17 @@ export interface TechStackCanvasBlock {
      * Select the size of the card (small, medium, or large).
      */
     size?: ('sm' | 'md' | 'lg') | null;
-    /**
-     * Set positions for different screen sizes. Positions are stored as normalized values (0-1) for responsiveness. Cards without positions will be automatically spaced.
-     */
-    positions?: {
-      mobile?: {
-        normalizedX?: number | null;
-        normalizedY?: number | null;
-      };
-      tablet?: {
-        normalizedX?: number | null;
-        normalizedY?: number | null;
-      };
-      desktop?: {
-        normalizedX?: number | null;
-        normalizedY?: number | null;
-      };
+    mobile?: {
+      normalizedX?: number | null;
+      normalizedY?: number | null;
+    };
+    tablet?: {
+      normalizedX?: number | null;
+      normalizedY?: number | null;
+    };
+    desktop?: {
+      normalizedX?: number | null;
+      normalizedY?: number | null;
     };
     id?: string | null;
   }[];
@@ -839,9 +831,6 @@ export interface DraggableCardsBlock {
      * Select the size of the card (small, medium, or large).
      */
     size?: ('sm' | 'md' | 'lg') | null;
-    /**
-     * Set positions for different screen sizes. Positions are stored as normalized values (0-1) for responsiveness. Cards without positions will be automatically spaced.
-     */
     positions?: {
       mobile?: {
         normalizedX?: number | null;
@@ -1736,27 +1725,23 @@ export interface TechStackCanvasBlockSelect<T extends boolean = true> {
         image?: T;
         category?: T;
         size?: T;
-        positions?:
+        mobile?:
           | T
           | {
-              mobile?:
-                | T
-                | {
-                    normalizedX?: T;
-                    normalizedY?: T;
-                  };
-              tablet?:
-                | T
-                | {
-                    normalizedX?: T;
-                    normalizedY?: T;
-                  };
-              desktop?:
-                | T
-                | {
-                    normalizedX?: T;
-                    normalizedY?: T;
-                  };
+              normalizedX?: T;
+              normalizedY?: T;
+            };
+        tablet?:
+          | T
+          | {
+              normalizedX?: T;
+              normalizedY?: T;
+            };
+        desktop?:
+          | T
+          | {
+              normalizedX?: T;
+              normalizedY?: T;
             };
         id?: T;
       };

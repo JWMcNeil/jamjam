@@ -182,15 +182,28 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
         ) {
           const x =
             breakpointPosition.normalizedX !== undefined
-              ? normalizedToPixels(breakpointPosition.normalizedX, containerSize.width, cardDimensions.width)
+              ? normalizedToPixels(
+                  breakpointPosition.normalizedX,
+                  containerSize.width,
+                  cardDimensions.width,
+                )
               : (prev[card.id]?.x ?? 0)
           const y =
             breakpointPosition.normalizedY !== undefined
-              ? normalizedToPixels(breakpointPosition.normalizedY, containerSize.height, cardDimensions.height)
+              ? normalizedToPixels(
+                  breakpointPosition.normalizedY,
+                  containerSize.height,
+                  cardDimensions.height,
+                )
               : (prev[card.id]?.y ?? 0)
 
           updated[card.id] = { x, y }
-          existingPositions.push({ x, y, width: cardDimensions.width, height: cardDimensions.height })
+          existingPositions.push({
+            x,
+            y,
+            width: cardDimensions.width,
+            height: cardDimensions.height,
+          })
         } else {
           // No explicit position - generate auto-position with collision avoidance
           const autoPosition = generateNonOverlappingPosition(
@@ -253,8 +266,16 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
 
       // Convert to normalized coordinates for potential saving
       // This could be passed to a callback or saved via API
-      const normalizedX = pixelsToNormalized(constrainedX, containerSize.width, cardDimensions.width)
-      const normalizedY = pixelsToNormalized(constrainedY, containerSize.height, cardDimensions.height)
+      const normalizedX = pixelsToNormalized(
+        constrainedX,
+        containerSize.width,
+        cardDimensions.width,
+      )
+      const normalizedY = pixelsToNormalized(
+        constrainedY,
+        containerSize.height,
+        cardDimensions.height,
+      )
 
       // Store normalized coordinates in a way that can be accessed later
       // You could emit an event or call a callback here to save positions

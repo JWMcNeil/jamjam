@@ -28,12 +28,16 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
         <div className="grid grid-cols-4 lg:grid-cols-12 gap-y-8 gap-x-16">
           {columns.map((col, index) => {
             const { enableLink, link, richText, size } = col
-            const contentCard = (col as typeof col & {
-              contentCard?: ContentCardBlock[]
-            }).contentCard
-            const techStackCanvas = (col as typeof col & {
-              techStackCanvas?: TechStackCanvasBlock[]
-            }).techStackCanvas
+            const contentCard = (
+              col as typeof col & {
+                contentCard?: ContentCardBlock[]
+              }
+            ).contentCard
+            const techStackCanvas = (
+              col as typeof col & {
+                techStackCanvas?: TechStackCanvasBlock[]
+              }
+            ).techStackCanvas
 
             return (
               <div
@@ -55,7 +59,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                   </div>
                 )}
                 {techStackCanvas && techStackCanvas.length > 0 && (
-                  <div className="mt-4">
+                  <div className="mt-8 md:mt-0">
                     {techStackCanvas.map((block: TechStackCanvasBlock, blockIndex: number) => {
                       return (
                         <div key={block.id || blockIndex}>

@@ -48,28 +48,29 @@ export const TechStackCanvasBlock: React.FC<TechStackCanvasBlockProps> = (props)
       const cardId = card.id || `card-${card.title}-${index}`.toLowerCase().replace(/\s+/g, '-')
 
       // Extract breakpoint positions if they exist
-      const positions = card.positions
-        ? {
-            ...(card.positions.mobile && {
-              mobile: {
-                normalizedX: card.positions.mobile.normalizedX ?? undefined,
-                normalizedY: card.positions.mobile.normalizedY ?? undefined,
-              },
-            }),
-            ...(card.positions.tablet && {
-              tablet: {
-                normalizedX: card.positions.tablet.normalizedX ?? undefined,
-                normalizedY: card.positions.tablet.normalizedY ?? undefined,
-              },
-            }),
-            ...(card.positions.desktop && {
-              desktop: {
-                normalizedX: card.positions.desktop.normalizedX ?? undefined,
-                normalizedY: card.positions.desktop.normalizedY ?? undefined,
-              },
-            }),
-          }
-        : undefined
+      const positions =
+        card.mobile || card.tablet || card.desktop
+          ? {
+              ...(card.mobile && {
+                mobile: {
+                  normalizedX: card.mobile.normalizedX ?? undefined,
+                  normalizedY: card.mobile.normalizedY ?? undefined,
+                },
+              }),
+              ...(card.tablet && {
+                tablet: {
+                  normalizedX: card.tablet.normalizedX ?? undefined,
+                  normalizedY: card.tablet.normalizedY ?? undefined,
+                },
+              }),
+              ...(card.desktop && {
+                desktop: {
+                  normalizedX: card.desktop.normalizedX ?? undefined,
+                  normalizedY: card.desktop.normalizedY ?? undefined,
+                },
+              }),
+            }
+          : undefined
 
       const cardData: DraggableCardData = {
         id: cardId,

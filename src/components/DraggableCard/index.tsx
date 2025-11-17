@@ -22,20 +22,20 @@ const sizeConfig: Record<
   sm: {
     minWidth: 'min-w-[100px]',
     maxWidth: 'max-w-[150px]',
-    imageMaxWidth: 'max-w-[80px]',
-    padding: 'p-3',
+    imageMaxWidth: 'max-w-[90px]',
+    padding: 'p-1',
   },
   md: {
     minWidth: 'min-w-[150px]',
     maxWidth: 'max-w-[250px]',
     imageMaxWidth: 'max-w-[150px]',
-    padding: 'p-4',
+    padding: 'p-2',
   },
   lg: {
     minWidth: 'min-w-[200px]',
     maxWidth: 'max-w-[350px]',
     imageMaxWidth: 'max-w-[250px]',
-    padding: 'p-5',
+    padding: 'p-4',
   },
 }
 
@@ -92,7 +92,7 @@ export const DraggableCard: React.FC<DraggableCardProps> = ({
             <Image
               src={card.image}
               alt={card.title}
-              className="object-contain rounded"
+              className="object-cover rounded"
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />

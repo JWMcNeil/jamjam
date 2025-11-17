@@ -49,21 +49,21 @@ export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) =
       const cardId = card.id || `card-${card.title}-${index}`.toLowerCase().replace(/\s+/g, '-')
 
       // Extract breakpoint positions if they exist
-      const positions = card.positions
+      const positions = card.positions && typeof card.positions === 'object'
         ? {
-            ...(card.positions.mobile && {
+            ...(card.positions.mobile && typeof card.positions.mobile === 'object' && {
               mobile: {
                 normalizedX: card.positions.mobile.normalizedX ?? undefined,
                 normalizedY: card.positions.mobile.normalizedY ?? undefined,
               },
             }),
-            ...(card.positions.tablet && {
+            ...(card.positions.tablet && typeof card.positions.tablet === 'object' && {
               tablet: {
                 normalizedX: card.positions.tablet.normalizedX ?? undefined,
                 normalizedY: card.positions.tablet.normalizedY ?? undefined,
               },
             }),
-            ...(card.positions.desktop && {
+            ...(card.positions.desktop && typeof card.positions.desktop === 'object' && {
               desktop: {
                 normalizedX: card.positions.desktop.normalizedX ?? undefined,
                 normalizedY: card.positions.desktop.normalizedY ?? undefined,

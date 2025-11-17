@@ -101,10 +101,10 @@ export const TechStackCanvas: Block = {
           ],
         },
         {
-          name: 'positions',
-          type: 'group',
+          type: 'collapsible',
           label: 'Responsive Positions',
           admin: {
+            initCollapsed: true,
             description:
               'Set positions for different screen sizes. Positions are stored as normalized values (0-1) for responsiveness. Cards without positions will be automatically spaced.',
           },
@@ -212,4 +212,3 @@ export const TechStackCanvas: Block = {
     singular: 'Tech Stack Canvas',
   },
 }
-
