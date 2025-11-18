@@ -73,6 +73,7 @@ export interface Config {
     categories: Category;
     users: User;
     projects: Project;
+    'mux-video': MuxVideo;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -90,6 +91,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'mux-video': MuxVideoSelect<false> | MuxVideoSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -305,6 +307,7 @@ export interface Page {
     | MediaBlock
     | ArchiveBlock
     | FormBlock
+    | VideoCardBlock
   )[];
   meta?: {
     title?: string | null;
@@ -539,6 +542,7 @@ export interface Project {
     | FormBlock
     | ImageMasonryGridBlock
     | VideoPlayerBlock
+    | VideoCardBlock
     | CarouselBlock
   )[];
   relatedProjects?: (number | Project)[] | null;
@@ -1254,6 +1258,86 @@ export interface VideoPlayerBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoCardBlock".
+ */
+export interface VideoCardBlock {
+  /**
+   * Select a video from Mux
+   */
+  video: number | MuxVideo;
+  aspectRatio?: ('auto' | 'square' | 'landscape' | 'portrait') | null;
+  /**
+   * When enabled, videos will autoplay. When disabled, videos show as thumbnails and play on hover.
+   */
+  videoAutoplay?: boolean | null;
+  enableLink?: boolean | null;
+  link?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null)
+      | ({
+          relationTo: 'projects';
+          value: number | Project;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  enableFooter?: boolean | null;
+  /**
+   * Add meta information to display in the footer.
+   */
+  footerMeta?: {
+    title?: string | null;
+    description?: string | null;
+    location?: string | null;
+    customText?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'videoCard';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mux-video".
+ */
+export interface MuxVideo {
+  id: number;
+  /**
+   * A unique title for this video that will help you identify it later.
+   */
+  title: string;
+  assetId?: string | null;
+  duration?: number | null;
+  /**
+   * Pick a timestamp (in seconds) from the video to be used as the poster image. When unset, defaults to the middle of the video.
+   */
+  posterTimestamp?: number | null;
+  aspectRatio?: string | null;
+  maxWidth?: number | null;
+  maxHeight?: number | null;
+  playbackOptions?:
+    | {
+        playbackId?: string | null;
+        playbackPolicy?: ('signed' | 'public') | null;
+        playbackUrl?: string | null;
+        posterUrl?: string | null;
+        gifUrl?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "CarouselBlock".
  */
 export interface CarouselBlock {
@@ -1497,6 +1581,10 @@ export interface PayloadLockedDocument {
         value: number | Project;
       } | null)
     | ({
+        relationTo: 'mux-video';
+        value: number | MuxVideo;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -1667,6 +1755,7 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        videoCard?: T | VideoCardBlockSelect<T>;
       };
   meta?:
     | T
@@ -1914,6 +2003,36 @@ export interface FormBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoCardBlock_select".
+ */
+export interface VideoCardBlockSelect<T extends boolean = true> {
+  video?: T;
+  aspectRatio?: T;
+  videoAutoplay?: T;
+  enableLink?: T;
+  link?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  enableFooter?: T;
+  footerMeta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        location?: T;
+        customText?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
@@ -2101,6 +2220,7 @@ export interface ProjectsSelect<T extends boolean = true> {
         formBlock?: T | FormBlockSelect<T>;
         imageMasonryGrid?: T | ImageMasonryGridBlockSelect<T>;
         videoPlayer?: T | VideoPlayerBlockSelect<T>;
+        videoCard?: T | VideoCardBlockSelect<T>;
         carousel?: T | CarouselBlockSelect<T>;
       };
   relatedProjects?: T;
@@ -2176,6 +2296,31 @@ export interface CarouselBlockSelect<T extends boolean = true> {
   showIndicators?: T;
   id?: T;
   blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mux-video_select".
+ */
+export interface MuxVideoSelect<T extends boolean = true> {
+  title?: T;
+  assetId?: T;
+  duration?: T;
+  posterTimestamp?: T;
+  aspectRatio?: T;
+  maxWidth?: T;
+  maxHeight?: T;
+  playbackOptions?:
+    | T
+    | {
+        playbackId?: T;
+        playbackPolicy?: T;
+        playbackUrl?: T;
+        posterUrl?: T;
+        gifUrl?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

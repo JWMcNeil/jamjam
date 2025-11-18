@@ -6,33 +6,631 @@
  * and re-run `payload generate:db-schema` to regenerate this file.
  */
 
-import type {} from '@payloadcms/db-sqlite'
+import type {} from '@payloadcms/db-postgres'
 import {
-  sqliteTable,
+  pgTable,
   index,
   uniqueIndex,
   foreignKey,
   integer,
-  text,
+  varchar,
+  boolean,
   numeric,
-  type AnySQLiteColumn,
-} from '@payloadcms/db-sqlite/drizzle/sqlite-core'
-import { sql, relations } from '@payloadcms/db-sqlite/drizzle'
+  text,
+  jsonb,
+  serial,
+  timestamp,
+  type AnyPgColumn,
+  pgEnum,
+} from '@payloadcms/db-postgres/drizzle/pg-core'
+import { sql, relations } from '@payloadcms/db-postgres/drizzle'
+export const enum_pages_hero_links_link_type = pgEnum('enum_pages_hero_links_link_type', [
+  'reference',
+  'custom',
+])
+export const enum_pages_hero_links_link_appearance = pgEnum(
+  'enum_pages_hero_links_link_appearance',
+  ['default', 'outline', 'secondary', 'miniOutline', 'link', 'white'],
+)
+export const enum_pages_hero_links_link_size = pgEnum('enum_pages_hero_links_link_size', [
+  'default',
+])
+export const enum_pages_hero_draggable_cards_cards_size = pgEnum(
+  'enum_pages_hero_draggable_cards_cards_size',
+  ['sm', 'md', 'lg'],
+)
+export const enum_pages_blocks_cta_links_link_type = pgEnum(
+  'enum_pages_blocks_cta_links_link_type',
+  ['reference', 'custom'],
+)
+export const enum_pages_blocks_cta_links_link_appearance = pgEnum(
+  'enum_pages_blocks_cta_links_link_appearance',
+  ['default', 'outline'],
+)
+export const enum_pages_blocks_cta_links_link_size = pgEnum(
+  'enum_pages_blocks_cta_links_link_size',
+  ['default'],
+)
+export const enum_pages_blocks_content_card_aspect_ratio = pgEnum(
+  'enum_pages_blocks_content_card_aspect_ratio',
+  ['auto', 'square', 'landscape', 'portrait'],
+)
+export const enum_pages_blocks_content_card_link_type = pgEnum(
+  'enum_pages_blocks_content_card_link_type',
+  ['reference', 'custom'],
+)
+export const enum_pages_blocks_tech_stack_canvas_cards_category = pgEnum(
+  'enum_pages_blocks_tech_stack_canvas_cards_category',
+  ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
+)
+export const enum_pages_blocks_tech_stack_canvas_cards_size = pgEnum(
+  'enum_pages_blocks_tech_stack_canvas_cards_size',
+  ['sm', 'md', 'lg'],
+)
+export const enum_pages_blocks_tech_stack_canvas_container_width = pgEnum(
+  'enum_pages_blocks_tech_stack_canvas_container_width',
+  ['container', 'full'],
+)
+export const enum_pages_blocks_content_columns_size = pgEnum(
+  'enum_pages_blocks_content_columns_size',
+  ['oneThird', 'half', 'twoThirds', 'full'],
+)
+export const enum_pages_blocks_content_columns_link_type = pgEnum(
+  'enum_pages_blocks_content_columns_link_type',
+  ['reference', 'custom'],
+)
+export const enum_pages_blocks_content_columns_link_appearance = pgEnum(
+  'enum_pages_blocks_content_columns_link_appearance',
+  ['default', 'outline'],
+)
+export const enum_pages_blocks_content_columns_link_size = pgEnum(
+  'enum_pages_blocks_content_columns_link_size',
+  ['default'],
+)
+export const enum_pages_blocks_draggable_cards_cards_category = pgEnum(
+  'enum_pages_blocks_draggable_cards_cards_category',
+  ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
+)
+export const enum_pages_blocks_draggable_cards_cards_size = pgEnum(
+  'enum_pages_blocks_draggable_cards_cards_size',
+  ['sm', 'md', 'lg'],
+)
+export const enum_pages_blocks_draggable_cards_container_width = pgEnum(
+  'enum_pages_blocks_draggable_cards_container_width',
+  ['full', 'container'],
+)
+export const enum_pages_blocks_grid_columns = pgEnum('enum_pages_blocks_grid_columns', [
+  '2',
+  '3',
+  '4',
+])
+export const enum_pages_blocks_archive_populate_by = pgEnum(
+  'enum_pages_blocks_archive_populate_by',
+  ['collection', 'selection'],
+)
+export const enum_pages_blocks_archive_relation_to = pgEnum(
+  'enum_pages_blocks_archive_relation_to',
+  ['posts', 'projects'],
+)
+export const enum_pages_blocks_video_card_aspect_ratio = pgEnum(
+  'enum_pages_blocks_video_card_aspect_ratio',
+  ['auto', 'square', 'landscape', 'portrait'],
+)
+export const enum_pages_blocks_video_card_link_type = pgEnum(
+  'enum_pages_blocks_video_card_link_type',
+  ['reference', 'custom'],
+)
+export const enum_pages_hero_type = pgEnum('enum_pages_hero_type', [
+  'none',
+  'highImpact',
+  'mediumImpact',
+  'lowImpact',
+  'custom',
+])
+export const enum_pages_hero_content_card_aspect_ratio = pgEnum(
+  'enum_pages_hero_content_card_aspect_ratio',
+  ['auto', 'square', 'landscape', 'portrait'],
+)
+export const enum_pages_hero_content_card_link_type = pgEnum(
+  'enum_pages_hero_content_card_link_type',
+  ['reference', 'custom'],
+)
+export const enum_pages_status = pgEnum('enum_pages_status', ['draft', 'published'])
+export const enum__pages_v_version_hero_links_link_type = pgEnum(
+  'enum__pages_v_version_hero_links_link_type',
+  ['reference', 'custom'],
+)
+export const enum__pages_v_version_hero_links_link_appearance = pgEnum(
+  'enum__pages_v_version_hero_links_link_appearance',
+  ['default', 'outline', 'secondary', 'miniOutline', 'link', 'white'],
+)
+export const enum__pages_v_version_hero_links_link_size = pgEnum(
+  'enum__pages_v_version_hero_links_link_size',
+  ['default'],
+)
+export const enum__pages_v_version_hero_draggable_cards_cards_size = pgEnum(
+  'enum__pages_v_version_hero_draggable_cards_cards_size',
+  ['sm', 'md', 'lg'],
+)
+export const enum__pages_v_blocks_cta_links_link_type = pgEnum(
+  'enum__pages_v_blocks_cta_links_link_type',
+  ['reference', 'custom'],
+)
+export const enum__pages_v_blocks_cta_links_link_appearance = pgEnum(
+  'enum__pages_v_blocks_cta_links_link_appearance',
+  ['default', 'outline'],
+)
+export const enum__pages_v_blocks_cta_links_link_size = pgEnum(
+  'enum__pages_v_blocks_cta_links_link_size',
+  ['default'],
+)
+export const enum__pages_v_blocks_content_card_aspect_ratio = pgEnum(
+  'enum__pages_v_blocks_content_card_aspect_ratio',
+  ['auto', 'square', 'landscape', 'portrait'],
+)
+export const enum__pages_v_blocks_content_card_link_type = pgEnum(
+  'enum__pages_v_blocks_content_card_link_type',
+  ['reference', 'custom'],
+)
+export const enum__pages_v_blocks_tech_stack_canvas_cards_category = pgEnum(
+  'enum__pages_v_blocks_tech_stack_canvas_cards_category',
+  ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
+)
+export const enum__pages_v_blocks_tech_stack_canvas_cards_size = pgEnum(
+  'enum__pages_v_blocks_tech_stack_canvas_cards_size',
+  ['sm', 'md', 'lg'],
+)
+export const enum__pages_v_blocks_tech_stack_canvas_container_width = pgEnum(
+  'enum__pages_v_blocks_tech_stack_canvas_container_width',
+  ['container', 'full'],
+)
+export const enum__pages_v_blocks_content_columns_size = pgEnum(
+  'enum__pages_v_blocks_content_columns_size',
+  ['oneThird', 'half', 'twoThirds', 'full'],
+)
+export const enum__pages_v_blocks_content_columns_link_type = pgEnum(
+  'enum__pages_v_blocks_content_columns_link_type',
+  ['reference', 'custom'],
+)
+export const enum__pages_v_blocks_content_columns_link_appearance = pgEnum(
+  'enum__pages_v_blocks_content_columns_link_appearance',
+  ['default', 'outline'],
+)
+export const enum__pages_v_blocks_content_columns_link_size = pgEnum(
+  'enum__pages_v_blocks_content_columns_link_size',
+  ['default'],
+)
+export const enum__pages_v_blocks_draggable_cards_cards_category = pgEnum(
+  'enum__pages_v_blocks_draggable_cards_cards_category',
+  ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
+)
+export const enum__pages_v_blocks_draggable_cards_cards_size = pgEnum(
+  'enum__pages_v_blocks_draggable_cards_cards_size',
+  ['sm', 'md', 'lg'],
+)
+export const enum__pages_v_blocks_draggable_cards_container_width = pgEnum(
+  'enum__pages_v_blocks_draggable_cards_container_width',
+  ['full', 'container'],
+)
+export const enum__pages_v_blocks_grid_columns = pgEnum('enum__pages_v_blocks_grid_columns', [
+  '2',
+  '3',
+  '4',
+])
+export const enum__pages_v_blocks_archive_populate_by = pgEnum(
+  'enum__pages_v_blocks_archive_populate_by',
+  ['collection', 'selection'],
+)
+export const enum__pages_v_blocks_archive_relation_to = pgEnum(
+  'enum__pages_v_blocks_archive_relation_to',
+  ['posts', 'projects'],
+)
+export const enum__pages_v_blocks_video_card_aspect_ratio = pgEnum(
+  'enum__pages_v_blocks_video_card_aspect_ratio',
+  ['auto', 'square', 'landscape', 'portrait'],
+)
+export const enum__pages_v_blocks_video_card_link_type = pgEnum(
+  'enum__pages_v_blocks_video_card_link_type',
+  ['reference', 'custom'],
+)
+export const enum__pages_v_version_hero_type = pgEnum('enum__pages_v_version_hero_type', [
+  'none',
+  'highImpact',
+  'mediumImpact',
+  'lowImpact',
+  'custom',
+])
+export const enum__pages_v_version_hero_content_card_aspect_ratio = pgEnum(
+  'enum__pages_v_version_hero_content_card_aspect_ratio',
+  ['auto', 'square', 'landscape', 'portrait'],
+)
+export const enum__pages_v_version_hero_content_card_link_type = pgEnum(
+  'enum__pages_v_version_hero_content_card_link_type',
+  ['reference', 'custom'],
+)
+export const enum__pages_v_version_status = pgEnum('enum__pages_v_version_status', [
+  'draft',
+  'published',
+])
+export const enum_posts_status = pgEnum('enum_posts_status', ['draft', 'published'])
+export const enum__posts_v_version_status = pgEnum('enum__posts_v_version_status', [
+  'draft',
+  'published',
+])
+export const enum_projects_blocks_cta_links_link_type = pgEnum(
+  'enum_projects_blocks_cta_links_link_type',
+  ['reference', 'custom'],
+)
+export const enum_projects_blocks_cta_links_link_appearance = pgEnum(
+  'enum_projects_blocks_cta_links_link_appearance',
+  ['default', 'outline'],
+)
+export const enum_projects_blocks_cta_links_link_size = pgEnum(
+  'enum_projects_blocks_cta_links_link_size',
+  ['default'],
+)
+export const enum_projects_blocks_content_card_aspect_ratio = pgEnum(
+  'enum_projects_blocks_content_card_aspect_ratio',
+  ['auto', 'square', 'landscape', 'portrait'],
+)
+export const enum_projects_blocks_content_card_link_type = pgEnum(
+  'enum_projects_blocks_content_card_link_type',
+  ['reference', 'custom'],
+)
+export const enum_projects_blocks_tech_stack_canvas_cards_category = pgEnum(
+  'enum_projects_blocks_tech_stack_canvas_cards_category',
+  ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
+)
+export const enum_projects_blocks_tech_stack_canvas_cards_size = pgEnum(
+  'enum_projects_blocks_tech_stack_canvas_cards_size',
+  ['sm', 'md', 'lg'],
+)
+export const enum_projects_blocks_tech_stack_canvas_container_width = pgEnum(
+  'enum_projects_blocks_tech_stack_canvas_container_width',
+  ['container', 'full'],
+)
+export const enum_projects_blocks_content_columns_size = pgEnum(
+  'enum_projects_blocks_content_columns_size',
+  ['oneThird', 'half', 'twoThirds', 'full'],
+)
+export const enum_projects_blocks_content_columns_link_type = pgEnum(
+  'enum_projects_blocks_content_columns_link_type',
+  ['reference', 'custom'],
+)
+export const enum_projects_blocks_content_columns_link_appearance = pgEnum(
+  'enum_projects_blocks_content_columns_link_appearance',
+  ['default', 'outline'],
+)
+export const enum_projects_blocks_content_columns_link_size = pgEnum(
+  'enum_projects_blocks_content_columns_link_size',
+  ['default'],
+)
+export const enum_projects_blocks_draggable_cards_cards_category = pgEnum(
+  'enum_projects_blocks_draggable_cards_cards_category',
+  ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
+)
+export const enum_projects_blocks_draggable_cards_cards_size = pgEnum(
+  'enum_projects_blocks_draggable_cards_cards_size',
+  ['sm', 'md', 'lg'],
+)
+export const enum_projects_blocks_draggable_cards_container_width = pgEnum(
+  'enum_projects_blocks_draggable_cards_container_width',
+  ['full', 'container'],
+)
+export const enum_projects_blocks_grid_columns = pgEnum('enum_projects_blocks_grid_columns', [
+  '2',
+  '3',
+  '4',
+])
+export const enum_projects_blocks_archive_populate_by = pgEnum(
+  'enum_projects_blocks_archive_populate_by',
+  ['collection', 'selection'],
+)
+export const enum_projects_blocks_archive_relation_to = pgEnum(
+  'enum_projects_blocks_archive_relation_to',
+  ['posts', 'projects'],
+)
+export const enum_projects_blocks_image_masonry_grid_gap = pgEnum(
+  'enum_projects_blocks_image_masonry_grid_gap',
+  ['small', 'medium', 'large'],
+)
+export const enum_projects_blocks_video_player_video_type = pgEnum(
+  'enum_projects_blocks_video_player_video_type',
+  ['mux', 'external'],
+)
+export const enum_projects_blocks_video_card_aspect_ratio = pgEnum(
+  'enum_projects_blocks_video_card_aspect_ratio',
+  ['auto', 'square', 'landscape', 'portrait'],
+)
+export const enum_projects_blocks_video_card_link_type = pgEnum(
+  'enum_projects_blocks_video_card_link_type',
+  ['reference', 'custom'],
+)
+export const enum_projects_project_type = pgEnum('enum_projects_project_type', [
+  'web',
+  'photography',
+  'videography',
+])
+export const enum_projects_status = pgEnum('enum_projects_status', ['draft', 'published'])
+export const enum__projects_v_blocks_cta_links_link_type = pgEnum(
+  'enum__projects_v_blocks_cta_links_link_type',
+  ['reference', 'custom'],
+)
+export const enum__projects_v_blocks_cta_links_link_appearance = pgEnum(
+  'enum__projects_v_blocks_cta_links_link_appearance',
+  ['default', 'outline'],
+)
+export const enum__projects_v_blocks_cta_links_link_size = pgEnum(
+  'enum__projects_v_blocks_cta_links_link_size',
+  ['default'],
+)
+export const enum__projects_v_blocks_content_card_aspect_ratio = pgEnum(
+  'enum__projects_v_blocks_content_card_aspect_ratio',
+  ['auto', 'square', 'landscape', 'portrait'],
+)
+export const enum__projects_v_blocks_content_card_link_type = pgEnum(
+  'enum__projects_v_blocks_content_card_link_type',
+  ['reference', 'custom'],
+)
+export const enum__projects_v_blocks_tech_stack_canvas_cards_category = pgEnum(
+  'enum__projects_v_blocks_tech_stack_canvas_cards_category',
+  ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
+)
+export const enum__projects_v_blocks_tech_stack_canvas_cards_size = pgEnum(
+  'enum__projects_v_blocks_tech_stack_canvas_cards_size',
+  ['sm', 'md', 'lg'],
+)
+export const enum__projects_v_blocks_tech_stack_canvas_container_width = pgEnum(
+  'enum__projects_v_blocks_tech_stack_canvas_container_width',
+  ['container', 'full'],
+)
+export const enum__projects_v_blocks_content_columns_size = pgEnum(
+  'enum__projects_v_blocks_content_columns_size',
+  ['oneThird', 'half', 'twoThirds', 'full'],
+)
+export const enum__projects_v_blocks_content_columns_link_type = pgEnum(
+  'enum__projects_v_blocks_content_columns_link_type',
+  ['reference', 'custom'],
+)
+export const enum__projects_v_blocks_content_columns_link_appearance = pgEnum(
+  'enum__projects_v_blocks_content_columns_link_appearance',
+  ['default', 'outline'],
+)
+export const enum__projects_v_blocks_content_columns_link_size = pgEnum(
+  'enum__projects_v_blocks_content_columns_link_size',
+  ['default'],
+)
+export const enum__projects_v_blocks_draggable_cards_cards_category = pgEnum(
+  'enum__projects_v_blocks_draggable_cards_cards_category',
+  ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
+)
+export const enum__projects_v_blocks_draggable_cards_cards_size = pgEnum(
+  'enum__projects_v_blocks_draggable_cards_cards_size',
+  ['sm', 'md', 'lg'],
+)
+export const enum__projects_v_blocks_draggable_cards_container_width = pgEnum(
+  'enum__projects_v_blocks_draggable_cards_container_width',
+  ['full', 'container'],
+)
+export const enum__projects_v_blocks_grid_columns = pgEnum('enum__projects_v_blocks_grid_columns', [
+  '2',
+  '3',
+  '4',
+])
+export const enum__projects_v_blocks_archive_populate_by = pgEnum(
+  'enum__projects_v_blocks_archive_populate_by',
+  ['collection', 'selection'],
+)
+export const enum__projects_v_blocks_archive_relation_to = pgEnum(
+  'enum__projects_v_blocks_archive_relation_to',
+  ['posts', 'projects'],
+)
+export const enum__projects_v_blocks_image_masonry_grid_gap = pgEnum(
+  'enum__projects_v_blocks_image_masonry_grid_gap',
+  ['small', 'medium', 'large'],
+)
+export const enum__projects_v_blocks_video_player_video_type = pgEnum(
+  'enum__projects_v_blocks_video_player_video_type',
+  ['mux', 'external'],
+)
+export const enum__projects_v_blocks_video_card_aspect_ratio = pgEnum(
+  'enum__projects_v_blocks_video_card_aspect_ratio',
+  ['auto', 'square', 'landscape', 'portrait'],
+)
+export const enum__projects_v_blocks_video_card_link_type = pgEnum(
+  'enum__projects_v_blocks_video_card_link_type',
+  ['reference', 'custom'],
+)
+export const enum__projects_v_version_project_type = pgEnum(
+  'enum__projects_v_version_project_type',
+  ['web', 'photography', 'videography'],
+)
+export const enum__projects_v_version_status = pgEnum('enum__projects_v_version_status', [
+  'draft',
+  'published',
+])
+export const enum_mux_video_playback_options_playback_policy = pgEnum(
+  'enum_mux_video_playback_options_playback_policy',
+  ['signed', 'public'],
+)
+export const enum_redirects_to_type = pgEnum('enum_redirects_to_type', ['reference', 'custom'])
+export const enum_forms_blocks_chips_options_icon = pgEnum('enum_forms_blocks_chips_options_icon', [
+  'HomeIcon',
+  'UserIcon',
+  'UsersIcon',
+  'DocumentIcon',
+  'DocumentsIcon',
+  'FolderIcon',
+  'MagnifyingGlassIcon',
+  'Cog6ToothIcon',
+  'BellIcon',
+  'HeartIcon',
+  'StarIcon',
+  'BookmarkIcon',
+  'CalendarIcon',
+  'ClockIcon',
+  'ChartBarIcon',
+  'Squares2X2Icon',
+  'Bars3Icon',
+  'Bars3BottomLeftIcon',
+  'ArrowRightIcon',
+  'ArrowLeftIcon',
+  'ArrowUpIcon',
+  'ArrowDownIcon',
+  'ChevronRightIcon',
+  'ChevronLeftIcon',
+  'PlusIcon',
+  'MinusIcon',
+  'XMarkIcon',
+  'CheckIcon',
+  'InformationCircleIcon',
+  'ExclamationTriangleIcon',
+  'QuestionMarkCircleIcon',
+  'LockClosedIcon',
+  'LockOpenIcon',
+  'KeyIcon',
+  'ShieldCheckIcon',
+  'EyeIcon',
+  'EyeSlashIcon',
+  'PencilIcon',
+  'TrashIcon',
+  'ShareIcon',
+  'LinkIcon',
+  'PhotoIcon',
+  'VideoCameraIcon',
+  'MusicalNoteIcon',
+  'EnvelopeIcon',
+  'PhoneIcon',
+  'GlobeAltIcon',
+  'MapPinIcon',
+  'ShoppingCartIcon',
+  'CreditCardIcon',
+  'TagIcon',
+  'FireIcon',
+  'BoltIcon',
+  'SunIcon',
+  'MoonIcon',
+  'CloudIcon',
+  'SignalIcon',
+])
+export const enum_forms_confirmation_type = pgEnum('enum_forms_confirmation_type', [
+  'message',
+  'redirect',
+])
+export const enum_payload_jobs_log_task_slug = pgEnum('enum_payload_jobs_log_task_slug', [
+  'inline',
+  'schedulePublish',
+])
+export const enum_payload_jobs_log_state = pgEnum('enum_payload_jobs_log_state', [
+  'failed',
+  'succeeded',
+])
+export const enum_payload_jobs_task_slug = pgEnum('enum_payload_jobs_task_slug', [
+  'inline',
+  'schedulePublish',
+])
+export const enum_header_nav_items_link_type = pgEnum('enum_header_nav_items_link_type', [
+  'reference',
+  'custom',
+])
+export const enum_header_nav_items_link_appearance = pgEnum(
+  'enum_header_nav_items_link_appearance',
+  ['default', 'outline', 'secondary', 'miniOutline', 'link'],
+)
+export const enum_header_nav_items_link_size = pgEnum('enum_header_nav_items_link_size', [
+  'default',
+])
+export const enum_footer_nav_items_link_type = pgEnum('enum_footer_nav_items_link_type', [
+  'reference',
+  'custom',
+])
+export const enum_footer_nav_items_link_size = pgEnum('enum_footer_nav_items_link_size', [
+  'default',
+])
+export const enum_sidebar_nav_items_link_type = pgEnum('enum_sidebar_nav_items_link_type', [
+  'reference',
+  'custom',
+])
+export const enum_sidebar_nav_items_link_appearance = pgEnum(
+  'enum_sidebar_nav_items_link_appearance',
+  ['default', 'outline', 'secondary', 'miniOutline', 'link'],
+)
+export const enum_sidebar_nav_items_link_size = pgEnum('enum_sidebar_nav_items_link_size', [
+  'default',
+  'icon',
+])
+export const enum_sidebar_nav_items_link_icon = pgEnum('enum_sidebar_nav_items_link_icon', [
+  'HomeIcon',
+  'UserIcon',
+  'UsersIcon',
+  'DocumentIcon',
+  'DocumentsIcon',
+  'FolderIcon',
+  'MagnifyingGlassIcon',
+  'Cog6ToothIcon',
+  'BellIcon',
+  'HeartIcon',
+  'StarIcon',
+  'BookmarkIcon',
+  'CalendarIcon',
+  'ClockIcon',
+  'ChartBarIcon',
+  'Squares2X2Icon',
+  'Bars3Icon',
+  'Bars3BottomLeftIcon',
+  'ArrowRightIcon',
+  'ArrowLeftIcon',
+  'ArrowUpIcon',
+  'ArrowDownIcon',
+  'ChevronRightIcon',
+  'ChevronLeftIcon',
+  'PlusIcon',
+  'MinusIcon',
+  'XMarkIcon',
+  'CheckIcon',
+  'InformationCircleIcon',
+  'ExclamationTriangleIcon',
+  'QuestionMarkCircleIcon',
+  'LockClosedIcon',
+  'LockOpenIcon',
+  'KeyIcon',
+  'ShieldCheckIcon',
+  'EyeIcon',
+  'EyeSlashIcon',
+  'PencilIcon',
+  'TrashIcon',
+  'ShareIcon',
+  'LinkIcon',
+  'PhotoIcon',
+  'VideoCameraIcon',
+  'MusicalNoteIcon',
+  'EnvelopeIcon',
+  'PhoneIcon',
+  'GlobeAltIcon',
+  'MapPinIcon',
+  'ShoppingCartIcon',
+  'CreditCardIcon',
+  'TagIcon',
+  'FireIcon',
+  'BoltIcon',
+  'SunIcon',
+  'MoonIcon',
+  'CloudIcon',
+  'SignalIcon',
+])
 
-export const pages_hero_links = sqliteTable(
+export const pages_hero_links = pgTable(
   'pages_hero_links',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_appearance: text('link_appearance', {
-      enum: ['default', 'outline', 'secondary', 'miniOutline', 'link', 'white'],
-    }).default('default'),
-    link_size: text('link_size', { enum: ['default'] }).default('default'),
+    id: varchar('id').primaryKey(),
+    link_type: enum_pages_hero_links_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_appearance: enum_pages_hero_links_link_appearance('link_appearance').default('default'),
+    link_size: enum_pages_hero_links_link_size('link_size').default('default'),
   },
   (columns) => [
     index('pages_hero_links_order_idx').on(columns._order),
@@ -45,12 +643,12 @@ export const pages_hero_links = sqliteTable(
   ],
 )
 
-export const pages_hero_content_card_media = sqliteTable(
+export const pages_hero_content_card_media = pgTable(
   'pages_hero_content_card_media',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
+    id: varchar('id').primaryKey(),
     item: integer('item_id').references(() => media.id, {
       onDelete: 'set null',
     }),
@@ -67,16 +665,16 @@ export const pages_hero_content_card_media = sqliteTable(
   ],
 )
 
-export const pages_hero_content_card_footer_meta = sqliteTable(
+export const pages_hero_content_card_footer_meta = pgTable(
   'pages_hero_content_card_footer_meta',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    location: text('location'),
-    customText: text('custom_text'),
+    id: varchar('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    location: varchar('location'),
+    customText: varchar('custom_text'),
   },
   (columns) => [
     index('pages_hero_content_card_footer_meta_order_idx').on(columns._order),
@@ -89,17 +687,17 @@ export const pages_hero_content_card_footer_meta = sqliteTable(
   ],
 )
 
-export const pages_hero_draggable_cards_cards = sqliteTable(
+export const pages_hero_draggable_cards_cards = pgTable(
   'pages_hero_draggable_cards_cards',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    title: text('title'),
+    id: varchar('id').primaryKey(),
+    title: varchar('title'),
     image: integer('image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    size: text('size', { enum: ['sm', 'md', 'lg'] }).default('md'),
+    size: enum_pages_hero_draggable_cards_cards_size('size').default('md'),
     positions_mobile_normalizedX: numeric('positions_mobile_normalized_x', { mode: 'number' }),
     positions_mobile_normalizedY: numeric('positions_mobile_normalized_y', { mode: 'number' }),
     positions_tablet_normalizedX: numeric('positions_tablet_normalized_x', { mode: 'number' }),
@@ -119,18 +717,19 @@ export const pages_hero_draggable_cards_cards = sqliteTable(
   ],
 )
 
-export const pages_blocks_cta_links = sqliteTable(
+export const pages_blocks_cta_links = pgTable(
   'pages_blocks_cta_links',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_appearance: text('link_appearance', { enum: ['default', 'outline'] }).default('default'),
-    link_size: text('link_size', { enum: ['default'] }).default('default'),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    link_type: enum_pages_blocks_cta_links_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_appearance:
+      enum_pages_blocks_cta_links_link_appearance('link_appearance').default('default'),
+    link_size: enum_pages_blocks_cta_links_link_size('link_size').default('default'),
   },
   (columns) => [
     index('pages_blocks_cta_links_order_idx').on(columns._order),
@@ -143,15 +742,15 @@ export const pages_blocks_cta_links = sqliteTable(
   ],
 )
 
-export const pages_blocks_cta = sqliteTable(
+export const pages_blocks_cta = pgTable(
   'pages_blocks_cta',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    richText: text('rich_text', { mode: 'json' }),
-    blockName: text('block_name'),
+    id: varchar('id').primaryKey(),
+    richText: jsonb('rich_text'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('pages_blocks_cta_order_idx').on(columns._order),
@@ -165,12 +764,12 @@ export const pages_blocks_cta = sqliteTable(
   ],
 )
 
-export const pages_blocks_content_card_media = sqliteTable(
+export const pages_blocks_content_card_media = pgTable(
   'pages_blocks_content_card_media',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
     item: integer('item_id').references(() => media.id, {
       onDelete: 'set null',
     }),
@@ -187,16 +786,16 @@ export const pages_blocks_content_card_media = sqliteTable(
   ],
 )
 
-export const pages_blocks_content_card_footer_meta = sqliteTable(
+export const pages_blocks_content_card_footer_meta = pgTable(
   'pages_blocks_content_card_footer_meta',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    location: text('location'),
-    customText: text('custom_text'),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    location: varchar('location'),
+    customText: varchar('custom_text'),
   },
   (columns) => [
     index('pages_blocks_content_card_footer_meta_order_idx').on(columns._order),
@@ -209,25 +808,23 @@ export const pages_blocks_content_card_footer_meta = sqliteTable(
   ],
 )
 
-export const pages_blocks_content_card = sqliteTable(
+export const pages_blocks_content_card = pgTable(
   'pages_blocks_content_card',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    aspectRatio: text('aspect_ratio', {
-      enum: ['auto', 'square', 'landscape', 'portrait'],
-    }).default('auto'),
+    id: varchar('id').primaryKey(),
+    aspectRatio: enum_pages_blocks_content_card_aspect_ratio('aspect_ratio').default('auto'),
     cycleInterval: numeric('cycle_interval', { mode: 'number' }).default('3'),
-    videoAutoplay: integer('video_autoplay', { mode: 'boolean' }).default(false),
-    enableLink: integer('enable_link', { mode: 'boolean' }).default(false),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    enableFooter: integer('enable_footer', { mode: 'boolean' }).default(false),
-    blockName: text('block_name'),
+    videoAutoplay: boolean('video_autoplay').default(false),
+    enableLink: boolean('enable_link').default(false),
+    link_type: enum_pages_blocks_content_card_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    enableFooter: boolean('enable_footer').default(false),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('pages_blocks_content_card_order_idx').on(columns._order),
@@ -241,20 +838,18 @@ export const pages_blocks_content_card = sqliteTable(
   ],
 )
 
-export const pages_blocks_tech_stack_canvas_cards = sqliteTable(
+export const pages_blocks_tech_stack_canvas_cards = pgTable(
   'pages_blocks_tech_stack_canvas_cards',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    title: text('title'),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    title: varchar('title'),
     image: integer('image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    category: text('category', {
-      enum: ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
-    }),
-    size: text('size', { enum: ['sm', 'md', 'lg'] }).default('md'),
+    category: enum_pages_blocks_tech_stack_canvas_cards_category('category'),
+    size: enum_pages_blocks_tech_stack_canvas_cards_size('size').default('md'),
     mobile_normalizedX: numeric('mobile_normalized_x', { mode: 'number' }),
     mobile_normalizedY: numeric('mobile_normalized_y', { mode: 'number' }),
     tablet_normalizedX: numeric('tablet_normalized_x', { mode: 'number' }),
@@ -274,18 +869,19 @@ export const pages_blocks_tech_stack_canvas_cards = sqliteTable(
   ],
 )
 
-export const pages_blocks_tech_stack_canvas = sqliteTable(
+export const pages_blocks_tech_stack_canvas = pgTable(
   'pages_blocks_tech_stack_canvas',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    containerWidth: text('container_width', { enum: ['container', 'full'] }).default('container'),
+    id: varchar('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    containerWidth:
+      enum_pages_blocks_tech_stack_canvas_container_width('container_width').default('container'),
     containerHeight: numeric('container_height', { mode: 'number' }).default('600'),
-    blockName: text('block_name'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('pages_blocks_tech_stack_canvas_order_idx').on(columns._order),
@@ -299,21 +895,22 @@ export const pages_blocks_tech_stack_canvas = sqliteTable(
   ],
 )
 
-export const pages_blocks_content_columns = sqliteTable(
+export const pages_blocks_content_columns = pgTable(
   'pages_blocks_content_columns',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    size: text('size', { enum: ['oneThird', 'half', 'twoThirds', 'full'] }).default('oneThird'),
-    richText: text('rich_text', { mode: 'json' }),
-    enableLink: integer('enable_link', { mode: 'boolean' }),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_appearance: text('link_appearance', { enum: ['default', 'outline'] }).default('default'),
-    link_size: text('link_size', { enum: ['default'] }).default('default'),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    size: enum_pages_blocks_content_columns_size('size').default('oneThird'),
+    richText: jsonb('rich_text'),
+    enableLink: boolean('enable_link'),
+    link_type: enum_pages_blocks_content_columns_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_appearance:
+      enum_pages_blocks_content_columns_link_appearance('link_appearance').default('default'),
+    link_size: enum_pages_blocks_content_columns_link_size('link_size').default('default'),
   },
   (columns) => [
     index('pages_blocks_content_columns_order_idx').on(columns._order),
@@ -326,14 +923,14 @@ export const pages_blocks_content_columns = sqliteTable(
   ],
 )
 
-export const pages_blocks_content = sqliteTable(
+export const pages_blocks_content = pgTable(
   'pages_blocks_content',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    blockName: text('block_name'),
+    id: varchar('id').primaryKey(),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('pages_blocks_content_order_idx').on(columns._order),
@@ -347,20 +944,18 @@ export const pages_blocks_content = sqliteTable(
   ],
 )
 
-export const pages_blocks_draggable_cards_cards = sqliteTable(
+export const pages_blocks_draggable_cards_cards = pgTable(
   'pages_blocks_draggable_cards_cards',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    title: text('title'),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    title: varchar('title'),
     image: integer('image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    category: text('category', {
-      enum: ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
-    }),
-    size: text('size', { enum: ['sm', 'md', 'lg'] }).default('md'),
+    category: enum_pages_blocks_draggable_cards_cards_category('category'),
+    size: enum_pages_blocks_draggable_cards_cards_size('size').default('md'),
     positions_mobile_normalizedX: numeric('positions_mobile_normalized_x', { mode: 'number' }),
     positions_mobile_normalizedY: numeric('positions_mobile_normalized_y', { mode: 'number' }),
     positions_tablet_normalizedX: numeric('positions_tablet_normalized_x', { mode: 'number' }),
@@ -380,18 +975,19 @@ export const pages_blocks_draggable_cards_cards = sqliteTable(
   ],
 )
 
-export const pages_blocks_draggable_cards = sqliteTable(
+export const pages_blocks_draggable_cards = pgTable(
   'pages_blocks_draggable_cards',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    containerWidth: text('container_width', { enum: ['full', 'container'] }).default('full'),
+    id: varchar('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    containerWidth:
+      enum_pages_blocks_draggable_cards_container_width('container_width').default('full'),
     containerHeight: numeric('container_height', { mode: 'number' }).default('600'),
-    blockName: text('block_name'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('pages_blocks_draggable_cards_order_idx').on(columns._order),
@@ -405,15 +1001,15 @@ export const pages_blocks_draggable_cards = sqliteTable(
   ],
 )
 
-export const pages_blocks_grid = sqliteTable(
+export const pages_blocks_grid = pgTable(
   'pages_blocks_grid',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    columns: text('columns', { enum: ['2', '3', '4'] }).default('3'),
-    blockName: text('block_name'),
+    id: varchar('id').primaryKey(),
+    columns: enum_pages_blocks_grid_columns('columns').default('3'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('pages_blocks_grid_order_idx').on(columns._order),
@@ -427,17 +1023,17 @@ export const pages_blocks_grid = sqliteTable(
   ],
 )
 
-export const pages_blocks_media_block = sqliteTable(
+export const pages_blocks_media_block = pgTable(
   'pages_blocks_media_block',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
+    id: varchar('id').primaryKey(),
     media: integer('media_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    blockName: text('block_name'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('pages_blocks_media_block_order_idx').on(columns._order),
@@ -452,18 +1048,18 @@ export const pages_blocks_media_block = sqliteTable(
   ],
 )
 
-export const pages_blocks_archive = sqliteTable(
+export const pages_blocks_archive = pgTable(
   'pages_blocks_archive',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    introContent: text('intro_content', { mode: 'json' }),
-    populateBy: text('populate_by', { enum: ['collection', 'selection'] }).default('collection'),
-    relationTo: text('relation_to', { enum: ['posts', 'projects'] }).default('posts'),
+    id: varchar('id').primaryKey(),
+    introContent: jsonb('intro_content'),
+    populateBy: enum_pages_blocks_archive_populate_by('populate_by').default('collection'),
+    relationTo: enum_pages_blocks_archive_relation_to('relation_to').default('posts'),
     limit: numeric('limit', { mode: 'number' }).default('10'),
-    blockName: text('block_name'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('pages_blocks_archive_order_idx').on(columns._order),
@@ -477,19 +1073,19 @@ export const pages_blocks_archive = sqliteTable(
   ],
 )
 
-export const pages_blocks_form_block = sqliteTable(
+export const pages_blocks_form_block = pgTable(
   'pages_blocks_form_block',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
+    id: varchar('id').primaryKey(),
     form: integer('form_id').references(() => forms.id, {
       onDelete: 'set null',
     }),
-    enableIntro: integer('enable_intro', { mode: 'boolean' }),
-    introContent: text('intro_content', { mode: 'json' }),
-    blockName: text('block_name'),
+    enableIntro: boolean('enable_intro'),
+    introContent: jsonb('intro_content'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('pages_blocks_form_block_order_idx').on(columns._order),
@@ -504,57 +1100,86 @@ export const pages_blocks_form_block = sqliteTable(
   ],
 )
 
-export const pages = sqliteTable(
+export const pages_blocks_video_card = pgTable(
+  'pages_blocks_video_card',
+  {
+    _order: integer('_order').notNull(),
+    _parentID: integer('_parent_id').notNull(),
+    _path: text('_path').notNull(),
+    id: varchar('id').primaryKey(),
+    video: integer('video_id').references(() => mux_video.id, {
+      onDelete: 'set null',
+    }),
+    aspectRatio: enum_pages_blocks_video_card_aspect_ratio('aspect_ratio').default('auto'),
+    videoAutoplay: boolean('video_autoplay').default(false),
+    enableLink: boolean('enable_link').default(false),
+    link_type: enum_pages_blocks_video_card_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    enableFooter: boolean('enable_footer').default(false),
+    footerMeta_title: varchar('footer_meta_title'),
+    footerMeta_description: varchar('footer_meta_description'),
+    footerMeta_location: varchar('footer_meta_location'),
+    footerMeta_customText: varchar('footer_meta_custom_text'),
+    blockName: varchar('block_name'),
+  },
+  (columns) => [
+    index('pages_blocks_video_card_order_idx').on(columns._order),
+    index('pages_blocks_video_card_parent_id_idx').on(columns._parentID),
+    index('pages_blocks_video_card_path_idx').on(columns._path),
+    index('pages_blocks_video_card_video_idx').on(columns.video),
+    foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [pages.id],
+      name: 'pages_blocks_video_card_parent_id_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
+export const pages = pgTable(
   'pages',
   {
-    id: integer('id').primaryKey(),
-    title: text('title'),
-    hero_type: text('hero_type', {
-      enum: ['none', 'highImpact', 'mediumImpact', 'lowImpact', 'custom'],
-    }).default('lowImpact'),
-    hero_richText: text('hero_rich_text', { mode: 'json' }),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
+    hero_type: enum_pages_hero_type('hero_type').default('lowImpact'),
+    hero_richText: jsonb('hero_rich_text'),
     hero_media: integer('hero_media_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    hero_contentCard_aspectRatio: text('hero_content_card_aspect_ratio', {
-      enum: ['auto', 'square', 'landscape', 'portrait'],
-    }).default('auto'),
+    hero_contentCard_aspectRatio: enum_pages_hero_content_card_aspect_ratio(
+      'hero_content_card_aspect_ratio',
+    ).default('auto'),
     hero_contentCard_cycleInterval: numeric('hero_content_card_cycle_interval', {
       mode: 'number',
     }).default('3'),
-    hero_contentCard_videoAutoplay: integer('hero_content_card_video_autoplay', {
-      mode: 'boolean',
-    }).default(false),
-    hero_contentCard_enableLink: integer('hero_content_card_enable_link', {
-      mode: 'boolean',
-    }).default(false),
-    hero_contentCard_link_type: text('hero_content_card_link_type', {
-      enum: ['reference', 'custom'],
-    }).default('reference'),
-    hero_contentCard_link_newTab: integer('hero_content_card_link_new_tab', { mode: 'boolean' }),
-    hero_contentCard_link_url: text('hero_content_card_link_url'),
-    hero_contentCard_link_label: text('hero_content_card_link_label'),
-    hero_contentCard_enableFooter: integer('hero_content_card_enable_footer', {
-      mode: 'boolean',
-    }).default(false),
+    hero_contentCard_videoAutoplay: boolean('hero_content_card_video_autoplay').default(false),
+    hero_contentCard_enableLink: boolean('hero_content_card_enable_link').default(false),
+    hero_contentCard_link_type: enum_pages_hero_content_card_link_type(
+      'hero_content_card_link_type',
+    ).default('reference'),
+    hero_contentCard_link_newTab: boolean('hero_content_card_link_new_tab'),
+    hero_contentCard_link_url: varchar('hero_content_card_link_url'),
+    hero_contentCard_link_label: varchar('hero_content_card_link_label'),
+    hero_contentCard_enableFooter: boolean('hero_content_card_enable_footer').default(false),
     hero_draggableCards_containerHeight: numeric('hero_draggable_cards_container_height', {
       mode: 'number',
     }).default('400'),
-    meta_title: text('meta_title'),
+    meta_title: varchar('meta_title'),
     meta_image: integer('meta_image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    meta_description: text('meta_description'),
-    publishedAt: text('published_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    generateSlug: integer('generate_slug', { mode: 'boolean' }).default(true),
-    slug: text('slug'),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    _status: text('_status', { enum: ['draft', 'published'] }).default('draft'),
+    meta_description: varchar('meta_description'),
+    publishedAt: timestamp('published_at', { mode: 'string', withTimezone: true, precision: 3 }),
+    generateSlug: boolean('generate_slug').default(true),
+    slug: varchar('slug'),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    _status: enum_pages_status('_status').default('draft'),
   },
   (columns) => [
     index('pages_hero_hero_media_idx').on(columns.hero_media),
@@ -566,13 +1191,13 @@ export const pages = sqliteTable(
   ],
 )
 
-export const pages_rels = sqliteTable(
+export const pages_rels = pgTable(
   'pages_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     pagesID: integer('pages_id'),
     postsID: integer('posts_id'),
     projectsID: integer('projects_id'),
@@ -614,21 +1239,20 @@ export const pages_rels = sqliteTable(
   ],
 )
 
-export const _pages_v_version_hero_links = sqliteTable(
+export const _pages_v_version_hero_links = pgTable(
   '_pages_v_version_hero_links',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_appearance: text('link_appearance', {
-      enum: ['default', 'outline', 'secondary', 'miniOutline', 'link', 'white'],
-    }).default('default'),
-    link_size: text('link_size', { enum: ['default'] }).default('default'),
-    _uuid: text('_uuid'),
+    id: serial('id').primaryKey(),
+    link_type: enum__pages_v_version_hero_links_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_appearance:
+      enum__pages_v_version_hero_links_link_appearance('link_appearance').default('default'),
+    link_size: enum__pages_v_version_hero_links_link_size('link_size').default('default'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_pages_v_version_hero_links_order_idx').on(columns._order),
@@ -641,16 +1265,16 @@ export const _pages_v_version_hero_links = sqliteTable(
   ],
 )
 
-export const _pages_v_version_hero_content_card_media = sqliteTable(
+export const _pages_v_version_hero_content_card_media = pgTable(
   '_pages_v_version_hero_content_card_media',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     item: integer('item_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    _uuid: text('_uuid'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_pages_v_version_hero_content_card_media_order_idx').on(columns._order),
@@ -664,17 +1288,17 @@ export const _pages_v_version_hero_content_card_media = sqliteTable(
   ],
 )
 
-export const _pages_v_version_hero_content_card_footer_meta = sqliteTable(
+export const _pages_v_version_hero_content_card_footer_meta = pgTable(
   '_pages_v_version_hero_content_card_footer_meta',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    location: text('location'),
-    customText: text('custom_text'),
-    _uuid: text('_uuid'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    location: varchar('location'),
+    customText: varchar('custom_text'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_pages_v_version_hero_content_card_footer_meta_order_idx').on(columns._order),
@@ -687,24 +1311,24 @@ export const _pages_v_version_hero_content_card_footer_meta = sqliteTable(
   ],
 )
 
-export const _pages_v_version_hero_draggable_cards_cards = sqliteTable(
+export const _pages_v_version_hero_draggable_cards_cards = pgTable(
   '_pages_v_version_hero_draggable_cards_cards',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    title: text('title'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
     image: integer('image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    size: text('size', { enum: ['sm', 'md', 'lg'] }).default('md'),
+    size: enum__pages_v_version_hero_draggable_cards_cards_size('size').default('md'),
     positions_mobile_normalizedX: numeric('positions_mobile_normalized_x', { mode: 'number' }),
     positions_mobile_normalizedY: numeric('positions_mobile_normalized_y', { mode: 'number' }),
     positions_tablet_normalizedX: numeric('positions_tablet_normalized_x', { mode: 'number' }),
     positions_tablet_normalizedY: numeric('positions_tablet_normalized_y', { mode: 'number' }),
     positions_desktop_normalizedX: numeric('positions_desktop_normalized_x', { mode: 'number' }),
     positions_desktop_normalizedY: numeric('positions_desktop_normalized_y', { mode: 'number' }),
-    _uuid: text('_uuid'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_pages_v_version_hero_draggable_cards_cards_order_idx').on(columns._order),
@@ -718,19 +1342,20 @@ export const _pages_v_version_hero_draggable_cards_cards = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_cta_links = sqliteTable(
+export const _pages_v_blocks_cta_links = pgTable(
   '_pages_v_blocks_cta_links',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_appearance: text('link_appearance', { enum: ['default', 'outline'] }).default('default'),
-    link_size: text('link_size', { enum: ['default'] }).default('default'),
-    _uuid: text('_uuid'),
+    id: serial('id').primaryKey(),
+    link_type: enum__pages_v_blocks_cta_links_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_appearance:
+      enum__pages_v_blocks_cta_links_link_appearance('link_appearance').default('default'),
+    link_size: enum__pages_v_blocks_cta_links_link_size('link_size').default('default'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_pages_v_blocks_cta_links_order_idx').on(columns._order),
@@ -743,16 +1368,16 @@ export const _pages_v_blocks_cta_links = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_cta = sqliteTable(
+export const _pages_v_blocks_cta = pgTable(
   '_pages_v_blocks_cta',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    richText: text('rich_text', { mode: 'json' }),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    id: serial('id').primaryKey(),
+    richText: jsonb('rich_text'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_pages_v_blocks_cta_order_idx').on(columns._order),
@@ -766,16 +1391,16 @@ export const _pages_v_blocks_cta = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_content_card_media = sqliteTable(
+export const _pages_v_blocks_content_card_media = pgTable(
   '_pages_v_blocks_content_card_media',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     item: integer('item_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    _uuid: text('_uuid'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_pages_v_blocks_content_card_media_order_idx').on(columns._order),
@@ -789,17 +1414,17 @@ export const _pages_v_blocks_content_card_media = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_content_card_footer_meta = sqliteTable(
+export const _pages_v_blocks_content_card_footer_meta = pgTable(
   '_pages_v_blocks_content_card_footer_meta',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    location: text('location'),
-    customText: text('custom_text'),
-    _uuid: text('_uuid'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    location: varchar('location'),
+    customText: varchar('custom_text'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_pages_v_blocks_content_card_footer_meta_order_idx').on(columns._order),
@@ -812,26 +1437,24 @@ export const _pages_v_blocks_content_card_footer_meta = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_content_card = sqliteTable(
+export const _pages_v_blocks_content_card = pgTable(
   '_pages_v_blocks_content_card',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    aspectRatio: text('aspect_ratio', {
-      enum: ['auto', 'square', 'landscape', 'portrait'],
-    }).default('auto'),
+    id: serial('id').primaryKey(),
+    aspectRatio: enum__pages_v_blocks_content_card_aspect_ratio('aspect_ratio').default('auto'),
     cycleInterval: numeric('cycle_interval', { mode: 'number' }).default('3'),
-    videoAutoplay: integer('video_autoplay', { mode: 'boolean' }).default(false),
-    enableLink: integer('enable_link', { mode: 'boolean' }).default(false),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    enableFooter: integer('enable_footer', { mode: 'boolean' }).default(false),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    videoAutoplay: boolean('video_autoplay').default(false),
+    enableLink: boolean('enable_link').default(false),
+    link_type: enum__pages_v_blocks_content_card_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    enableFooter: boolean('enable_footer').default(false),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_pages_v_blocks_content_card_order_idx').on(columns._order),
@@ -845,27 +1468,25 @@ export const _pages_v_blocks_content_card = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_tech_stack_canvas_cards = sqliteTable(
+export const _pages_v_blocks_tech_stack_canvas_cards = pgTable(
   '_pages_v_blocks_tech_stack_canvas_cards',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    title: text('title'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
     image: integer('image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    category: text('category', {
-      enum: ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
-    }),
-    size: text('size', { enum: ['sm', 'md', 'lg'] }).default('md'),
+    category: enum__pages_v_blocks_tech_stack_canvas_cards_category('category'),
+    size: enum__pages_v_blocks_tech_stack_canvas_cards_size('size').default('md'),
     mobile_normalizedX: numeric('mobile_normalized_x', { mode: 'number' }),
     mobile_normalizedY: numeric('mobile_normalized_y', { mode: 'number' }),
     tablet_normalizedX: numeric('tablet_normalized_x', { mode: 'number' }),
     tablet_normalizedY: numeric('tablet_normalized_y', { mode: 'number' }),
     desktop_normalizedX: numeric('desktop_normalized_x', { mode: 'number' }),
     desktop_normalizedY: numeric('desktop_normalized_y', { mode: 'number' }),
-    _uuid: text('_uuid'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_pages_v_blocks_tech_stack_canvas_cards_order_idx').on(columns._order),
@@ -879,19 +1500,22 @@ export const _pages_v_blocks_tech_stack_canvas_cards = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_tech_stack_canvas = sqliteTable(
+export const _pages_v_blocks_tech_stack_canvas = pgTable(
   '_pages_v_blocks_tech_stack_canvas',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    containerWidth: text('container_width', { enum: ['container', 'full'] }).default('container'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    containerWidth:
+      enum__pages_v_blocks_tech_stack_canvas_container_width('container_width').default(
+        'container',
+      ),
     containerHeight: numeric('container_height', { mode: 'number' }).default('600'),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_pages_v_blocks_tech_stack_canvas_order_idx').on(columns._order),
@@ -905,22 +1529,23 @@ export const _pages_v_blocks_tech_stack_canvas = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_content_columns = sqliteTable(
+export const _pages_v_blocks_content_columns = pgTable(
   '_pages_v_blocks_content_columns',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    size: text('size', { enum: ['oneThird', 'half', 'twoThirds', 'full'] }).default('oneThird'),
-    richText: text('rich_text', { mode: 'json' }),
-    enableLink: integer('enable_link', { mode: 'boolean' }),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_appearance: text('link_appearance', { enum: ['default', 'outline'] }).default('default'),
-    link_size: text('link_size', { enum: ['default'] }).default('default'),
-    _uuid: text('_uuid'),
+    id: serial('id').primaryKey(),
+    size: enum__pages_v_blocks_content_columns_size('size').default('oneThird'),
+    richText: jsonb('rich_text'),
+    enableLink: boolean('enable_link'),
+    link_type: enum__pages_v_blocks_content_columns_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_appearance:
+      enum__pages_v_blocks_content_columns_link_appearance('link_appearance').default('default'),
+    link_size: enum__pages_v_blocks_content_columns_link_size('link_size').default('default'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_pages_v_blocks_content_columns_order_idx').on(columns._order),
@@ -933,15 +1558,15 @@ export const _pages_v_blocks_content_columns = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_content = sqliteTable(
+export const _pages_v_blocks_content = pgTable(
   '_pages_v_blocks_content',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    id: serial('id').primaryKey(),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_pages_v_blocks_content_order_idx').on(columns._order),
@@ -955,27 +1580,25 @@ export const _pages_v_blocks_content = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_draggable_cards_cards = sqliteTable(
+export const _pages_v_blocks_draggable_cards_cards = pgTable(
   '_pages_v_blocks_draggable_cards_cards',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    title: text('title'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
     image: integer('image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    category: text('category', {
-      enum: ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
-    }),
-    size: text('size', { enum: ['sm', 'md', 'lg'] }).default('md'),
+    category: enum__pages_v_blocks_draggable_cards_cards_category('category'),
+    size: enum__pages_v_blocks_draggable_cards_cards_size('size').default('md'),
     positions_mobile_normalizedX: numeric('positions_mobile_normalized_x', { mode: 'number' }),
     positions_mobile_normalizedY: numeric('positions_mobile_normalized_y', { mode: 'number' }),
     positions_tablet_normalizedX: numeric('positions_tablet_normalized_x', { mode: 'number' }),
     positions_tablet_normalizedY: numeric('positions_tablet_normalized_y', { mode: 'number' }),
     positions_desktop_normalizedX: numeric('positions_desktop_normalized_x', { mode: 'number' }),
     positions_desktop_normalizedY: numeric('positions_desktop_normalized_y', { mode: 'number' }),
-    _uuid: text('_uuid'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_pages_v_blocks_draggable_cards_cards_order_idx').on(columns._order),
@@ -989,19 +1612,20 @@ export const _pages_v_blocks_draggable_cards_cards = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_draggable_cards = sqliteTable(
+export const _pages_v_blocks_draggable_cards = pgTable(
   '_pages_v_blocks_draggable_cards',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    containerWidth: text('container_width', { enum: ['full', 'container'] }).default('full'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    containerWidth:
+      enum__pages_v_blocks_draggable_cards_container_width('container_width').default('full'),
     containerHeight: numeric('container_height', { mode: 'number' }).default('600'),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_pages_v_blocks_draggable_cards_order_idx').on(columns._order),
@@ -1015,16 +1639,16 @@ export const _pages_v_blocks_draggable_cards = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_grid = sqliteTable(
+export const _pages_v_blocks_grid = pgTable(
   '_pages_v_blocks_grid',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    columns: text('columns', { enum: ['2', '3', '4'] }).default('3'),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    id: serial('id').primaryKey(),
+    columns: enum__pages_v_blocks_grid_columns('columns').default('3'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_pages_v_blocks_grid_order_idx').on(columns._order),
@@ -1038,18 +1662,18 @@ export const _pages_v_blocks_grid = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_media_block = sqliteTable(
+export const _pages_v_blocks_media_block = pgTable(
   '_pages_v_blocks_media_block',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     media: integer('media_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_pages_v_blocks_media_block_order_idx').on(columns._order),
@@ -1064,19 +1688,19 @@ export const _pages_v_blocks_media_block = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_archive = sqliteTable(
+export const _pages_v_blocks_archive = pgTable(
   '_pages_v_blocks_archive',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    introContent: text('intro_content', { mode: 'json' }),
-    populateBy: text('populate_by', { enum: ['collection', 'selection'] }).default('collection'),
-    relationTo: text('relation_to', { enum: ['posts', 'projects'] }).default('posts'),
+    id: serial('id').primaryKey(),
+    introContent: jsonb('intro_content'),
+    populateBy: enum__pages_v_blocks_archive_populate_by('populate_by').default('collection'),
+    relationTo: enum__pages_v_blocks_archive_relation_to('relation_to').default('posts'),
     limit: numeric('limit', { mode: 'number' }).default('10'),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_pages_v_blocks_archive_order_idx').on(columns._order),
@@ -1090,20 +1714,20 @@ export const _pages_v_blocks_archive = sqliteTable(
   ],
 )
 
-export const _pages_v_blocks_form_block = sqliteTable(
+export const _pages_v_blocks_form_block = pgTable(
   '_pages_v_blocks_form_block',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     form: integer('form_id').references(() => forms.id, {
       onDelete: 'set null',
     }),
-    enableIntro: integer('enable_intro', { mode: 'boolean' }),
-    introContent: text('intro_content', { mode: 'json' }),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    enableIntro: boolean('enable_intro'),
+    introContent: jsonb('intro_content'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_pages_v_blocks_form_block_order_idx').on(columns._order),
@@ -1118,73 +1742,113 @@ export const _pages_v_blocks_form_block = sqliteTable(
   ],
 )
 
-export const _pages_v = sqliteTable(
+export const _pages_v_blocks_video_card = pgTable(
+  '_pages_v_blocks_video_card',
+  {
+    _order: integer('_order').notNull(),
+    _parentID: integer('_parent_id').notNull(),
+    _path: text('_path').notNull(),
+    id: serial('id').primaryKey(),
+    video: integer('video_id').references(() => mux_video.id, {
+      onDelete: 'set null',
+    }),
+    aspectRatio: enum__pages_v_blocks_video_card_aspect_ratio('aspect_ratio').default('auto'),
+    videoAutoplay: boolean('video_autoplay').default(false),
+    enableLink: boolean('enable_link').default(false),
+    link_type: enum__pages_v_blocks_video_card_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    enableFooter: boolean('enable_footer').default(false),
+    footerMeta_title: varchar('footer_meta_title'),
+    footerMeta_description: varchar('footer_meta_description'),
+    footerMeta_location: varchar('footer_meta_location'),
+    footerMeta_customText: varchar('footer_meta_custom_text'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
+  },
+  (columns) => [
+    index('_pages_v_blocks_video_card_order_idx').on(columns._order),
+    index('_pages_v_blocks_video_card_parent_id_idx').on(columns._parentID),
+    index('_pages_v_blocks_video_card_path_idx').on(columns._path),
+    index('_pages_v_blocks_video_card_video_idx').on(columns.video),
+    foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [_pages_v.id],
+      name: '_pages_v_blocks_video_card_parent_id_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
+export const _pages_v = pgTable(
   '_pages_v',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     parent: integer('parent_id').references(() => pages.id, {
       onDelete: 'set null',
     }),
-    version_title: text('version_title'),
-    version_hero_type: text('version_hero_type', {
-      enum: ['none', 'highImpact', 'mediumImpact', 'lowImpact', 'custom'],
-    }).default('lowImpact'),
-    version_hero_richText: text('version_hero_rich_text', { mode: 'json' }),
+    version_title: varchar('version_title'),
+    version_hero_type: enum__pages_v_version_hero_type('version_hero_type').default('lowImpact'),
+    version_hero_richText: jsonb('version_hero_rich_text'),
     version_hero_media: integer('version_hero_media_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    version_hero_contentCard_aspectRatio: text('version_hero_content_card_aspect_ratio', {
-      enum: ['auto', 'square', 'landscape', 'portrait'],
-    }).default('auto'),
+    version_hero_contentCard_aspectRatio: enum__pages_v_version_hero_content_card_aspect_ratio(
+      'version_hero_content_card_aspect_ratio',
+    ).default('auto'),
     version_hero_contentCard_cycleInterval: numeric('version_hero_content_card_cycle_interval', {
       mode: 'number',
     }).default('3'),
-    version_hero_contentCard_videoAutoplay: integer('version_hero_content_card_video_autoplay', {
-      mode: 'boolean',
-    }).default(false),
-    version_hero_contentCard_enableLink: integer('version_hero_content_card_enable_link', {
-      mode: 'boolean',
-    }).default(false),
-    version_hero_contentCard_link_type: text('version_hero_content_card_link_type', {
-      enum: ['reference', 'custom'],
-    }).default('reference'),
-    version_hero_contentCard_link_newTab: integer('version_hero_content_card_link_new_tab', {
-      mode: 'boolean',
-    }),
-    version_hero_contentCard_link_url: text('version_hero_content_card_link_url'),
-    version_hero_contentCard_link_label: text('version_hero_content_card_link_label'),
-    version_hero_contentCard_enableFooter: integer('version_hero_content_card_enable_footer', {
-      mode: 'boolean',
-    }).default(false),
+    version_hero_contentCard_videoAutoplay: boolean(
+      'version_hero_content_card_video_autoplay',
+    ).default(false),
+    version_hero_contentCard_enableLink: boolean('version_hero_content_card_enable_link').default(
+      false,
+    ),
+    version_hero_contentCard_link_type: enum__pages_v_version_hero_content_card_link_type(
+      'version_hero_content_card_link_type',
+    ).default('reference'),
+    version_hero_contentCard_link_newTab: boolean('version_hero_content_card_link_new_tab'),
+    version_hero_contentCard_link_url: varchar('version_hero_content_card_link_url'),
+    version_hero_contentCard_link_label: varchar('version_hero_content_card_link_label'),
+    version_hero_contentCard_enableFooter: boolean(
+      'version_hero_content_card_enable_footer',
+    ).default(false),
     version_hero_draggableCards_containerHeight: numeric(
       'version_hero_draggable_cards_container_height',
       { mode: 'number' },
     ).default('400'),
-    version_meta_title: text('version_meta_title'),
+    version_meta_title: varchar('version_meta_title'),
     version_meta_image: integer('version_meta_image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    version_meta_description: text('version_meta_description'),
-    version_publishedAt: text('version_published_at').default(
-      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
-    ),
-    version_generateSlug: integer('version_generate_slug', { mode: 'boolean' }).default(true),
-    version_slug: text('version_slug'),
-    version_updatedAt: text('version_updated_at').default(
-      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
-    ),
-    version_createdAt: text('version_created_at').default(
-      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
-    ),
-    version__status: text('version__status', { enum: ['draft', 'published'] }).default('draft'),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    latest: integer('latest', { mode: 'boolean' }),
-    autosave: integer('autosave', { mode: 'boolean' }),
+    version_meta_description: varchar('version_meta_description'),
+    version_publishedAt: timestamp('version_published_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version_generateSlug: boolean('version_generate_slug').default(true),
+    version_slug: varchar('version_slug'),
+    version_updatedAt: timestamp('version_updated_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version_createdAt: timestamp('version_created_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version__status: enum__pages_v_version_status('version__status').default('draft'),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    latest: boolean('latest'),
+    autosave: boolean('autosave'),
   },
   (columns) => [
     index('_pages_v_parent_idx').on(columns.parent),
@@ -1201,13 +1865,13 @@ export const _pages_v = sqliteTable(
   ],
 )
 
-export const _pages_v_rels = sqliteTable(
+export const _pages_v_rels = pgTable(
   '_pages_v_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     pagesID: integer('pages_id'),
     postsID: integer('posts_id'),
     projectsID: integer('projects_id'),
@@ -1249,13 +1913,13 @@ export const _pages_v_rels = sqliteTable(
   ],
 )
 
-export const posts_populated_authors = sqliteTable(
+export const posts_populated_authors = pgTable(
   'posts_populated_authors',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    name: text('name'),
+    id: varchar('id').primaryKey(),
+    name: varchar('name'),
   },
   (columns) => [
     index('posts_populated_authors_order_idx').on(columns._order),
@@ -1268,30 +1932,30 @@ export const posts_populated_authors = sqliteTable(
   ],
 )
 
-export const posts = sqliteTable(
+export const posts = pgTable(
   'posts',
   {
-    id: integer('id').primaryKey(),
-    title: text('title'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
     heroImage: integer('hero_image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    content: text('content', { mode: 'json' }),
-    meta_title: text('meta_title'),
+    content: jsonb('content'),
+    meta_title: varchar('meta_title'),
     meta_image: integer('meta_image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    meta_description: text('meta_description'),
-    publishedAt: text('published_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    generateSlug: integer('generate_slug', { mode: 'boolean' }).default(true),
-    slug: text('slug'),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    _status: text('_status', { enum: ['draft', 'published'] }).default('draft'),
+    meta_description: varchar('meta_description'),
+    publishedAt: timestamp('published_at', { mode: 'string', withTimezone: true, precision: 3 }),
+    generateSlug: boolean('generate_slug').default(true),
+    slug: varchar('slug'),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    _status: enum_posts_status('_status').default('draft'),
   },
   (columns) => [
     index('posts_hero_image_idx').on(columns.heroImage),
@@ -1303,13 +1967,13 @@ export const posts = sqliteTable(
   ],
 )
 
-export const posts_rels = sqliteTable(
+export const posts_rels = pgTable(
   'posts_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     postsID: integer('posts_id'),
     categoriesID: integer('categories_id'),
     usersID: integer('users_id'),
@@ -1344,14 +2008,14 @@ export const posts_rels = sqliteTable(
   ],
 )
 
-export const _posts_v_version_populated_authors = sqliteTable(
+export const _posts_v_version_populated_authors = pgTable(
   '_posts_v_version_populated_authors',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    _uuid: text('_uuid'),
-    name: text('name'),
+    id: serial('id').primaryKey(),
+    _uuid: varchar('_uuid'),
+    name: varchar('name'),
   },
   (columns) => [
     index('_posts_v_version_populated_authors_order_idx').on(columns._order),
@@ -1364,43 +2028,49 @@ export const _posts_v_version_populated_authors = sqliteTable(
   ],
 )
 
-export const _posts_v = sqliteTable(
+export const _posts_v = pgTable(
   '_posts_v',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     parent: integer('parent_id').references(() => posts.id, {
       onDelete: 'set null',
     }),
-    version_title: text('version_title'),
+    version_title: varchar('version_title'),
     version_heroImage: integer('version_hero_image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    version_content: text('version_content', { mode: 'json' }),
-    version_meta_title: text('version_meta_title'),
+    version_content: jsonb('version_content'),
+    version_meta_title: varchar('version_meta_title'),
     version_meta_image: integer('version_meta_image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    version_meta_description: text('version_meta_description'),
-    version_publishedAt: text('version_published_at').default(
-      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
-    ),
-    version_generateSlug: integer('version_generate_slug', { mode: 'boolean' }).default(true),
-    version_slug: text('version_slug'),
-    version_updatedAt: text('version_updated_at').default(
-      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
-    ),
-    version_createdAt: text('version_created_at').default(
-      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
-    ),
-    version__status: text('version__status', { enum: ['draft', 'published'] }).default('draft'),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    latest: integer('latest', { mode: 'boolean' }),
-    autosave: integer('autosave', { mode: 'boolean' }),
+    version_meta_description: varchar('version_meta_description'),
+    version_publishedAt: timestamp('version_published_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version_generateSlug: boolean('version_generate_slug').default(true),
+    version_slug: varchar('version_slug'),
+    version_updatedAt: timestamp('version_updated_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version_createdAt: timestamp('version_created_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version__status: enum__posts_v_version_status('version__status').default('draft'),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    latest: boolean('latest'),
+    autosave: boolean('autosave'),
   },
   (columns) => [
     index('_posts_v_parent_idx').on(columns.parent),
@@ -1417,13 +2087,13 @@ export const _posts_v = sqliteTable(
   ],
 )
 
-export const _posts_v_rels = sqliteTable(
+export const _posts_v_rels = pgTable(
   '_posts_v_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     postsID: integer('posts_id'),
     categoriesID: integer('categories_id'),
     usersID: integer('users_id'),
@@ -1458,69 +2128,69 @@ export const _posts_v_rels = sqliteTable(
   ],
 )
 
-export const media = sqliteTable(
+export const media = pgTable(
   'media',
   {
-    id: integer('id').primaryKey(),
-    alt: text('alt'),
-    caption: text('caption', { mode: 'json' }),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    url: text('url'),
-    thumbnailURL: text('thumbnail_u_r_l'),
-    filename: text('filename'),
-    mimeType: text('mime_type'),
+    id: serial('id').primaryKey(),
+    alt: varchar('alt'),
+    caption: jsonb('caption'),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    url: varchar('url'),
+    thumbnailURL: varchar('thumbnail_u_r_l'),
+    filename: varchar('filename'),
+    mimeType: varchar('mime_type'),
     filesize: numeric('filesize', { mode: 'number' }),
     width: numeric('width', { mode: 'number' }),
     height: numeric('height', { mode: 'number' }),
     focalX: numeric('focal_x', { mode: 'number' }),
     focalY: numeric('focal_y', { mode: 'number' }),
-    sizes_thumbnail_url: text('sizes_thumbnail_url'),
+    sizes_thumbnail_url: varchar('sizes_thumbnail_url'),
     sizes_thumbnail_width: numeric('sizes_thumbnail_width', { mode: 'number' }),
     sizes_thumbnail_height: numeric('sizes_thumbnail_height', { mode: 'number' }),
-    sizes_thumbnail_mimeType: text('sizes_thumbnail_mime_type'),
+    sizes_thumbnail_mimeType: varchar('sizes_thumbnail_mime_type'),
     sizes_thumbnail_filesize: numeric('sizes_thumbnail_filesize', { mode: 'number' }),
-    sizes_thumbnail_filename: text('sizes_thumbnail_filename'),
-    sizes_square_url: text('sizes_square_url'),
+    sizes_thumbnail_filename: varchar('sizes_thumbnail_filename'),
+    sizes_square_url: varchar('sizes_square_url'),
     sizes_square_width: numeric('sizes_square_width', { mode: 'number' }),
     sizes_square_height: numeric('sizes_square_height', { mode: 'number' }),
-    sizes_square_mimeType: text('sizes_square_mime_type'),
+    sizes_square_mimeType: varchar('sizes_square_mime_type'),
     sizes_square_filesize: numeric('sizes_square_filesize', { mode: 'number' }),
-    sizes_square_filename: text('sizes_square_filename'),
-    sizes_small_url: text('sizes_small_url'),
+    sizes_square_filename: varchar('sizes_square_filename'),
+    sizes_small_url: varchar('sizes_small_url'),
     sizes_small_width: numeric('sizes_small_width', { mode: 'number' }),
     sizes_small_height: numeric('sizes_small_height', { mode: 'number' }),
-    sizes_small_mimeType: text('sizes_small_mime_type'),
+    sizes_small_mimeType: varchar('sizes_small_mime_type'),
     sizes_small_filesize: numeric('sizes_small_filesize', { mode: 'number' }),
-    sizes_small_filename: text('sizes_small_filename'),
-    sizes_medium_url: text('sizes_medium_url'),
+    sizes_small_filename: varchar('sizes_small_filename'),
+    sizes_medium_url: varchar('sizes_medium_url'),
     sizes_medium_width: numeric('sizes_medium_width', { mode: 'number' }),
     sizes_medium_height: numeric('sizes_medium_height', { mode: 'number' }),
-    sizes_medium_mimeType: text('sizes_medium_mime_type'),
+    sizes_medium_mimeType: varchar('sizes_medium_mime_type'),
     sizes_medium_filesize: numeric('sizes_medium_filesize', { mode: 'number' }),
-    sizes_medium_filename: text('sizes_medium_filename'),
-    sizes_large_url: text('sizes_large_url'),
+    sizes_medium_filename: varchar('sizes_medium_filename'),
+    sizes_large_url: varchar('sizes_large_url'),
     sizes_large_width: numeric('sizes_large_width', { mode: 'number' }),
     sizes_large_height: numeric('sizes_large_height', { mode: 'number' }),
-    sizes_large_mimeType: text('sizes_large_mime_type'),
+    sizes_large_mimeType: varchar('sizes_large_mime_type'),
     sizes_large_filesize: numeric('sizes_large_filesize', { mode: 'number' }),
-    sizes_large_filename: text('sizes_large_filename'),
-    sizes_xlarge_url: text('sizes_xlarge_url'),
+    sizes_large_filename: varchar('sizes_large_filename'),
+    sizes_xlarge_url: varchar('sizes_xlarge_url'),
     sizes_xlarge_width: numeric('sizes_xlarge_width', { mode: 'number' }),
     sizes_xlarge_height: numeric('sizes_xlarge_height', { mode: 'number' }),
-    sizes_xlarge_mimeType: text('sizes_xlarge_mime_type'),
+    sizes_xlarge_mimeType: varchar('sizes_xlarge_mime_type'),
     sizes_xlarge_filesize: numeric('sizes_xlarge_filesize', { mode: 'number' }),
-    sizes_xlarge_filename: text('sizes_xlarge_filename'),
-    sizes_og_url: text('sizes_og_url'),
+    sizes_xlarge_filename: varchar('sizes_xlarge_filename'),
+    sizes_og_url: varchar('sizes_og_url'),
     sizes_og_width: numeric('sizes_og_width', { mode: 'number' }),
     sizes_og_height: numeric('sizes_og_height', { mode: 'number' }),
-    sizes_og_mimeType: text('sizes_og_mime_type'),
+    sizes_og_mimeType: varchar('sizes_og_mime_type'),
     sizes_og_filesize: numeric('sizes_og_filesize', { mode: 'number' }),
-    sizes_og_filename: text('sizes_og_filename'),
+    sizes_og_filename: varchar('sizes_og_filename'),
   },
   (columns) => [
     index('media_updated_at_idx').on(columns.updatedAt),
@@ -1538,17 +2208,17 @@ export const media = sqliteTable(
   ],
 )
 
-export const categories_breadcrumbs = sqliteTable(
+export const categories_breadcrumbs = pgTable(
   'categories_breadcrumbs',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
+    id: varchar('id').primaryKey(),
     doc: integer('doc_id').references(() => categories.id, {
       onDelete: 'set null',
     }),
-    url: text('url'),
-    label: text('label'),
+    url: varchar('url'),
+    label: varchar('label'),
   },
   (columns) => [
     index('categories_breadcrumbs_order_idx').on(columns._order),
@@ -1562,22 +2232,22 @@ export const categories_breadcrumbs = sqliteTable(
   ],
 )
 
-export const categories = sqliteTable(
+export const categories = pgTable(
   'categories',
   {
-    id: integer('id').primaryKey(),
-    title: text('title').notNull(),
-    generateSlug: integer('generate_slug', { mode: 'boolean' }).default(true),
-    slug: text('slug').notNull(),
-    parent: integer('parent_id').references((): AnySQLiteColumn => categories.id, {
+    id: serial('id').primaryKey(),
+    title: varchar('title').notNull(),
+    generateSlug: boolean('generate_slug').default(true),
+    slug: varchar('slug').notNull(),
+    parent: integer('parent_id').references((): AnyPgColumn => categories.id, {
       onDelete: 'set null',
     }),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
   },
   (columns) => [
     uniqueIndex('categories_slug_idx').on(columns.slug),
@@ -1587,16 +2257,18 @@ export const categories = sqliteTable(
   ],
 )
 
-export const users_sessions = sqliteTable(
+export const users_sessions = pgTable(
   'users_sessions',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    createdAt: text('created_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    expiresAt: text('expires_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    id: varchar('id').primaryKey(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 }),
+    expiresAt: timestamp('expires_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }).notNull(),
   },
   (columns) => [
     index('users_sessions_order_idx').on(columns._order),
@@ -1609,26 +2281,28 @@ export const users_sessions = sqliteTable(
   ],
 )
 
-export const users = sqliteTable(
+export const users = pgTable(
   'users',
   {
-    id: integer('id').primaryKey(),
-    name: text('name'),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    email: text('email').notNull(),
-    resetPasswordToken: text('reset_password_token'),
-    resetPasswordExpiration: text('reset_password_expiration').default(
-      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
-    ),
-    salt: text('salt'),
-    hash: text('hash'),
+    id: serial('id').primaryKey(),
+    name: varchar('name'),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    email: varchar('email').notNull(),
+    resetPasswordToken: varchar('reset_password_token'),
+    resetPasswordExpiration: timestamp('reset_password_expiration', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    salt: varchar('salt'),
+    hash: varchar('hash'),
     loginAttempts: numeric('login_attempts', { mode: 'number' }).default('0'),
-    lockUntil: text('lock_until').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    lockUntil: timestamp('lock_until', { mode: 'string', withTimezone: true, precision: 3 }),
   },
   (columns) => [
     index('users_updated_at_idx').on(columns.updatedAt),
@@ -1637,18 +2311,19 @@ export const users = sqliteTable(
   ],
 )
 
-export const projects_blocks_cta_links = sqliteTable(
+export const projects_blocks_cta_links = pgTable(
   'projects_blocks_cta_links',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_appearance: text('link_appearance', { enum: ['default', 'outline'] }).default('default'),
-    link_size: text('link_size', { enum: ['default'] }).default('default'),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    link_type: enum_projects_blocks_cta_links_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_appearance:
+      enum_projects_blocks_cta_links_link_appearance('link_appearance').default('default'),
+    link_size: enum_projects_blocks_cta_links_link_size('link_size').default('default'),
   },
   (columns) => [
     index('projects_blocks_cta_links_order_idx').on(columns._order),
@@ -1661,15 +2336,15 @@ export const projects_blocks_cta_links = sqliteTable(
   ],
 )
 
-export const projects_blocks_cta = sqliteTable(
+export const projects_blocks_cta = pgTable(
   'projects_blocks_cta',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    richText: text('rich_text', { mode: 'json' }),
-    blockName: text('block_name'),
+    id: varchar('id').primaryKey(),
+    richText: jsonb('rich_text'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('projects_blocks_cta_order_idx').on(columns._order),
@@ -1683,12 +2358,12 @@ export const projects_blocks_cta = sqliteTable(
   ],
 )
 
-export const projects_blocks_content_card_media = sqliteTable(
+export const projects_blocks_content_card_media = pgTable(
   'projects_blocks_content_card_media',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
     item: integer('item_id').references(() => media.id, {
       onDelete: 'set null',
     }),
@@ -1705,16 +2380,16 @@ export const projects_blocks_content_card_media = sqliteTable(
   ],
 )
 
-export const projects_blocks_content_card_footer_meta = sqliteTable(
+export const projects_blocks_content_card_footer_meta = pgTable(
   'projects_blocks_content_card_footer_meta',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    location: text('location'),
-    customText: text('custom_text'),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    location: varchar('location'),
+    customText: varchar('custom_text'),
   },
   (columns) => [
     index('projects_blocks_content_card_footer_meta_order_idx').on(columns._order),
@@ -1727,25 +2402,23 @@ export const projects_blocks_content_card_footer_meta = sqliteTable(
   ],
 )
 
-export const projects_blocks_content_card = sqliteTable(
+export const projects_blocks_content_card = pgTable(
   'projects_blocks_content_card',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    aspectRatio: text('aspect_ratio', {
-      enum: ['auto', 'square', 'landscape', 'portrait'],
-    }).default('auto'),
+    id: varchar('id').primaryKey(),
+    aspectRatio: enum_projects_blocks_content_card_aspect_ratio('aspect_ratio').default('auto'),
     cycleInterval: numeric('cycle_interval', { mode: 'number' }).default('3'),
-    videoAutoplay: integer('video_autoplay', { mode: 'boolean' }).default(false),
-    enableLink: integer('enable_link', { mode: 'boolean' }).default(false),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    enableFooter: integer('enable_footer', { mode: 'boolean' }).default(false),
-    blockName: text('block_name'),
+    videoAutoplay: boolean('video_autoplay').default(false),
+    enableLink: boolean('enable_link').default(false),
+    link_type: enum_projects_blocks_content_card_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    enableFooter: boolean('enable_footer').default(false),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('projects_blocks_content_card_order_idx').on(columns._order),
@@ -1759,20 +2432,18 @@ export const projects_blocks_content_card = sqliteTable(
   ],
 )
 
-export const projects_blocks_tech_stack_canvas_cards = sqliteTable(
+export const projects_blocks_tech_stack_canvas_cards = pgTable(
   'projects_blocks_tech_stack_canvas_cards',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    title: text('title'),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    title: varchar('title'),
     image: integer('image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    category: text('category', {
-      enum: ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
-    }),
-    size: text('size', { enum: ['sm', 'md', 'lg'] }).default('md'),
+    category: enum_projects_blocks_tech_stack_canvas_cards_category('category'),
+    size: enum_projects_blocks_tech_stack_canvas_cards_size('size').default('md'),
     mobile_normalizedX: numeric('mobile_normalized_x', { mode: 'number' }),
     mobile_normalizedY: numeric('mobile_normalized_y', { mode: 'number' }),
     tablet_normalizedX: numeric('tablet_normalized_x', { mode: 'number' }),
@@ -1792,18 +2463,21 @@ export const projects_blocks_tech_stack_canvas_cards = sqliteTable(
   ],
 )
 
-export const projects_blocks_tech_stack_canvas = sqliteTable(
+export const projects_blocks_tech_stack_canvas = pgTable(
   'projects_blocks_tech_stack_canvas',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    containerWidth: text('container_width', { enum: ['container', 'full'] }).default('container'),
+    id: varchar('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    containerWidth:
+      enum_projects_blocks_tech_stack_canvas_container_width('container_width').default(
+        'container',
+      ),
     containerHeight: numeric('container_height', { mode: 'number' }).default('600'),
-    blockName: text('block_name'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('projects_blocks_tech_stack_canvas_order_idx').on(columns._order),
@@ -1817,21 +2491,22 @@ export const projects_blocks_tech_stack_canvas = sqliteTable(
   ],
 )
 
-export const projects_blocks_content_columns = sqliteTable(
+export const projects_blocks_content_columns = pgTable(
   'projects_blocks_content_columns',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    size: text('size', { enum: ['oneThird', 'half', 'twoThirds', 'full'] }).default('oneThird'),
-    richText: text('rich_text', { mode: 'json' }),
-    enableLink: integer('enable_link', { mode: 'boolean' }),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_appearance: text('link_appearance', { enum: ['default', 'outline'] }).default('default'),
-    link_size: text('link_size', { enum: ['default'] }).default('default'),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    size: enum_projects_blocks_content_columns_size('size').default('oneThird'),
+    richText: jsonb('rich_text'),
+    enableLink: boolean('enable_link'),
+    link_type: enum_projects_blocks_content_columns_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_appearance:
+      enum_projects_blocks_content_columns_link_appearance('link_appearance').default('default'),
+    link_size: enum_projects_blocks_content_columns_link_size('link_size').default('default'),
   },
   (columns) => [
     index('projects_blocks_content_columns_order_idx').on(columns._order),
@@ -1844,14 +2519,14 @@ export const projects_blocks_content_columns = sqliteTable(
   ],
 )
 
-export const projects_blocks_content = sqliteTable(
+export const projects_blocks_content = pgTable(
   'projects_blocks_content',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    blockName: text('block_name'),
+    id: varchar('id').primaryKey(),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('projects_blocks_content_order_idx').on(columns._order),
@@ -1865,20 +2540,18 @@ export const projects_blocks_content = sqliteTable(
   ],
 )
 
-export const projects_blocks_draggable_cards_cards = sqliteTable(
+export const projects_blocks_draggable_cards_cards = pgTable(
   'projects_blocks_draggable_cards_cards',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    title: text('title'),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    title: varchar('title'),
     image: integer('image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    category: text('category', {
-      enum: ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
-    }),
-    size: text('size', { enum: ['sm', 'md', 'lg'] }).default('md'),
+    category: enum_projects_blocks_draggable_cards_cards_category('category'),
+    size: enum_projects_blocks_draggable_cards_cards_size('size').default('md'),
     positions_mobile_normalizedX: numeric('positions_mobile_normalized_x', { mode: 'number' }),
     positions_mobile_normalizedY: numeric('positions_mobile_normalized_y', { mode: 'number' }),
     positions_tablet_normalizedX: numeric('positions_tablet_normalized_x', { mode: 'number' }),
@@ -1898,18 +2571,19 @@ export const projects_blocks_draggable_cards_cards = sqliteTable(
   ],
 )
 
-export const projects_blocks_draggable_cards = sqliteTable(
+export const projects_blocks_draggable_cards = pgTable(
   'projects_blocks_draggable_cards',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    containerWidth: text('container_width', { enum: ['full', 'container'] }).default('full'),
+    id: varchar('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    containerWidth:
+      enum_projects_blocks_draggable_cards_container_width('container_width').default('full'),
     containerHeight: numeric('container_height', { mode: 'number' }).default('600'),
-    blockName: text('block_name'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('projects_blocks_draggable_cards_order_idx').on(columns._order),
@@ -1923,15 +2597,15 @@ export const projects_blocks_draggable_cards = sqliteTable(
   ],
 )
 
-export const projects_blocks_grid = sqliteTable(
+export const projects_blocks_grid = pgTable(
   'projects_blocks_grid',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    columns: text('columns', { enum: ['2', '3', '4'] }).default('3'),
-    blockName: text('block_name'),
+    id: varchar('id').primaryKey(),
+    columns: enum_projects_blocks_grid_columns('columns').default('3'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('projects_blocks_grid_order_idx').on(columns._order),
@@ -1945,17 +2619,17 @@ export const projects_blocks_grid = sqliteTable(
   ],
 )
 
-export const projects_blocks_media_block = sqliteTable(
+export const projects_blocks_media_block = pgTable(
   'projects_blocks_media_block',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
+    id: varchar('id').primaryKey(),
     media: integer('media_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    blockName: text('block_name'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('projects_blocks_media_block_order_idx').on(columns._order),
@@ -1970,18 +2644,18 @@ export const projects_blocks_media_block = sqliteTable(
   ],
 )
 
-export const projects_blocks_archive = sqliteTable(
+export const projects_blocks_archive = pgTable(
   'projects_blocks_archive',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    introContent: text('intro_content', { mode: 'json' }),
-    populateBy: text('populate_by', { enum: ['collection', 'selection'] }).default('collection'),
-    relationTo: text('relation_to', { enum: ['posts', 'projects'] }).default('posts'),
+    id: varchar('id').primaryKey(),
+    introContent: jsonb('intro_content'),
+    populateBy: enum_projects_blocks_archive_populate_by('populate_by').default('collection'),
+    relationTo: enum_projects_blocks_archive_relation_to('relation_to').default('posts'),
     limit: numeric('limit', { mode: 'number' }).default('10'),
-    blockName: text('block_name'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('projects_blocks_archive_order_idx').on(columns._order),
@@ -1995,19 +2669,19 @@ export const projects_blocks_archive = sqliteTable(
   ],
 )
 
-export const projects_blocks_form_block = sqliteTable(
+export const projects_blocks_form_block = pgTable(
   'projects_blocks_form_block',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
+    id: varchar('id').primaryKey(),
     form: integer('form_id').references(() => forms.id, {
       onDelete: 'set null',
     }),
-    enableIntro: integer('enable_intro', { mode: 'boolean' }),
-    introContent: text('intro_content', { mode: 'json' }),
-    blockName: text('block_name'),
+    enableIntro: boolean('enable_intro'),
+    introContent: jsonb('intro_content'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('projects_blocks_form_block_order_idx').on(columns._order),
@@ -2022,16 +2696,16 @@ export const projects_blocks_form_block = sqliteTable(
   ],
 )
 
-export const projects_blocks_image_masonry_grid_images = sqliteTable(
+export const projects_blocks_image_masonry_grid_images = pgTable(
   'projects_blocks_image_masonry_grid_images',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
     image: integer('image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    caption: text('caption'),
+    caption: varchar('caption'),
   },
   (columns) => [
     index('projects_blocks_image_masonry_grid_images_order_idx').on(columns._order),
@@ -2045,15 +2719,15 @@ export const projects_blocks_image_masonry_grid_images = sqliteTable(
   ],
 )
 
-export const projects_blocks_image_masonry_grid = sqliteTable(
+export const projects_blocks_image_masonry_grid = pgTable(
   'projects_blocks_image_masonry_grid',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    gap: text('gap', { enum: ['small', 'medium', 'large'] }).default('medium'),
-    blockName: text('block_name'),
+    id: varchar('id').primaryKey(),
+    gap: enum_projects_blocks_image_masonry_grid_gap('gap').default('medium'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('projects_blocks_image_masonry_grid_order_idx').on(columns._order),
@@ -2067,24 +2741,24 @@ export const projects_blocks_image_masonry_grid = sqliteTable(
   ],
 )
 
-export const projects_blocks_video_player = sqliteTable(
+export const projects_blocks_video_player = pgTable(
   'projects_blocks_video_player',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    videoType: text('video_type', { enum: ['mux', 'external'] }).default('mux'),
-    muxAssetId: text('mux_asset_id'),
-    externalUrl: text('external_url'),
+    id: varchar('id').primaryKey(),
+    videoType: enum_projects_blocks_video_player_video_type('video_type').default('mux'),
+    muxAssetId: varchar('mux_asset_id'),
+    externalUrl: varchar('external_url'),
     poster: integer('poster_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    autoplay: integer('autoplay', { mode: 'boolean' }).default(false),
-    controls: integer('controls', { mode: 'boolean' }).default(true),
-    loop: integer('loop', { mode: 'boolean' }).default(false),
-    muted: integer('muted', { mode: 'boolean' }).default(false),
-    blockName: text('block_name'),
+    autoplay: boolean('autoplay').default(false),
+    controls: boolean('controls').default(true),
+    loop: boolean('loop').default(false),
+    muted: boolean('muted').default(false),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('projects_blocks_video_player_order_idx').on(columns._order),
@@ -2099,16 +2773,53 @@ export const projects_blocks_video_player = sqliteTable(
   ],
 )
 
-export const projects_blocks_carousel_slides = sqliteTable(
+export const projects_blocks_video_card = pgTable(
+  'projects_blocks_video_card',
+  {
+    _order: integer('_order').notNull(),
+    _parentID: integer('_parent_id').notNull(),
+    _path: text('_path').notNull(),
+    id: varchar('id').primaryKey(),
+    video: integer('video_id').references(() => mux_video.id, {
+      onDelete: 'set null',
+    }),
+    aspectRatio: enum_projects_blocks_video_card_aspect_ratio('aspect_ratio').default('auto'),
+    videoAutoplay: boolean('video_autoplay').default(false),
+    enableLink: boolean('enable_link').default(false),
+    link_type: enum_projects_blocks_video_card_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    enableFooter: boolean('enable_footer').default(false),
+    footerMeta_title: varchar('footer_meta_title'),
+    footerMeta_description: varchar('footer_meta_description'),
+    footerMeta_location: varchar('footer_meta_location'),
+    footerMeta_customText: varchar('footer_meta_custom_text'),
+    blockName: varchar('block_name'),
+  },
+  (columns) => [
+    index('projects_blocks_video_card_order_idx').on(columns._order),
+    index('projects_blocks_video_card_parent_id_idx').on(columns._parentID),
+    index('projects_blocks_video_card_path_idx').on(columns._path),
+    index('projects_blocks_video_card_video_idx').on(columns.video),
+    foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [projects.id],
+      name: 'projects_blocks_video_card_parent_id_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
+export const projects_blocks_carousel_slides = pgTable(
   'projects_blocks_carousel_slides',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
     media: integer('media_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    caption: text('caption', { mode: 'json' }),
+    caption: jsonb('caption'),
   },
   (columns) => [
     index('projects_blocks_carousel_slides_order_idx').on(columns._order),
@@ -2122,18 +2833,18 @@ export const projects_blocks_carousel_slides = sqliteTable(
   ],
 )
 
-export const projects_blocks_carousel = sqliteTable(
+export const projects_blocks_carousel = pgTable(
   'projects_blocks_carousel',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    autoplay: integer('autoplay', { mode: 'boolean' }).default(false),
+    id: varchar('id').primaryKey(),
+    autoplay: boolean('autoplay').default(false),
     autoplayInterval: numeric('autoplay_interval', { mode: 'number' }).default('5000'),
-    showNavigation: integer('show_navigation', { mode: 'boolean' }).default(true),
-    showIndicators: integer('show_indicators', { mode: 'boolean' }).default(true),
-    blockName: text('block_name'),
+    showNavigation: boolean('show_navigation').default(true),
+    showIndicators: boolean('show_indicators').default(true),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('projects_blocks_carousel_order_idx').on(columns._order),
@@ -2147,13 +2858,13 @@ export const projects_blocks_carousel = sqliteTable(
   ],
 )
 
-export const projects_populated_authors = sqliteTable(
+export const projects_populated_authors = pgTable(
   'projects_populated_authors',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    name: text('name'),
+    id: varchar('id').primaryKey(),
+    name: varchar('name'),
   },
   (columns) => [
     index('projects_populated_authors_order_idx').on(columns._order),
@@ -2166,30 +2877,30 @@ export const projects_populated_authors = sqliteTable(
   ],
 )
 
-export const projects = sqliteTable(
+export const projects = pgTable(
   'projects',
   {
-    id: integer('id').primaryKey(),
-    title: text('title'),
-    projectType: text('project_type', { enum: ['web', 'photography', 'videography'] }),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
+    projectType: enum_projects_project_type('project_type'),
     heroImage: integer('hero_image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    meta_title: text('meta_title'),
+    meta_title: varchar('meta_title'),
     meta_image: integer('meta_image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    meta_description: text('meta_description'),
-    publishedAt: text('published_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    generateSlug: integer('generate_slug', { mode: 'boolean' }).default(true),
-    slug: text('slug'),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    _status: text('_status', { enum: ['draft', 'published'] }).default('draft'),
+    meta_description: varchar('meta_description'),
+    publishedAt: timestamp('published_at', { mode: 'string', withTimezone: true, precision: 3 }),
+    generateSlug: boolean('generate_slug').default(true),
+    slug: varchar('slug'),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    _status: enum_projects_status('_status').default('draft'),
   },
   (columns) => [
     index('projects_hero_image_idx').on(columns.heroImage),
@@ -2201,13 +2912,13 @@ export const projects = sqliteTable(
   ],
 )
 
-export const projects_rels = sqliteTable(
+export const projects_rels = pgTable(
   'projects_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     pagesID: integer('pages_id'),
     postsID: integer('posts_id'),
     projectsID: integer('projects_id'),
@@ -2256,19 +2967,20 @@ export const projects_rels = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_cta_links = sqliteTable(
+export const _projects_v_blocks_cta_links = pgTable(
   '_projects_v_blocks_cta_links',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_appearance: text('link_appearance', { enum: ['default', 'outline'] }).default('default'),
-    link_size: text('link_size', { enum: ['default'] }).default('default'),
-    _uuid: text('_uuid'),
+    id: serial('id').primaryKey(),
+    link_type: enum__projects_v_blocks_cta_links_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_appearance:
+      enum__projects_v_blocks_cta_links_link_appearance('link_appearance').default('default'),
+    link_size: enum__projects_v_blocks_cta_links_link_size('link_size').default('default'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_projects_v_blocks_cta_links_order_idx').on(columns._order),
@@ -2281,16 +2993,16 @@ export const _projects_v_blocks_cta_links = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_cta = sqliteTable(
+export const _projects_v_blocks_cta = pgTable(
   '_projects_v_blocks_cta',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    richText: text('rich_text', { mode: 'json' }),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    id: serial('id').primaryKey(),
+    richText: jsonb('rich_text'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_projects_v_blocks_cta_order_idx').on(columns._order),
@@ -2304,16 +3016,16 @@ export const _projects_v_blocks_cta = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_content_card_media = sqliteTable(
+export const _projects_v_blocks_content_card_media = pgTable(
   '_projects_v_blocks_content_card_media',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     item: integer('item_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    _uuid: text('_uuid'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_projects_v_blocks_content_card_media_order_idx').on(columns._order),
@@ -2327,17 +3039,17 @@ export const _projects_v_blocks_content_card_media = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_content_card_footer_meta = sqliteTable(
+export const _projects_v_blocks_content_card_footer_meta = pgTable(
   '_projects_v_blocks_content_card_footer_meta',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    location: text('location'),
-    customText: text('custom_text'),
-    _uuid: text('_uuid'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    location: varchar('location'),
+    customText: varchar('custom_text'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_projects_v_blocks_content_card_footer_meta_order_idx').on(columns._order),
@@ -2350,26 +3062,24 @@ export const _projects_v_blocks_content_card_footer_meta = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_content_card = sqliteTable(
+export const _projects_v_blocks_content_card = pgTable(
   '_projects_v_blocks_content_card',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    aspectRatio: text('aspect_ratio', {
-      enum: ['auto', 'square', 'landscape', 'portrait'],
-    }).default('auto'),
+    id: serial('id').primaryKey(),
+    aspectRatio: enum__projects_v_blocks_content_card_aspect_ratio('aspect_ratio').default('auto'),
     cycleInterval: numeric('cycle_interval', { mode: 'number' }).default('3'),
-    videoAutoplay: integer('video_autoplay', { mode: 'boolean' }).default(false),
-    enableLink: integer('enable_link', { mode: 'boolean' }).default(false),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    enableFooter: integer('enable_footer', { mode: 'boolean' }).default(false),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    videoAutoplay: boolean('video_autoplay').default(false),
+    enableLink: boolean('enable_link').default(false),
+    link_type: enum__projects_v_blocks_content_card_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    enableFooter: boolean('enable_footer').default(false),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_projects_v_blocks_content_card_order_idx').on(columns._order),
@@ -2383,27 +3093,25 @@ export const _projects_v_blocks_content_card = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_tech_stack_canvas_cards = sqliteTable(
+export const _projects_v_blocks_tech_stack_canvas_cards = pgTable(
   '_projects_v_blocks_tech_stack_canvas_cards',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    title: text('title'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
     image: integer('image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    category: text('category', {
-      enum: ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
-    }),
-    size: text('size', { enum: ['sm', 'md', 'lg'] }).default('md'),
+    category: enum__projects_v_blocks_tech_stack_canvas_cards_category('category'),
+    size: enum__projects_v_blocks_tech_stack_canvas_cards_size('size').default('md'),
     mobile_normalizedX: numeric('mobile_normalized_x', { mode: 'number' }),
     mobile_normalizedY: numeric('mobile_normalized_y', { mode: 'number' }),
     tablet_normalizedX: numeric('tablet_normalized_x', { mode: 'number' }),
     tablet_normalizedY: numeric('tablet_normalized_y', { mode: 'number' }),
     desktop_normalizedX: numeric('desktop_normalized_x', { mode: 'number' }),
     desktop_normalizedY: numeric('desktop_normalized_y', { mode: 'number' }),
-    _uuid: text('_uuid'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_projects_v_blocks_tech_stack_canvas_cards_order_idx').on(columns._order),
@@ -2417,19 +3125,22 @@ export const _projects_v_blocks_tech_stack_canvas_cards = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_tech_stack_canvas = sqliteTable(
+export const _projects_v_blocks_tech_stack_canvas = pgTable(
   '_projects_v_blocks_tech_stack_canvas',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    containerWidth: text('container_width', { enum: ['container', 'full'] }).default('container'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    containerWidth:
+      enum__projects_v_blocks_tech_stack_canvas_container_width('container_width').default(
+        'container',
+      ),
     containerHeight: numeric('container_height', { mode: 'number' }).default('600'),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_projects_v_blocks_tech_stack_canvas_order_idx').on(columns._order),
@@ -2443,22 +3154,23 @@ export const _projects_v_blocks_tech_stack_canvas = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_content_columns = sqliteTable(
+export const _projects_v_blocks_content_columns = pgTable(
   '_projects_v_blocks_content_columns',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    size: text('size', { enum: ['oneThird', 'half', 'twoThirds', 'full'] }).default('oneThird'),
-    richText: text('rich_text', { mode: 'json' }),
-    enableLink: integer('enable_link', { mode: 'boolean' }),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_appearance: text('link_appearance', { enum: ['default', 'outline'] }).default('default'),
-    link_size: text('link_size', { enum: ['default'] }).default('default'),
-    _uuid: text('_uuid'),
+    id: serial('id').primaryKey(),
+    size: enum__projects_v_blocks_content_columns_size('size').default('oneThird'),
+    richText: jsonb('rich_text'),
+    enableLink: boolean('enable_link'),
+    link_type: enum__projects_v_blocks_content_columns_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_appearance:
+      enum__projects_v_blocks_content_columns_link_appearance('link_appearance').default('default'),
+    link_size: enum__projects_v_blocks_content_columns_link_size('link_size').default('default'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_projects_v_blocks_content_columns_order_idx').on(columns._order),
@@ -2471,15 +3183,15 @@ export const _projects_v_blocks_content_columns = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_content = sqliteTable(
+export const _projects_v_blocks_content = pgTable(
   '_projects_v_blocks_content',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    id: serial('id').primaryKey(),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_projects_v_blocks_content_order_idx').on(columns._order),
@@ -2493,27 +3205,25 @@ export const _projects_v_blocks_content = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_draggable_cards_cards = sqliteTable(
+export const _projects_v_blocks_draggable_cards_cards = pgTable(
   '_projects_v_blocks_draggable_cards_cards',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    title: text('title'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
     image: integer('image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    category: text('category', {
-      enum: ['frontend', 'backend', 'database', 'infrastructure', 'tooling'],
-    }),
-    size: text('size', { enum: ['sm', 'md', 'lg'] }).default('md'),
+    category: enum__projects_v_blocks_draggable_cards_cards_category('category'),
+    size: enum__projects_v_blocks_draggable_cards_cards_size('size').default('md'),
     positions_mobile_normalizedX: numeric('positions_mobile_normalized_x', { mode: 'number' }),
     positions_mobile_normalizedY: numeric('positions_mobile_normalized_y', { mode: 'number' }),
     positions_tablet_normalizedX: numeric('positions_tablet_normalized_x', { mode: 'number' }),
     positions_tablet_normalizedY: numeric('positions_tablet_normalized_y', { mode: 'number' }),
     positions_desktop_normalizedX: numeric('positions_desktop_normalized_x', { mode: 'number' }),
     positions_desktop_normalizedY: numeric('positions_desktop_normalized_y', { mode: 'number' }),
-    _uuid: text('_uuid'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_projects_v_blocks_draggable_cards_cards_order_idx').on(columns._order),
@@ -2527,19 +3237,20 @@ export const _projects_v_blocks_draggable_cards_cards = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_draggable_cards = sqliteTable(
+export const _projects_v_blocks_draggable_cards = pgTable(
   '_projects_v_blocks_draggable_cards',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    title: text('title'),
-    description: text('description'),
-    containerWidth: text('container_width', { enum: ['full', 'container'] }).default('full'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
+    description: varchar('description'),
+    containerWidth:
+      enum__projects_v_blocks_draggable_cards_container_width('container_width').default('full'),
     containerHeight: numeric('container_height', { mode: 'number' }).default('600'),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_projects_v_blocks_draggable_cards_order_idx').on(columns._order),
@@ -2553,16 +3264,16 @@ export const _projects_v_blocks_draggable_cards = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_grid = sqliteTable(
+export const _projects_v_blocks_grid = pgTable(
   '_projects_v_blocks_grid',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    columns: text('columns', { enum: ['2', '3', '4'] }).default('3'),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    id: serial('id').primaryKey(),
+    columns: enum__projects_v_blocks_grid_columns('columns').default('3'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_projects_v_blocks_grid_order_idx').on(columns._order),
@@ -2576,18 +3287,18 @@ export const _projects_v_blocks_grid = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_media_block = sqliteTable(
+export const _projects_v_blocks_media_block = pgTable(
   '_projects_v_blocks_media_block',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     media: integer('media_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_projects_v_blocks_media_block_order_idx').on(columns._order),
@@ -2602,19 +3313,19 @@ export const _projects_v_blocks_media_block = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_archive = sqliteTable(
+export const _projects_v_blocks_archive = pgTable(
   '_projects_v_blocks_archive',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    introContent: text('intro_content', { mode: 'json' }),
-    populateBy: text('populate_by', { enum: ['collection', 'selection'] }).default('collection'),
-    relationTo: text('relation_to', { enum: ['posts', 'projects'] }).default('posts'),
+    id: serial('id').primaryKey(),
+    introContent: jsonb('intro_content'),
+    populateBy: enum__projects_v_blocks_archive_populate_by('populate_by').default('collection'),
+    relationTo: enum__projects_v_blocks_archive_relation_to('relation_to').default('posts'),
     limit: numeric('limit', { mode: 'number' }).default('10'),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_projects_v_blocks_archive_order_idx').on(columns._order),
@@ -2628,20 +3339,20 @@ export const _projects_v_blocks_archive = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_form_block = sqliteTable(
+export const _projects_v_blocks_form_block = pgTable(
   '_projects_v_blocks_form_block',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     form: integer('form_id').references(() => forms.id, {
       onDelete: 'set null',
     }),
-    enableIntro: integer('enable_intro', { mode: 'boolean' }),
-    introContent: text('intro_content', { mode: 'json' }),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    enableIntro: boolean('enable_intro'),
+    introContent: jsonb('intro_content'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_projects_v_blocks_form_block_order_idx').on(columns._order),
@@ -2656,17 +3367,17 @@ export const _projects_v_blocks_form_block = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_image_masonry_grid_images = sqliteTable(
+export const _projects_v_blocks_image_masonry_grid_images = pgTable(
   '_projects_v_blocks_image_masonry_grid_images',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     image: integer('image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    caption: text('caption'),
-    _uuid: text('_uuid'),
+    caption: varchar('caption'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_projects_v_blocks_image_masonry_grid_images_order_idx').on(columns._order),
@@ -2680,16 +3391,16 @@ export const _projects_v_blocks_image_masonry_grid_images = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_image_masonry_grid = sqliteTable(
+export const _projects_v_blocks_image_masonry_grid = pgTable(
   '_projects_v_blocks_image_masonry_grid',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    gap: text('gap', { enum: ['small', 'medium', 'large'] }).default('medium'),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    id: serial('id').primaryKey(),
+    gap: enum__projects_v_blocks_image_masonry_grid_gap('gap').default('medium'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_projects_v_blocks_image_masonry_grid_order_idx').on(columns._order),
@@ -2703,25 +3414,25 @@ export const _projects_v_blocks_image_masonry_grid = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_video_player = sqliteTable(
+export const _projects_v_blocks_video_player = pgTable(
   '_projects_v_blocks_video_player',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    videoType: text('video_type', { enum: ['mux', 'external'] }).default('mux'),
-    muxAssetId: text('mux_asset_id'),
-    externalUrl: text('external_url'),
+    id: serial('id').primaryKey(),
+    videoType: enum__projects_v_blocks_video_player_video_type('video_type').default('mux'),
+    muxAssetId: varchar('mux_asset_id'),
+    externalUrl: varchar('external_url'),
     poster: integer('poster_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    autoplay: integer('autoplay', { mode: 'boolean' }).default(false),
-    controls: integer('controls', { mode: 'boolean' }).default(true),
-    loop: integer('loop', { mode: 'boolean' }).default(false),
-    muted: integer('muted', { mode: 'boolean' }).default(false),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    autoplay: boolean('autoplay').default(false),
+    controls: boolean('controls').default(true),
+    loop: boolean('loop').default(false),
+    muted: boolean('muted').default(false),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_projects_v_blocks_video_player_order_idx').on(columns._order),
@@ -2736,17 +3447,55 @@ export const _projects_v_blocks_video_player = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_carousel_slides = sqliteTable(
+export const _projects_v_blocks_video_card = pgTable(
+  '_projects_v_blocks_video_card',
+  {
+    _order: integer('_order').notNull(),
+    _parentID: integer('_parent_id').notNull(),
+    _path: text('_path').notNull(),
+    id: serial('id').primaryKey(),
+    video: integer('video_id').references(() => mux_video.id, {
+      onDelete: 'set null',
+    }),
+    aspectRatio: enum__projects_v_blocks_video_card_aspect_ratio('aspect_ratio').default('auto'),
+    videoAutoplay: boolean('video_autoplay').default(false),
+    enableLink: boolean('enable_link').default(false),
+    link_type: enum__projects_v_blocks_video_card_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    enableFooter: boolean('enable_footer').default(false),
+    footerMeta_title: varchar('footer_meta_title'),
+    footerMeta_description: varchar('footer_meta_description'),
+    footerMeta_location: varchar('footer_meta_location'),
+    footerMeta_customText: varchar('footer_meta_custom_text'),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
+  },
+  (columns) => [
+    index('_projects_v_blocks_video_card_order_idx').on(columns._order),
+    index('_projects_v_blocks_video_card_parent_id_idx').on(columns._parentID),
+    index('_projects_v_blocks_video_card_path_idx').on(columns._path),
+    index('_projects_v_blocks_video_card_video_idx').on(columns.video),
+    foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [_projects_v.id],
+      name: '_projects_v_blocks_video_card_parent_id_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
+export const _projects_v_blocks_carousel_slides = pgTable(
   '_projects_v_blocks_carousel_slides',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     media: integer('media_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    caption: text('caption', { mode: 'json' }),
-    _uuid: text('_uuid'),
+    caption: jsonb('caption'),
+    _uuid: varchar('_uuid'),
   },
   (columns) => [
     index('_projects_v_blocks_carousel_slides_order_idx').on(columns._order),
@@ -2760,19 +3509,19 @@ export const _projects_v_blocks_carousel_slides = sqliteTable(
   ],
 )
 
-export const _projects_v_blocks_carousel = sqliteTable(
+export const _projects_v_blocks_carousel = pgTable(
   '_projects_v_blocks_carousel',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: integer('id').primaryKey(),
-    autoplay: integer('autoplay', { mode: 'boolean' }).default(false),
+    id: serial('id').primaryKey(),
+    autoplay: boolean('autoplay').default(false),
     autoplayInterval: numeric('autoplay_interval', { mode: 'number' }).default('5000'),
-    showNavigation: integer('show_navigation', { mode: 'boolean' }).default(true),
-    showIndicators: integer('show_indicators', { mode: 'boolean' }).default(true),
-    _uuid: text('_uuid'),
-    blockName: text('block_name'),
+    showNavigation: boolean('show_navigation').default(true),
+    showIndicators: boolean('show_indicators').default(true),
+    _uuid: varchar('_uuid'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('_projects_v_blocks_carousel_order_idx').on(columns._order),
@@ -2786,14 +3535,14 @@ export const _projects_v_blocks_carousel = sqliteTable(
   ],
 )
 
-export const _projects_v_version_populated_authors = sqliteTable(
+export const _projects_v_version_populated_authors = pgTable(
   '_projects_v_version_populated_authors',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: integer('id').primaryKey(),
-    _uuid: text('_uuid'),
-    name: text('name'),
+    id: serial('id').primaryKey(),
+    _uuid: varchar('_uuid'),
+    name: varchar('name'),
   },
   (columns) => [
     index('_projects_v_version_populated_authors_order_idx').on(columns._order),
@@ -2806,45 +3555,49 @@ export const _projects_v_version_populated_authors = sqliteTable(
   ],
 )
 
-export const _projects_v = sqliteTable(
+export const _projects_v = pgTable(
   '_projects_v',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     parent: integer('parent_id').references(() => projects.id, {
       onDelete: 'set null',
     }),
-    version_title: text('version_title'),
-    version_projectType: text('version_project_type', {
-      enum: ['web', 'photography', 'videography'],
-    }),
+    version_title: varchar('version_title'),
+    version_projectType: enum__projects_v_version_project_type('version_project_type'),
     version_heroImage: integer('version_hero_image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    version_meta_title: text('version_meta_title'),
+    version_meta_title: varchar('version_meta_title'),
     version_meta_image: integer('version_meta_image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    version_meta_description: text('version_meta_description'),
-    version_publishedAt: text('version_published_at').default(
-      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
-    ),
-    version_generateSlug: integer('version_generate_slug', { mode: 'boolean' }).default(true),
-    version_slug: text('version_slug'),
-    version_updatedAt: text('version_updated_at').default(
-      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
-    ),
-    version_createdAt: text('version_created_at').default(
-      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
-    ),
-    version__status: text('version__status', { enum: ['draft', 'published'] }).default('draft'),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    latest: integer('latest', { mode: 'boolean' }),
-    autosave: integer('autosave', { mode: 'boolean' }),
+    version_meta_description: varchar('version_meta_description'),
+    version_publishedAt: timestamp('version_published_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version_generateSlug: boolean('version_generate_slug').default(true),
+    version_slug: varchar('version_slug'),
+    version_updatedAt: timestamp('version_updated_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version_createdAt: timestamp('version_created_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version__status: enum__projects_v_version_status('version__status').default('draft'),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    latest: boolean('latest'),
+    autosave: boolean('autosave'),
   },
   (columns) => [
     index('_projects_v_parent_idx').on(columns.parent),
@@ -2861,13 +3614,13 @@ export const _projects_v = sqliteTable(
   ],
 )
 
-export const _projects_v_rels = sqliteTable(
+export const _projects_v_rels = pgTable(
   '_projects_v_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     pagesID: integer('pages_id'),
     postsID: integer('posts_id'),
     projectsID: integer('projects_id'),
@@ -2916,19 +3669,64 @@ export const _projects_v_rels = sqliteTable(
   ],
 )
 
-export const redirects = sqliteTable(
+export const mux_video_playback_options = pgTable(
+  'mux_video_playback_options',
+  {
+    _order: integer('_order').notNull(),
+    _parentID: integer('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    playbackId: varchar('playback_id'),
+    playbackPolicy: enum_mux_video_playback_options_playback_policy('playback_policy'),
+  },
+  (columns) => [
+    index('mux_video_playback_options_order_idx').on(columns._order),
+    index('mux_video_playback_options_parent_id_idx').on(columns._parentID),
+    foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [mux_video.id],
+      name: 'mux_video_playback_options_parent_id_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
+export const mux_video = pgTable(
+  'mux_video',
+  {
+    id: serial('id').primaryKey(),
+    title: varchar('title').notNull(),
+    assetId: varchar('asset_id'),
+    duration: numeric('duration', { mode: 'number' }),
+    posterTimestamp: numeric('poster_timestamp', { mode: 'number' }),
+    aspectRatio: varchar('aspect_ratio'),
+    maxWidth: numeric('max_width', { mode: 'number' }),
+    maxHeight: numeric('max_height', { mode: 'number' }),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    uniqueIndex('mux_video_title_idx').on(columns.title),
+    index('mux_video_updated_at_idx').on(columns.updatedAt),
+    index('mux_video_created_at_idx').on(columns.createdAt),
+  ],
+)
+
+export const redirects = pgTable(
   'redirects',
   {
-    id: integer('id').primaryKey(),
-    from: text('from').notNull(),
-    to_type: text('to_type', { enum: ['reference', 'custom'] }).default('reference'),
-    to_url: text('to_url'),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    id: serial('id').primaryKey(),
+    from: varchar('from').notNull(),
+    to_type: enum_redirects_to_type('to_type').default('reference'),
+    to_url: varchar('to_url'),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
   },
   (columns) => [
     uniqueIndex('redirects_from_idx').on(columns.from),
@@ -2937,13 +3735,13 @@ export const redirects = sqliteTable(
   ],
 )
 
-export const redirects_rels = sqliteTable(
+export const redirects_rels = pgTable(
   'redirects_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     pagesID: integer('pages_id'),
     postsID: integer('posts_id'),
   },
@@ -2971,19 +3769,19 @@ export const redirects_rels = sqliteTable(
   ],
 )
 
-export const forms_blocks_checkbox = sqliteTable(
+export const forms_blocks_checkbox = pgTable(
   'forms_blocks_checkbox',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    label: text('label'),
+    id: varchar('id').primaryKey(),
+    name: varchar('name').notNull(),
+    label: varchar('label'),
     width: numeric('width', { mode: 'number' }),
-    required: integer('required', { mode: 'boolean' }),
-    defaultValue: integer('default_value', { mode: 'boolean' }),
-    blockName: text('block_name'),
+    required: boolean('required'),
+    defaultValue: boolean('default_value'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('forms_blocks_checkbox_order_idx').on(columns._order),
@@ -2997,18 +3795,18 @@ export const forms_blocks_checkbox = sqliteTable(
   ],
 )
 
-export const forms_blocks_country = sqliteTable(
+export const forms_blocks_country = pgTable(
   'forms_blocks_country',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    label: text('label'),
+    id: varchar('id').primaryKey(),
+    name: varchar('name').notNull(),
+    label: varchar('label'),
     width: numeric('width', { mode: 'number' }),
-    required: integer('required', { mode: 'boolean' }),
-    blockName: text('block_name'),
+    required: boolean('required'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('forms_blocks_country_order_idx').on(columns._order),
@@ -3022,18 +3820,18 @@ export const forms_blocks_country = sqliteTable(
   ],
 )
 
-export const forms_blocks_email = sqliteTable(
+export const forms_blocks_email = pgTable(
   'forms_blocks_email',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    label: text('label'),
+    id: varchar('id').primaryKey(),
+    name: varchar('name').notNull(),
+    label: varchar('label'),
     width: numeric('width', { mode: 'number' }),
-    required: integer('required', { mode: 'boolean' }),
-    blockName: text('block_name'),
+    required: boolean('required'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('forms_blocks_email_order_idx').on(columns._order),
@@ -3047,15 +3845,15 @@ export const forms_blocks_email = sqliteTable(
   ],
 )
 
-export const forms_blocks_message = sqliteTable(
+export const forms_blocks_message = pgTable(
   'forms_blocks_message',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    message: text('message', { mode: 'json' }),
-    blockName: text('block_name'),
+    id: varchar('id').primaryKey(),
+    message: jsonb('message'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('forms_blocks_message_order_idx').on(columns._order),
@@ -3069,19 +3867,19 @@ export const forms_blocks_message = sqliteTable(
   ],
 )
 
-export const forms_blocks_number = sqliteTable(
+export const forms_blocks_number = pgTable(
   'forms_blocks_number',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    label: text('label'),
+    id: varchar('id').primaryKey(),
+    name: varchar('name').notNull(),
+    label: varchar('label'),
     width: numeric('width', { mode: 'number' }),
     defaultValue: numeric('default_value', { mode: 'number' }),
-    required: integer('required', { mode: 'boolean' }),
-    blockName: text('block_name'),
+    required: boolean('required'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('forms_blocks_number_order_idx').on(columns._order),
@@ -3095,14 +3893,14 @@ export const forms_blocks_number = sqliteTable(
   ],
 )
 
-export const forms_blocks_select_options = sqliteTable(
+export const forms_blocks_select_options = pgTable(
   'forms_blocks_select_options',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    label: text('label').notNull(),
-    value: text('value').notNull(),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    label: varchar('label').notNull(),
+    value: varchar('value').notNull(),
   },
   (columns) => [
     index('forms_blocks_select_options_order_idx').on(columns._order),
@@ -3115,20 +3913,20 @@ export const forms_blocks_select_options = sqliteTable(
   ],
 )
 
-export const forms_blocks_select = sqliteTable(
+export const forms_blocks_select = pgTable(
   'forms_blocks_select',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    label: text('label'),
+    id: varchar('id').primaryKey(),
+    name: varchar('name').notNull(),
+    label: varchar('label'),
     width: numeric('width', { mode: 'number' }),
-    defaultValue: text('default_value'),
-    placeholder: text('placeholder'),
-    required: integer('required', { mode: 'boolean' }),
-    blockName: text('block_name'),
+    defaultValue: varchar('default_value'),
+    placeholder: varchar('placeholder'),
+    required: boolean('required'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('forms_blocks_select_order_idx').on(columns._order),
@@ -3142,18 +3940,18 @@ export const forms_blocks_select = sqliteTable(
   ],
 )
 
-export const forms_blocks_state = sqliteTable(
+export const forms_blocks_state = pgTable(
   'forms_blocks_state',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    label: text('label'),
+    id: varchar('id').primaryKey(),
+    name: varchar('name').notNull(),
+    label: varchar('label'),
     width: numeric('width', { mode: 'number' }),
-    required: integer('required', { mode: 'boolean' }),
-    blockName: text('block_name'),
+    required: boolean('required'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('forms_blocks_state_order_idx').on(columns._order),
@@ -3167,19 +3965,19 @@ export const forms_blocks_state = sqliteTable(
   ],
 )
 
-export const forms_blocks_text = sqliteTable(
+export const forms_blocks_text = pgTable(
   'forms_blocks_text',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    label: text('label'),
+    id: varchar('id').primaryKey(),
+    name: varchar('name').notNull(),
+    label: varchar('label'),
     width: numeric('width', { mode: 'number' }),
-    defaultValue: text('default_value'),
-    required: integer('required', { mode: 'boolean' }),
-    blockName: text('block_name'),
+    defaultValue: varchar('default_value'),
+    required: boolean('required'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('forms_blocks_text_order_idx').on(columns._order),
@@ -3193,19 +3991,19 @@ export const forms_blocks_text = sqliteTable(
   ],
 )
 
-export const forms_blocks_textarea = sqliteTable(
+export const forms_blocks_textarea = pgTable(
   'forms_blocks_textarea',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    label: text('label'),
+    id: varchar('id').primaryKey(),
+    name: varchar('name').notNull(),
+    label: varchar('label'),
     width: numeric('width', { mode: 'number' }),
-    defaultValue: text('default_value'),
-    required: integer('required', { mode: 'boolean' }),
-    blockName: text('block_name'),
+    defaultValue: varchar('default_value'),
+    required: boolean('required'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('forms_blocks_textarea_order_idx').on(columns._order),
@@ -3219,74 +4017,14 @@ export const forms_blocks_textarea = sqliteTable(
   ],
 )
 
-export const forms_blocks_chips_options = sqliteTable(
+export const forms_blocks_chips_options = pgTable(
   'forms_blocks_chips_options',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    label: text('label').notNull(),
-    icon: text('icon', {
-      enum: [
-        'HomeIcon',
-        'UserIcon',
-        'UsersIcon',
-        'DocumentIcon',
-        'DocumentsIcon',
-        'FolderIcon',
-        'MagnifyingGlassIcon',
-        'Cog6ToothIcon',
-        'BellIcon',
-        'HeartIcon',
-        'StarIcon',
-        'BookmarkIcon',
-        'CalendarIcon',
-        'ClockIcon',
-        'ChartBarIcon',
-        'Squares2X2Icon',
-        'Bars3Icon',
-        'Bars3BottomLeftIcon',
-        'ArrowRightIcon',
-        'ArrowLeftIcon',
-        'ArrowUpIcon',
-        'ArrowDownIcon',
-        'ChevronRightIcon',
-        'ChevronLeftIcon',
-        'PlusIcon',
-        'MinusIcon',
-        'XMarkIcon',
-        'CheckIcon',
-        'InformationCircleIcon',
-        'ExclamationTriangleIcon',
-        'QuestionMarkCircleIcon',
-        'LockClosedIcon',
-        'LockOpenIcon',
-        'KeyIcon',
-        'ShieldCheckIcon',
-        'EyeIcon',
-        'EyeSlashIcon',
-        'PencilIcon',
-        'TrashIcon',
-        'ShareIcon',
-        'LinkIcon',
-        'PhotoIcon',
-        'VideoCameraIcon',
-        'MusicalNoteIcon',
-        'EnvelopeIcon',
-        'PhoneIcon',
-        'GlobeAltIcon',
-        'MapPinIcon',
-        'ShoppingCartIcon',
-        'CreditCardIcon',
-        'TagIcon',
-        'FireIcon',
-        'BoltIcon',
-        'SunIcon',
-        'MoonIcon',
-        'CloudIcon',
-        'SignalIcon',
-      ],
-    }).notNull(),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    label: varchar('label').notNull(),
+    icon: enum_forms_blocks_chips_options_icon('icon').notNull(),
   },
   (columns) => [
     index('forms_blocks_chips_options_order_idx').on(columns._order),
@@ -3299,17 +4037,17 @@ export const forms_blocks_chips_options = sqliteTable(
   ],
 )
 
-export const forms_blocks_chips = sqliteTable(
+export const forms_blocks_chips = pgTable(
   'forms_blocks_chips',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     _path: text('_path').notNull(),
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    label: text('label'),
-    required: integer('required', { mode: 'boolean' }),
-    blockName: text('block_name'),
+    id: varchar('id').primaryKey(),
+    name: varchar('name').notNull(),
+    label: varchar('label'),
+    required: boolean('required'),
+    blockName: varchar('block_name'),
   },
   (columns) => [
     index('forms_blocks_chips_order_idx').on(columns._order),
@@ -3323,19 +4061,19 @@ export const forms_blocks_chips = sqliteTable(
   ],
 )
 
-export const forms_emails = sqliteTable(
+export const forms_emails = pgTable(
   'forms_emails',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    emailTo: text('email_to'),
-    cc: text('cc'),
-    bcc: text('bcc'),
-    replyTo: text('reply_to'),
-    emailFrom: text('email_from'),
-    subject: text('subject').notNull().default("You've received a new message."),
-    message: text('message', { mode: 'json' }),
+    id: varchar('id').primaryKey(),
+    emailTo: varchar('email_to'),
+    cc: varchar('cc'),
+    bcc: varchar('bcc'),
+    replyTo: varchar('reply_to'),
+    emailFrom: varchar('email_from'),
+    subject: varchar('subject').notNull().default("You've received a new message."),
+    message: jsonb('message'),
   },
   (columns) => [
     index('forms_emails_order_idx').on(columns._order),
@@ -3348,23 +4086,21 @@ export const forms_emails = sqliteTable(
   ],
 )
 
-export const forms = sqliteTable(
+export const forms = pgTable(
   'forms',
   {
-    id: integer('id').primaryKey(),
-    title: text('title').notNull(),
-    submitButtonLabel: text('submit_button_label'),
-    confirmationType: text('confirmation_type', { enum: ['message', 'redirect'] }).default(
-      'message',
-    ),
-    confirmationMessage: text('confirmation_message', { mode: 'json' }),
-    redirect_url: text('redirect_url'),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    id: serial('id').primaryKey(),
+    title: varchar('title').notNull(),
+    submitButtonLabel: varchar('submit_button_label'),
+    confirmationType: enum_forms_confirmation_type('confirmation_type').default('message'),
+    confirmationMessage: jsonb('confirmation_message'),
+    redirect_url: varchar('redirect_url'),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
   },
   (columns) => [
     index('forms_updated_at_idx').on(columns.updatedAt),
@@ -3372,14 +4108,14 @@ export const forms = sqliteTable(
   ],
 )
 
-export const form_submissions_submission_data = sqliteTable(
+export const form_submissions_submission_data = pgTable(
   'form_submissions_submission_data',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    field: text('field').notNull(),
-    value: text('value').notNull(),
+    id: varchar('id').primaryKey(),
+    field: varchar('field').notNull(),
+    value: varchar('value').notNull(),
   },
   (columns) => [
     index('form_submissions_submission_data_order_idx').on(columns._order),
@@ -3392,21 +4128,21 @@ export const form_submissions_submission_data = sqliteTable(
   ],
 )
 
-export const form_submissions = sqliteTable(
+export const form_submissions = pgTable(
   'form_submissions',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     form: integer('form_id')
       .notNull()
       .references(() => forms.id, {
         onDelete: 'set null',
       }),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
   },
   (columns) => [
     index('form_submissions_form_idx').on(columns.form),
@@ -3415,15 +4151,15 @@ export const form_submissions = sqliteTable(
   ],
 )
 
-export const search_categories = sqliteTable(
+export const search_categories = pgTable(
   'search_categories',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    relationTo: text('relation_to'),
-    categoryID: text('category_i_d'),
-    title: text('title'),
+    id: varchar('id').primaryKey(),
+    relationTo: varchar('relation_to'),
+    categoryID: varchar('category_i_d'),
+    title: varchar('title'),
   },
   (columns) => [
     index('search_categories_order_idx').on(columns._order),
@@ -3436,24 +4172,24 @@ export const search_categories = sqliteTable(
   ],
 )
 
-export const search = sqliteTable(
+export const search = pgTable(
   'search',
   {
-    id: integer('id').primaryKey(),
-    title: text('title'),
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
     priority: numeric('priority', { mode: 'number' }),
-    slug: text('slug'),
-    meta_title: text('meta_title'),
-    meta_description: text('meta_description'),
+    slug: varchar('slug'),
+    meta_title: varchar('meta_title'),
+    meta_description: varchar('meta_description'),
     meta_image: integer('meta_image_id').references(() => media.id, {
       onDelete: 'set null',
     }),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
   },
   (columns) => [
     index('search_slug_idx').on(columns.slug),
@@ -3463,13 +4199,13 @@ export const search = sqliteTable(
   ],
 )
 
-export const search_rels = sqliteTable(
+export const search_rels = pgTable(
   'search_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     postsID: integer('posts_id'),
   },
   (columns) => [
@@ -3490,24 +4226,28 @@ export const search_rels = sqliteTable(
   ],
 )
 
-export const payload_jobs_log = sqliteTable(
+export const payload_jobs_log = pgTable(
   'payload_jobs_log',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    executedAt: text('executed_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    completedAt: text('completed_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    taskSlug: text('task_slug', { enum: ['inline', 'schedulePublish'] }).notNull(),
-    taskID: text('task_i_d').notNull(),
-    input: text('input', { mode: 'json' }),
-    output: text('output', { mode: 'json' }),
-    state: text('state', { enum: ['failed', 'succeeded'] }).notNull(),
-    error: text('error', { mode: 'json' }),
+    id: varchar('id').primaryKey(),
+    executedAt: timestamp('executed_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }).notNull(),
+    completedAt: timestamp('completed_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }).notNull(),
+    taskSlug: enum_payload_jobs_log_task_slug('task_slug').notNull(),
+    taskID: varchar('task_i_d').notNull(),
+    input: jsonb('input'),
+    output: jsonb('output'),
+    state: enum_payload_jobs_log_state('state').notNull(),
+    error: jsonb('error'),
   },
   (columns) => [
     index('payload_jobs_log_order_idx').on(columns._order),
@@ -3520,25 +4260,25 @@ export const payload_jobs_log = sqliteTable(
   ],
 )
 
-export const payload_jobs = sqliteTable(
+export const payload_jobs = pgTable(
   'payload_jobs',
   {
-    id: integer('id').primaryKey(),
-    input: text('input', { mode: 'json' }),
-    completedAt: text('completed_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    id: serial('id').primaryKey(),
+    input: jsonb('input'),
+    completedAt: timestamp('completed_at', { mode: 'string', withTimezone: true, precision: 3 }),
     totalTried: numeric('total_tried', { mode: 'number' }).default('0'),
-    hasError: integer('has_error', { mode: 'boolean' }).default(false),
-    error: text('error', { mode: 'json' }),
-    taskSlug: text('task_slug', { enum: ['inline', 'schedulePublish'] }),
-    queue: text('queue').default('default'),
-    waitUntil: text('wait_until').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    processing: integer('processing', { mode: 'boolean' }).default(false),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    hasError: boolean('has_error').default(false),
+    error: jsonb('error'),
+    taskSlug: enum_payload_jobs_task_slug('task_slug'),
+    queue: varchar('queue').default('default'),
+    waitUntil: timestamp('wait_until', { mode: 'string', withTimezone: true, precision: 3 }),
+    processing: boolean('processing').default(false),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
   },
   (columns) => [
     index('payload_jobs_completed_at_idx').on(columns.completedAt),
@@ -3553,17 +4293,17 @@ export const payload_jobs = sqliteTable(
   ],
 )
 
-export const payload_locked_documents = sqliteTable(
+export const payload_locked_documents = pgTable(
   'payload_locked_documents',
   {
-    id: integer('id').primaryKey(),
-    globalSlug: text('global_slug'),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    id: serial('id').primaryKey(),
+    globalSlug: varchar('global_slug'),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
   },
   (columns) => [
     index('payload_locked_documents_global_slug_idx').on(columns.globalSlug),
@@ -3572,19 +4312,20 @@ export const payload_locked_documents = sqliteTable(
   ],
 )
 
-export const payload_locked_documents_rels = sqliteTable(
+export const payload_locked_documents_rels = pgTable(
   'payload_locked_documents_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     pagesID: integer('pages_id'),
     postsID: integer('posts_id'),
     mediaID: integer('media_id'),
     categoriesID: integer('categories_id'),
     usersID: integer('users_id'),
     projectsID: integer('projects_id'),
+    'mux-videoID': integer('mux_video_id'),
     redirectsID: integer('redirects_id'),
     formsID: integer('forms_id'),
     'form-submissionsID': integer('form_submissions_id'),
@@ -3601,6 +4342,7 @@ export const payload_locked_documents_rels = sqliteTable(
     index('payload_locked_documents_rels_categories_id_idx').on(columns.categoriesID),
     index('payload_locked_documents_rels_users_id_idx').on(columns.usersID),
     index('payload_locked_documents_rels_projects_id_idx').on(columns.projectsID),
+    index('payload_locked_documents_rels_mux_video_id_idx').on(columns['mux-videoID']),
     index('payload_locked_documents_rels_redirects_id_idx').on(columns.redirectsID),
     index('payload_locked_documents_rels_forms_id_idx').on(columns.formsID),
     index('payload_locked_documents_rels_form_submissions_id_idx').on(
@@ -3644,6 +4386,11 @@ export const payload_locked_documents_rels = sqliteTable(
       name: 'payload_locked_documents_rels_projects_fk',
     }).onDelete('cascade'),
     foreignKey({
+      columns: [columns['mux-videoID']],
+      foreignColumns: [mux_video.id],
+      name: 'payload_locked_documents_rels_mux_video_fk',
+    }).onDelete('cascade'),
+    foreignKey({
       columns: [columns['redirectsID']],
       foreignColumns: [redirects.id],
       name: 'payload_locked_documents_rels_redirects_fk',
@@ -3671,18 +4418,18 @@ export const payload_locked_documents_rels = sqliteTable(
   ],
 )
 
-export const payload_preferences = sqliteTable(
+export const payload_preferences = pgTable(
   'payload_preferences',
   {
-    id: integer('id').primaryKey(),
-    key: text('key'),
-    value: text('value', { mode: 'json' }),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    id: serial('id').primaryKey(),
+    key: varchar('key'),
+    value: jsonb('value'),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
   },
   (columns) => [
     index('payload_preferences_key_idx').on(columns.key),
@@ -3691,13 +4438,13 @@ export const payload_preferences = sqliteTable(
   ],
 )
 
-export const payload_preferences_rels = sqliteTable(
+export const payload_preferences_rels = pgTable(
   'payload_preferences_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     usersID: integer('users_id'),
   },
   (columns) => [
@@ -3718,18 +4465,18 @@ export const payload_preferences_rels = sqliteTable(
   ],
 )
 
-export const payload_migrations = sqliteTable(
+export const payload_migrations = pgTable(
   'payload_migrations',
   {
-    id: integer('id').primaryKey(),
-    name: text('name'),
+    id: serial('id').primaryKey(),
+    name: varchar('name'),
     batch: numeric('batch', { mode: 'number' }),
-    updatedAt: text('updated_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text('created_at')
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
   },
   (columns) => [
     index('payload_migrations_updated_at_idx').on(columns.updatedAt),
@@ -3737,20 +4484,18 @@ export const payload_migrations = sqliteTable(
   ],
 )
 
-export const header_nav_items = sqliteTable(
+export const header_nav_items = pgTable(
   'header_nav_items',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_appearance: text('link_appearance', {
-      enum: ['default', 'outline', 'secondary', 'miniOutline', 'link'],
-    }).default('default'),
-    link_size: text('link_size', { enum: ['default'] }).default('default'),
+    id: varchar('id').primaryKey(),
+    link_type: enum_header_nav_items_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_appearance: enum_header_nav_items_link_appearance('link_appearance').default('default'),
+    link_size: enum_header_nav_items_link_size('link_size').default('default'),
   },
   (columns) => [
     index('header_nav_items_order_idx').on(columns._order),
@@ -3763,19 +4508,19 @@ export const header_nav_items = sqliteTable(
   ],
 )
 
-export const header = sqliteTable('header', {
-  id: integer('id').primaryKey(),
-  updatedAt: text('updated_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-  createdAt: text('created_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+export const header = pgTable('header', {
+  id: serial('id').primaryKey(),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 }),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 }),
 })
 
-export const header_rels = sqliteTable(
+export const header_rels = pgTable(
   'header_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     pagesID: integer('pages_id'),
     postsID: integer('posts_id'),
     projectsID: integer('projects_id'),
@@ -3810,17 +4555,17 @@ export const header_rels = sqliteTable(
   ],
 )
 
-export const footer_nav_items = sqliteTable(
+export const footer_nav_items = pgTable(
   'footer_nav_items',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_size: text('link_size', { enum: ['default'] }).default('default'),
+    id: varchar('id').primaryKey(),
+    link_type: enum_footer_nav_items_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_size: enum_footer_nav_items_link_size('link_size').default('default'),
   },
   (columns) => [
     index('footer_nav_items_order_idx').on(columns._order),
@@ -3833,19 +4578,19 @@ export const footer_nav_items = sqliteTable(
   ],
 )
 
-export const footer = sqliteTable('footer', {
-  id: integer('id').primaryKey(),
-  updatedAt: text('updated_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-  createdAt: text('created_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+export const footer = pgTable('footer', {
+  id: serial('id').primaryKey(),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 }),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 }),
 })
 
-export const footer_rels = sqliteTable(
+export const footer_rels = pgTable(
   'footer_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     pagesID: integer('pages_id'),
     postsID: integer('posts_id'),
     projectsID: integer('projects_id'),
@@ -3880,13 +4625,13 @@ export const footer_rels = sqliteTable(
   ],
 )
 
-export const sidebar_nav_items_show_on_pages = sqliteTable(
+export const sidebar_nav_items_show_on_pages = pgTable(
   'sidebar_nav_items_show_on_pages',
   {
     _order: integer('_order').notNull(),
-    _parentID: text('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    path: text('path').notNull(),
+    _parentID: varchar('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    path: varchar('path').notNull(),
   },
   (columns) => [
     index('sidebar_nav_items_show_on_pages_order_idx').on(columns._order),
@@ -3899,81 +4644,19 @@ export const sidebar_nav_items_show_on_pages = sqliteTable(
   ],
 )
 
-export const sidebar_nav_items = sqliteTable(
+export const sidebar_nav_items = pgTable(
   'sidebar_nav_items',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
-    id: text('id').primaryKey(),
-    link_type: text('link_type', { enum: ['reference', 'custom'] }).default('reference'),
-    link_newTab: integer('link_new_tab', { mode: 'boolean' }),
-    link_url: text('link_url'),
-    link_label: text('link_label'),
-    link_appearance: text('link_appearance', {
-      enum: ['default', 'outline', 'secondary', 'miniOutline', 'link'],
-    }).default('default'),
-    link_size: text('link_size', { enum: ['default', 'icon'] }).default('default'),
-    link_icon: text('link_icon', {
-      enum: [
-        'HomeIcon',
-        'UserIcon',
-        'UsersIcon',
-        'DocumentIcon',
-        'DocumentsIcon',
-        'FolderIcon',
-        'MagnifyingGlassIcon',
-        'Cog6ToothIcon',
-        'BellIcon',
-        'HeartIcon',
-        'StarIcon',
-        'BookmarkIcon',
-        'CalendarIcon',
-        'ClockIcon',
-        'ChartBarIcon',
-        'Squares2X2Icon',
-        'Bars3Icon',
-        'Bars3BottomLeftIcon',
-        'ArrowRightIcon',
-        'ArrowLeftIcon',
-        'ArrowUpIcon',
-        'ArrowDownIcon',
-        'ChevronRightIcon',
-        'ChevronLeftIcon',
-        'PlusIcon',
-        'MinusIcon',
-        'XMarkIcon',
-        'CheckIcon',
-        'InformationCircleIcon',
-        'ExclamationTriangleIcon',
-        'QuestionMarkCircleIcon',
-        'LockClosedIcon',
-        'LockOpenIcon',
-        'KeyIcon',
-        'ShieldCheckIcon',
-        'EyeIcon',
-        'EyeSlashIcon',
-        'PencilIcon',
-        'TrashIcon',
-        'ShareIcon',
-        'LinkIcon',
-        'PhotoIcon',
-        'VideoCameraIcon',
-        'MusicalNoteIcon',
-        'EnvelopeIcon',
-        'PhoneIcon',
-        'GlobeAltIcon',
-        'MapPinIcon',
-        'ShoppingCartIcon',
-        'CreditCardIcon',
-        'TagIcon',
-        'FireIcon',
-        'BoltIcon',
-        'SunIcon',
-        'MoonIcon',
-        'CloudIcon',
-        'SignalIcon',
-      ],
-    }),
+    id: varchar('id').primaryKey(),
+    link_type: enum_sidebar_nav_items_link_type('link_type').default('reference'),
+    link_newTab: boolean('link_new_tab'),
+    link_url: varchar('link_url'),
+    link_label: varchar('link_label'),
+    link_appearance: enum_sidebar_nav_items_link_appearance('link_appearance').default('default'),
+    link_size: enum_sidebar_nav_items_link_size('link_size').default('default'),
+    link_icon: enum_sidebar_nav_items_link_icon('link_icon'),
   },
   (columns) => [
     index('sidebar_nav_items_order_idx').on(columns._order),
@@ -3986,19 +4669,19 @@ export const sidebar_nav_items = sqliteTable(
   ],
 )
 
-export const sidebar = sqliteTable('sidebar', {
-  id: integer('id').primaryKey(),
-  updatedAt: text('updated_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-  createdAt: text('created_at').default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+export const sidebar = pgTable('sidebar', {
+  id: serial('id').primaryKey(),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 }),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 }),
 })
 
-export const sidebar_rels = sqliteTable(
+export const sidebar_rels = pgTable(
   'sidebar_rels',
   {
-    id: integer('id').primaryKey(),
+    id: serial('id').primaryKey(),
     order: integer('order'),
     parent: integer('parent_id').notNull(),
-    path: text('path').notNull(),
+    path: varchar('path').notNull(),
     pagesID: integer('pages_id'),
     postsID: integer('posts_id'),
     projectsID: integer('projects_id'),
@@ -4255,6 +4938,18 @@ export const relations_pages_blocks_form_block = relations(pages_blocks_form_blo
     relationName: 'form',
   }),
 }))
+export const relations_pages_blocks_video_card = relations(pages_blocks_video_card, ({ one }) => ({
+  _parentID: one(pages, {
+    fields: [pages_blocks_video_card._parentID],
+    references: [pages.id],
+    relationName: '_blocks_videoCard',
+  }),
+  video: one(mux_video, {
+    fields: [pages_blocks_video_card.video],
+    references: [mux_video.id],
+    relationName: 'video',
+  }),
+}))
 export const relations_pages_rels = relations(pages_rels, ({ one }) => ({
   parent: one(pages, {
     fields: [pages_rels.parent],
@@ -4326,6 +5021,9 @@ export const relations_pages = relations(pages, ({ one, many }) => ({
   }),
   _blocks_formBlock: many(pages_blocks_form_block, {
     relationName: '_blocks_formBlock',
+  }),
+  _blocks_videoCard: many(pages_blocks_video_card, {
+    relationName: '_blocks_videoCard',
   }),
   meta_image: one(media, {
     fields: [pages.meta_image],
@@ -4570,6 +5268,21 @@ export const relations__pages_v_blocks_form_block = relations(
     }),
   }),
 )
+export const relations__pages_v_blocks_video_card = relations(
+  _pages_v_blocks_video_card,
+  ({ one }) => ({
+    _parentID: one(_pages_v, {
+      fields: [_pages_v_blocks_video_card._parentID],
+      references: [_pages_v.id],
+      relationName: '_blocks_videoCard',
+    }),
+    video: one(mux_video, {
+      fields: [_pages_v_blocks_video_card.video],
+      references: [mux_video.id],
+      relationName: 'video',
+    }),
+  }),
+)
 export const relations__pages_v_rels = relations(_pages_v_rels, ({ one }) => ({
   parent: one(_pages_v, {
     fields: [_pages_v_rels.parent],
@@ -4646,6 +5359,9 @@ export const relations__pages_v = relations(_pages_v, ({ one, many }) => ({
   }),
   _blocks_formBlock: many(_pages_v_blocks_form_block, {
     relationName: '_blocks_formBlock',
+  }),
+  _blocks_videoCard: many(_pages_v_blocks_video_card, {
+    relationName: '_blocks_videoCard',
   }),
   version_meta_image: one(media, {
     fields: [_pages_v.version_meta_image],
@@ -5020,6 +5736,21 @@ export const relations_projects_blocks_video_player = relations(
     }),
   }),
 )
+export const relations_projects_blocks_video_card = relations(
+  projects_blocks_video_card,
+  ({ one }) => ({
+    _parentID: one(projects, {
+      fields: [projects_blocks_video_card._parentID],
+      references: [projects.id],
+      relationName: '_blocks_videoCard',
+    }),
+    video: one(mux_video, {
+      fields: [projects_blocks_video_card.video],
+      references: [mux_video.id],
+      relationName: 'video',
+    }),
+  }),
+)
 export const relations_projects_blocks_carousel_slides = relations(
   projects_blocks_carousel_slides,
   ({ one }) => ({
@@ -5128,6 +5859,9 @@ export const relations_projects = relations(projects, ({ one, many }) => ({
   }),
   _blocks_videoPlayer: many(projects_blocks_video_player, {
     relationName: '_blocks_videoPlayer',
+  }),
+  _blocks_videoCard: many(projects_blocks_video_card, {
+    relationName: '_blocks_videoCard',
   }),
   _blocks_carousel: many(projects_blocks_carousel, {
     relationName: '_blocks_carousel',
@@ -5377,6 +6111,21 @@ export const relations__projects_v_blocks_video_player = relations(
     }),
   }),
 )
+export const relations__projects_v_blocks_video_card = relations(
+  _projects_v_blocks_video_card,
+  ({ one }) => ({
+    _parentID: one(_projects_v, {
+      fields: [_projects_v_blocks_video_card._parentID],
+      references: [_projects_v.id],
+      relationName: '_blocks_videoCard',
+    }),
+    video: one(mux_video, {
+      fields: [_projects_v_blocks_video_card.video],
+      references: [mux_video.id],
+      relationName: 'video',
+    }),
+  }),
+)
 export const relations__projects_v_blocks_carousel_slides = relations(
   _projects_v_blocks_carousel_slides,
   ({ one }) => ({
@@ -5491,6 +6240,9 @@ export const relations__projects_v = relations(_projects_v, ({ one, many }) => (
   _blocks_videoPlayer: many(_projects_v_blocks_video_player, {
     relationName: '_blocks_videoPlayer',
   }),
+  _blocks_videoCard: many(_projects_v_blocks_video_card, {
+    relationName: '_blocks_videoCard',
+  }),
   _blocks_carousel: many(_projects_v_blocks_carousel, {
     relationName: '_blocks_carousel',
   }),
@@ -5504,6 +6256,21 @@ export const relations__projects_v = relations(_projects_v, ({ one, many }) => (
   }),
   _rels: many(_projects_v_rels, {
     relationName: '_rels',
+  }),
+}))
+export const relations_mux_video_playback_options = relations(
+  mux_video_playback_options,
+  ({ one }) => ({
+    _parentID: one(mux_video, {
+      fields: [mux_video_playback_options._parentID],
+      references: [mux_video.id],
+      relationName: 'playbackOptions',
+    }),
+  }),
+)
+export const relations_mux_video = relations(mux_video, ({ many }) => ({
+  playbackOptions: many(mux_video_playback_options, {
+    relationName: 'playbackOptions',
   }),
 }))
 export const relations_redirects_rels = relations(redirects_rels, ({ one }) => ({
@@ -5768,6 +6535,11 @@ export const relations_payload_locked_documents_rels = relations(
       references: [projects.id],
       relationName: 'projects',
     }),
+    'mux-videoID': one(mux_video, {
+      fields: [payload_locked_documents_rels['mux-videoID']],
+      references: [mux_video.id],
+      relationName: 'mux-video',
+    }),
     redirectsID: one(redirects, {
       fields: [payload_locked_documents_rels.redirectsID],
       references: [redirects.id],
@@ -5950,6 +6722,128 @@ export const relations_sidebar = relations(sidebar, ({ many }) => ({
 }))
 
 type DatabaseSchema = {
+  enum_pages_hero_links_link_type: typeof enum_pages_hero_links_link_type
+  enum_pages_hero_links_link_appearance: typeof enum_pages_hero_links_link_appearance
+  enum_pages_hero_links_link_size: typeof enum_pages_hero_links_link_size
+  enum_pages_hero_draggable_cards_cards_size: typeof enum_pages_hero_draggable_cards_cards_size
+  enum_pages_blocks_cta_links_link_type: typeof enum_pages_blocks_cta_links_link_type
+  enum_pages_blocks_cta_links_link_appearance: typeof enum_pages_blocks_cta_links_link_appearance
+  enum_pages_blocks_cta_links_link_size: typeof enum_pages_blocks_cta_links_link_size
+  enum_pages_blocks_content_card_aspect_ratio: typeof enum_pages_blocks_content_card_aspect_ratio
+  enum_pages_blocks_content_card_link_type: typeof enum_pages_blocks_content_card_link_type
+  enum_pages_blocks_tech_stack_canvas_cards_category: typeof enum_pages_blocks_tech_stack_canvas_cards_category
+  enum_pages_blocks_tech_stack_canvas_cards_size: typeof enum_pages_blocks_tech_stack_canvas_cards_size
+  enum_pages_blocks_tech_stack_canvas_container_width: typeof enum_pages_blocks_tech_stack_canvas_container_width
+  enum_pages_blocks_content_columns_size: typeof enum_pages_blocks_content_columns_size
+  enum_pages_blocks_content_columns_link_type: typeof enum_pages_blocks_content_columns_link_type
+  enum_pages_blocks_content_columns_link_appearance: typeof enum_pages_blocks_content_columns_link_appearance
+  enum_pages_blocks_content_columns_link_size: typeof enum_pages_blocks_content_columns_link_size
+  enum_pages_blocks_draggable_cards_cards_category: typeof enum_pages_blocks_draggable_cards_cards_category
+  enum_pages_blocks_draggable_cards_cards_size: typeof enum_pages_blocks_draggable_cards_cards_size
+  enum_pages_blocks_draggable_cards_container_width: typeof enum_pages_blocks_draggable_cards_container_width
+  enum_pages_blocks_grid_columns: typeof enum_pages_blocks_grid_columns
+  enum_pages_blocks_archive_populate_by: typeof enum_pages_blocks_archive_populate_by
+  enum_pages_blocks_archive_relation_to: typeof enum_pages_blocks_archive_relation_to
+  enum_pages_blocks_video_card_aspect_ratio: typeof enum_pages_blocks_video_card_aspect_ratio
+  enum_pages_blocks_video_card_link_type: typeof enum_pages_blocks_video_card_link_type
+  enum_pages_hero_type: typeof enum_pages_hero_type
+  enum_pages_hero_content_card_aspect_ratio: typeof enum_pages_hero_content_card_aspect_ratio
+  enum_pages_hero_content_card_link_type: typeof enum_pages_hero_content_card_link_type
+  enum_pages_status: typeof enum_pages_status
+  enum__pages_v_version_hero_links_link_type: typeof enum__pages_v_version_hero_links_link_type
+  enum__pages_v_version_hero_links_link_appearance: typeof enum__pages_v_version_hero_links_link_appearance
+  enum__pages_v_version_hero_links_link_size: typeof enum__pages_v_version_hero_links_link_size
+  enum__pages_v_version_hero_draggable_cards_cards_size: typeof enum__pages_v_version_hero_draggable_cards_cards_size
+  enum__pages_v_blocks_cta_links_link_type: typeof enum__pages_v_blocks_cta_links_link_type
+  enum__pages_v_blocks_cta_links_link_appearance: typeof enum__pages_v_blocks_cta_links_link_appearance
+  enum__pages_v_blocks_cta_links_link_size: typeof enum__pages_v_blocks_cta_links_link_size
+  enum__pages_v_blocks_content_card_aspect_ratio: typeof enum__pages_v_blocks_content_card_aspect_ratio
+  enum__pages_v_blocks_content_card_link_type: typeof enum__pages_v_blocks_content_card_link_type
+  enum__pages_v_blocks_tech_stack_canvas_cards_category: typeof enum__pages_v_blocks_tech_stack_canvas_cards_category
+  enum__pages_v_blocks_tech_stack_canvas_cards_size: typeof enum__pages_v_blocks_tech_stack_canvas_cards_size
+  enum__pages_v_blocks_tech_stack_canvas_container_width: typeof enum__pages_v_blocks_tech_stack_canvas_container_width
+  enum__pages_v_blocks_content_columns_size: typeof enum__pages_v_blocks_content_columns_size
+  enum__pages_v_blocks_content_columns_link_type: typeof enum__pages_v_blocks_content_columns_link_type
+  enum__pages_v_blocks_content_columns_link_appearance: typeof enum__pages_v_blocks_content_columns_link_appearance
+  enum__pages_v_blocks_content_columns_link_size: typeof enum__pages_v_blocks_content_columns_link_size
+  enum__pages_v_blocks_draggable_cards_cards_category: typeof enum__pages_v_blocks_draggable_cards_cards_category
+  enum__pages_v_blocks_draggable_cards_cards_size: typeof enum__pages_v_blocks_draggable_cards_cards_size
+  enum__pages_v_blocks_draggable_cards_container_width: typeof enum__pages_v_blocks_draggable_cards_container_width
+  enum__pages_v_blocks_grid_columns: typeof enum__pages_v_blocks_grid_columns
+  enum__pages_v_blocks_archive_populate_by: typeof enum__pages_v_blocks_archive_populate_by
+  enum__pages_v_blocks_archive_relation_to: typeof enum__pages_v_blocks_archive_relation_to
+  enum__pages_v_blocks_video_card_aspect_ratio: typeof enum__pages_v_blocks_video_card_aspect_ratio
+  enum__pages_v_blocks_video_card_link_type: typeof enum__pages_v_blocks_video_card_link_type
+  enum__pages_v_version_hero_type: typeof enum__pages_v_version_hero_type
+  enum__pages_v_version_hero_content_card_aspect_ratio: typeof enum__pages_v_version_hero_content_card_aspect_ratio
+  enum__pages_v_version_hero_content_card_link_type: typeof enum__pages_v_version_hero_content_card_link_type
+  enum__pages_v_version_status: typeof enum__pages_v_version_status
+  enum_posts_status: typeof enum_posts_status
+  enum__posts_v_version_status: typeof enum__posts_v_version_status
+  enum_projects_blocks_cta_links_link_type: typeof enum_projects_blocks_cta_links_link_type
+  enum_projects_blocks_cta_links_link_appearance: typeof enum_projects_blocks_cta_links_link_appearance
+  enum_projects_blocks_cta_links_link_size: typeof enum_projects_blocks_cta_links_link_size
+  enum_projects_blocks_content_card_aspect_ratio: typeof enum_projects_blocks_content_card_aspect_ratio
+  enum_projects_blocks_content_card_link_type: typeof enum_projects_blocks_content_card_link_type
+  enum_projects_blocks_tech_stack_canvas_cards_category: typeof enum_projects_blocks_tech_stack_canvas_cards_category
+  enum_projects_blocks_tech_stack_canvas_cards_size: typeof enum_projects_blocks_tech_stack_canvas_cards_size
+  enum_projects_blocks_tech_stack_canvas_container_width: typeof enum_projects_blocks_tech_stack_canvas_container_width
+  enum_projects_blocks_content_columns_size: typeof enum_projects_blocks_content_columns_size
+  enum_projects_blocks_content_columns_link_type: typeof enum_projects_blocks_content_columns_link_type
+  enum_projects_blocks_content_columns_link_appearance: typeof enum_projects_blocks_content_columns_link_appearance
+  enum_projects_blocks_content_columns_link_size: typeof enum_projects_blocks_content_columns_link_size
+  enum_projects_blocks_draggable_cards_cards_category: typeof enum_projects_blocks_draggable_cards_cards_category
+  enum_projects_blocks_draggable_cards_cards_size: typeof enum_projects_blocks_draggable_cards_cards_size
+  enum_projects_blocks_draggable_cards_container_width: typeof enum_projects_blocks_draggable_cards_container_width
+  enum_projects_blocks_grid_columns: typeof enum_projects_blocks_grid_columns
+  enum_projects_blocks_archive_populate_by: typeof enum_projects_blocks_archive_populate_by
+  enum_projects_blocks_archive_relation_to: typeof enum_projects_blocks_archive_relation_to
+  enum_projects_blocks_image_masonry_grid_gap: typeof enum_projects_blocks_image_masonry_grid_gap
+  enum_projects_blocks_video_player_video_type: typeof enum_projects_blocks_video_player_video_type
+  enum_projects_blocks_video_card_aspect_ratio: typeof enum_projects_blocks_video_card_aspect_ratio
+  enum_projects_blocks_video_card_link_type: typeof enum_projects_blocks_video_card_link_type
+  enum_projects_project_type: typeof enum_projects_project_type
+  enum_projects_status: typeof enum_projects_status
+  enum__projects_v_blocks_cta_links_link_type: typeof enum__projects_v_blocks_cta_links_link_type
+  enum__projects_v_blocks_cta_links_link_appearance: typeof enum__projects_v_blocks_cta_links_link_appearance
+  enum__projects_v_blocks_cta_links_link_size: typeof enum__projects_v_blocks_cta_links_link_size
+  enum__projects_v_blocks_content_card_aspect_ratio: typeof enum__projects_v_blocks_content_card_aspect_ratio
+  enum__projects_v_blocks_content_card_link_type: typeof enum__projects_v_blocks_content_card_link_type
+  enum__projects_v_blocks_tech_stack_canvas_cards_category: typeof enum__projects_v_blocks_tech_stack_canvas_cards_category
+  enum__projects_v_blocks_tech_stack_canvas_cards_size: typeof enum__projects_v_blocks_tech_stack_canvas_cards_size
+  enum__projects_v_blocks_tech_stack_canvas_container_width: typeof enum__projects_v_blocks_tech_stack_canvas_container_width
+  enum__projects_v_blocks_content_columns_size: typeof enum__projects_v_blocks_content_columns_size
+  enum__projects_v_blocks_content_columns_link_type: typeof enum__projects_v_blocks_content_columns_link_type
+  enum__projects_v_blocks_content_columns_link_appearance: typeof enum__projects_v_blocks_content_columns_link_appearance
+  enum__projects_v_blocks_content_columns_link_size: typeof enum__projects_v_blocks_content_columns_link_size
+  enum__projects_v_blocks_draggable_cards_cards_category: typeof enum__projects_v_blocks_draggable_cards_cards_category
+  enum__projects_v_blocks_draggable_cards_cards_size: typeof enum__projects_v_blocks_draggable_cards_cards_size
+  enum__projects_v_blocks_draggable_cards_container_width: typeof enum__projects_v_blocks_draggable_cards_container_width
+  enum__projects_v_blocks_grid_columns: typeof enum__projects_v_blocks_grid_columns
+  enum__projects_v_blocks_archive_populate_by: typeof enum__projects_v_blocks_archive_populate_by
+  enum__projects_v_blocks_archive_relation_to: typeof enum__projects_v_blocks_archive_relation_to
+  enum__projects_v_blocks_image_masonry_grid_gap: typeof enum__projects_v_blocks_image_masonry_grid_gap
+  enum__projects_v_blocks_video_player_video_type: typeof enum__projects_v_blocks_video_player_video_type
+  enum__projects_v_blocks_video_card_aspect_ratio: typeof enum__projects_v_blocks_video_card_aspect_ratio
+  enum__projects_v_blocks_video_card_link_type: typeof enum__projects_v_blocks_video_card_link_type
+  enum__projects_v_version_project_type: typeof enum__projects_v_version_project_type
+  enum__projects_v_version_status: typeof enum__projects_v_version_status
+  enum_mux_video_playback_options_playback_policy: typeof enum_mux_video_playback_options_playback_policy
+  enum_redirects_to_type: typeof enum_redirects_to_type
+  enum_forms_blocks_chips_options_icon: typeof enum_forms_blocks_chips_options_icon
+  enum_forms_confirmation_type: typeof enum_forms_confirmation_type
+  enum_payload_jobs_log_task_slug: typeof enum_payload_jobs_log_task_slug
+  enum_payload_jobs_log_state: typeof enum_payload_jobs_log_state
+  enum_payload_jobs_task_slug: typeof enum_payload_jobs_task_slug
+  enum_header_nav_items_link_type: typeof enum_header_nav_items_link_type
+  enum_header_nav_items_link_appearance: typeof enum_header_nav_items_link_appearance
+  enum_header_nav_items_link_size: typeof enum_header_nav_items_link_size
+  enum_footer_nav_items_link_type: typeof enum_footer_nav_items_link_type
+  enum_footer_nav_items_link_size: typeof enum_footer_nav_items_link_size
+  enum_sidebar_nav_items_link_type: typeof enum_sidebar_nav_items_link_type
+  enum_sidebar_nav_items_link_appearance: typeof enum_sidebar_nav_items_link_appearance
+  enum_sidebar_nav_items_link_size: typeof enum_sidebar_nav_items_link_size
+  enum_sidebar_nav_items_link_icon: typeof enum_sidebar_nav_items_link_icon
   pages_hero_links: typeof pages_hero_links
   pages_hero_content_card_media: typeof pages_hero_content_card_media
   pages_hero_content_card_footer_meta: typeof pages_hero_content_card_footer_meta
@@ -5969,6 +6863,7 @@ type DatabaseSchema = {
   pages_blocks_media_block: typeof pages_blocks_media_block
   pages_blocks_archive: typeof pages_blocks_archive
   pages_blocks_form_block: typeof pages_blocks_form_block
+  pages_blocks_video_card: typeof pages_blocks_video_card
   pages: typeof pages
   pages_rels: typeof pages_rels
   _pages_v_version_hero_links: typeof _pages_v_version_hero_links
@@ -5990,6 +6885,7 @@ type DatabaseSchema = {
   _pages_v_blocks_media_block: typeof _pages_v_blocks_media_block
   _pages_v_blocks_archive: typeof _pages_v_blocks_archive
   _pages_v_blocks_form_block: typeof _pages_v_blocks_form_block
+  _pages_v_blocks_video_card: typeof _pages_v_blocks_video_card
   _pages_v: typeof _pages_v
   _pages_v_rels: typeof _pages_v_rels
   posts_populated_authors: typeof posts_populated_authors
@@ -6021,6 +6917,7 @@ type DatabaseSchema = {
   projects_blocks_image_masonry_grid_images: typeof projects_blocks_image_masonry_grid_images
   projects_blocks_image_masonry_grid: typeof projects_blocks_image_masonry_grid
   projects_blocks_video_player: typeof projects_blocks_video_player
+  projects_blocks_video_card: typeof projects_blocks_video_card
   projects_blocks_carousel_slides: typeof projects_blocks_carousel_slides
   projects_blocks_carousel: typeof projects_blocks_carousel
   projects_populated_authors: typeof projects_populated_authors
@@ -6044,11 +6941,14 @@ type DatabaseSchema = {
   _projects_v_blocks_image_masonry_grid_images: typeof _projects_v_blocks_image_masonry_grid_images
   _projects_v_blocks_image_masonry_grid: typeof _projects_v_blocks_image_masonry_grid
   _projects_v_blocks_video_player: typeof _projects_v_blocks_video_player
+  _projects_v_blocks_video_card: typeof _projects_v_blocks_video_card
   _projects_v_blocks_carousel_slides: typeof _projects_v_blocks_carousel_slides
   _projects_v_blocks_carousel: typeof _projects_v_blocks_carousel
   _projects_v_version_populated_authors: typeof _projects_v_version_populated_authors
   _projects_v: typeof _projects_v
   _projects_v_rels: typeof _projects_v_rels
+  mux_video_playback_options: typeof mux_video_playback_options
+  mux_video: typeof mux_video
   redirects: typeof redirects
   redirects_rels: typeof redirects_rels
   forms_blocks_checkbox: typeof forms_blocks_checkbox
@@ -6106,6 +7006,7 @@ type DatabaseSchema = {
   relations_pages_blocks_media_block: typeof relations_pages_blocks_media_block
   relations_pages_blocks_archive: typeof relations_pages_blocks_archive
   relations_pages_blocks_form_block: typeof relations_pages_blocks_form_block
+  relations_pages_blocks_video_card: typeof relations_pages_blocks_video_card
   relations_pages_rels: typeof relations_pages_rels
   relations_pages: typeof relations_pages
   relations__pages_v_version_hero_links: typeof relations__pages_v_version_hero_links
@@ -6127,6 +7028,7 @@ type DatabaseSchema = {
   relations__pages_v_blocks_media_block: typeof relations__pages_v_blocks_media_block
   relations__pages_v_blocks_archive: typeof relations__pages_v_blocks_archive
   relations__pages_v_blocks_form_block: typeof relations__pages_v_blocks_form_block
+  relations__pages_v_blocks_video_card: typeof relations__pages_v_blocks_video_card
   relations__pages_v_rels: typeof relations__pages_v_rels
   relations__pages_v: typeof relations__pages_v
   relations_posts_populated_authors: typeof relations_posts_populated_authors
@@ -6158,6 +7060,7 @@ type DatabaseSchema = {
   relations_projects_blocks_image_masonry_grid_images: typeof relations_projects_blocks_image_masonry_grid_images
   relations_projects_blocks_image_masonry_grid: typeof relations_projects_blocks_image_masonry_grid
   relations_projects_blocks_video_player: typeof relations_projects_blocks_video_player
+  relations_projects_blocks_video_card: typeof relations_projects_blocks_video_card
   relations_projects_blocks_carousel_slides: typeof relations_projects_blocks_carousel_slides
   relations_projects_blocks_carousel: typeof relations_projects_blocks_carousel
   relations_projects_populated_authors: typeof relations_projects_populated_authors
@@ -6181,11 +7084,14 @@ type DatabaseSchema = {
   relations__projects_v_blocks_image_masonry_grid_images: typeof relations__projects_v_blocks_image_masonry_grid_images
   relations__projects_v_blocks_image_masonry_grid: typeof relations__projects_v_blocks_image_masonry_grid
   relations__projects_v_blocks_video_player: typeof relations__projects_v_blocks_video_player
+  relations__projects_v_blocks_video_card: typeof relations__projects_v_blocks_video_card
   relations__projects_v_blocks_carousel_slides: typeof relations__projects_v_blocks_carousel_slides
   relations__projects_v_blocks_carousel: typeof relations__projects_v_blocks_carousel
   relations__projects_v_version_populated_authors: typeof relations__projects_v_version_populated_authors
   relations__projects_v_rels: typeof relations__projects_v_rels
   relations__projects_v: typeof relations__projects_v
+  relations_mux_video_playback_options: typeof relations_mux_video_playback_options
+  relations_mux_video: typeof relations_mux_video
   relations_redirects_rels: typeof relations_redirects_rels
   relations_redirects: typeof relations_redirects
   relations_forms_blocks_checkbox: typeof relations_forms_blocks_checkbox
@@ -6226,7 +7132,7 @@ type DatabaseSchema = {
   relations_sidebar: typeof relations_sidebar
 }
 
-declare module '@payloadcms/db-sqlite' {
+declare module '@payloadcms/db-postgres' {
   export interface GeneratedDatabaseSchema {
     schema: DatabaseSchema
   }

@@ -2,19 +2,22 @@ import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
-import { Archive } from '../../blocks/ArchiveBlock/config'
-import { CallToAction } from '../../blocks/CallToAction/config'
-import { Content } from '../../blocks/Content/config'
-import { ContentCard } from '../../blocks/ContentCard/config'
-import { DraggableCards } from '../../blocks/DraggableCards/config'
-import { TechStackCanvas } from '../../blocks/TechStackCanvas/config'
-import { FormBlock } from '../../blocks/Form/config'
-import { Grid } from '../../blocks/Grid/config'
-import { MediaBlock } from '../../blocks/MediaBlock/config'
+import {
+  Archive,
+  CallToAction,
+  Content,
+  ContentCard,
+  DraggableCards,
+  FormBlock,
+  Grid,
+  MediaBlock,
+  TechStackCanvas,
+  VideoCard,
+} from '../../blocks'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
-import { generatePreviewPath } from '../../utilities/generatePreviewPath'
+import { generatePreviewPath } from './lib/generatePreviewPath'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 
 import {
@@ -43,18 +46,16 @@ export const Pages: CollectionConfig<'pages'> = {
   admin: {
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
-      url: ({ data, req }) =>
+      url: ({ data }) =>
         generatePreviewPath({
           slug: data?.slug,
           collection: 'pages',
-          req,
         }),
     },
-    preview: (data, { req }) =>
+    preview: (data) =>
       generatePreviewPath({
         slug: data?.slug as string,
         collection: 'pages',
-        req,
       }),
     useAsTitle: 'title',
   },
@@ -76,7 +77,7 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, ContentCard, DraggableCards, TechStackCanvas, Grid, MediaBlock, Archive, FormBlock],
+              blocks: [CallToAction, Content, ContentCard, DraggableCards, TechStackCanvas, Grid, MediaBlock, Archive, FormBlock, VideoCard],
               required: true,
               admin: {
                 initCollapsed: true,

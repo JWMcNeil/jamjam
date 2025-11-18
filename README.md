@@ -2,9 +2,21 @@
 
 ## Core Setup
 
-- [ ] Switch SQLite → Postgres (optional, but ideal for production)
+- [x] Switch SQLite → Postgres (completed - using Docker)
 - [ ] Run clean migrations and verify Payload boots without warnings
 - [ ] Set environment variables for production (Payload secrets, DB URL, Next.js vars)
+
+### Database Setup
+
+PostgreSQL is configured via Docker Compose. To start the database:
+
+```bash
+docker-compose up -d postgres
+```
+
+The default connection string is: `postgresql://payload:payload@localhost:5432/jamjam`
+
+Set `DATABASE_URI` in your `.env` file if you need a different connection string.
 
 ## Content & Pages
 

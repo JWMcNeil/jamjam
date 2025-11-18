@@ -15,7 +15,6 @@ export const VideoPlayer: React.FC<Props> = (props) => {
   const {
     autoplay = false,
     className,
-    controls = true,
     externalUrl,
     loop = false,
     muxAssetId,
@@ -40,7 +39,7 @@ export const VideoPlayer: React.FC<Props> = (props) => {
   const getEmbedUrl = (url: string): string => {
     try {
       const urlObj = new URL(url)
-      
+
       // YouTube
       if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
         const videoId = urlObj.hostname.includes('youtu.be')
@@ -50,7 +49,7 @@ export const VideoPlayer: React.FC<Props> = (props) => {
           return `https://www.youtube.com/embed/${videoId}`
         }
       }
-      
+
       // Vimeo
       if (urlObj.hostname.includes('vimeo.com')) {
         const videoId = urlObj.pathname.slice(1)
@@ -58,7 +57,7 @@ export const VideoPlayer: React.FC<Props> = (props) => {
           return `https://player.vimeo.com/video/${videoId}`
         }
       }
-      
+
       // If already an embed URL or can't parse, return as-is
       return url
     } catch {
@@ -84,12 +83,14 @@ export const VideoPlayer: React.FC<Props> = (props) => {
           <MuxPlayer
             playbackId={muxAssetId}
             autoPlay={autoplay ?? false}
-            controls={controls ?? true}
             loop={loop ?? false}
             muted={muted ?? false}
             poster={posterUrl}
             streamType="on-demand"
             className="w-full h-full"
+            accentColor="hsl(127.66, 19.34%, 47.65%)"
+            primaryColor="hsl(0, 0%, 100%)"
+            secondaryColor="hsl(217.2, 32.6%, 17.5%)"
           />
         ) : videoType === 'external' && embedUrl ? (
           <iframe
@@ -104,4 +105,3 @@ export const VideoPlayer: React.FC<Props> = (props) => {
     </div>
   )
 }
-

@@ -1,5 +1,5 @@
 // storage-adapter-import-placeholder
-import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 
 import sharp from 'sharp' // sharp-import
 import path from 'path'
@@ -18,8 +18,6 @@ import { Sidebar } from './Sidebar/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
-
-import icon16 from '../public/jamjam-icon-16.png'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -67,12 +65,12 @@ export default buildConfig({
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
-  db: sqliteAdapter({
-    client: {
-      url: process.env.DATABASE_URI || `file:${path.resolve(dirname, '../jamjam.db')}`,
+  db: postgresAdapter({
+    pool: {
+      connectionString:
+        process.env.DATABASE_URI || 'postgresql://payload:payload@localhost:5432/jamjam',
     },
-    // Temporarily disable push to avoid freezing on column deletion
-    // Run migrations instead: pnpm payload migrate
+    // Use push mode in development - Payload will auto-sync schema
     push: true,
   }),
   collections: [Pages, Posts, Media, Categories, Users, Projects],

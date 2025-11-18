@@ -82,6 +82,75 @@
     --warning: 34 51% 25%;
     --error: 10 39% 43%;
   } */
+
+  /* Mux Player theme customization */
+  mux-player {
+    /* Use accent-color CSS property (standard CSS, works with web components) */
+    accent-color: hsl(var(--primary));
+
+    /* Set controls backdrop color with semi-transparent overlay */
+    --controls-backdrop-color: hsl(var(--background) / 60%);
+  }
+
+  /* Style Mux Player controls using ::part() selectors */
+  mux-player::part(button) {
+    color: hsl(var(--foreground));
+  }
+
+  mux-player::part(center play button) {
+    color: hsl(var(--foreground));
+  }
+
+  mux-player::part(bottom) {
+    background-color: hsl(var(--muted) / 80%);
+  }
+
+  mux-player::part(top) {
+    background-color: hsl(var(--muted) / 80%);
+  }
+
+  /* Override any pink/magenta colors with theme colors */
+  mux-player::part(play),
+  mux-player::part(mute),
+  mux-player::part(captions),
+  mux-player::part(fullscreen),
+  mux-player::part(pip),
+  mux-player::part(cast),
+  mux-player::part(airplay),
+  mux-player::part(seek-backward),
+  mux-player::part(seek-forward),
+  mux-player::part(playback-rate) {
+    color: hsl(var(--foreground));
+  }
+
+  /* Style the time display and other text elements */
+  mux-player::part(display),
+  mux-player::part(time) {
+    color: hsl(var(--foreground));
+  }
+
+  /* Override any SVG fills and strokes that might be pink */
+  mux-player::part(button) svg,
+  mux-player::part(play) svg,
+  mux-player::part(mute) svg,
+  mux-player::part(captions) svg,
+  mux-player::part(fullscreen) svg,
+  mux-player::part(pip) svg,
+  mux-player::part(cast) svg,
+  mux-player::part(airplay) svg,
+  mux-player::part(seek-backward) svg,
+  mux-player::part(seek-forward) svg,
+  mux-player::part(playback-rate) svg {
+    fill: hsl(var(--foreground));
+    stroke: hsl(var(--foreground));
+    color: hsl(var(--foreground));
+  }
+
+  /* Additional overrides for any remaining pink elements */
+  mux-player::part(center),
+  mux-player::part(layer) {
+    color: hsl(var(--foreground));
+  }
 }
 
 @layer base {

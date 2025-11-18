@@ -5,6 +5,7 @@ import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
 import { Plugin } from 'payload'
+import { muxVideoPlugin } from '@oversightstudio/mux-video'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -26,6 +27,17 @@ const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
 }
 
 export const plugins: Plugin[] = [
+  muxVideoPlugin({
+    enabled: true,
+    initSettings: {
+      tokenId: process.env.MUX_TOKEN_ID || '',
+      tokenSecret: process.env.MUX_TOKEN_SECRET || '',
+      webhookSecret: process.env.MUX_WEBHOOK_SIGNING_SECRET || '',
+    },
+    uploadSettings: {
+      cors_origin: getServerSideURL() || 'http://localhost:3000',
+    },
+  }),
   redirectsPlugin({
     collections: ['pages', 'posts'],
     overrides: {

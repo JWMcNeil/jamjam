@@ -13,6 +13,7 @@ import { GridBlock } from '@/blocks/Grid/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import { ImageMasonryGrid } from '@/blocks/ImageMasonryGrid/Component'
 import { VideoPlayer } from '@/blocks/VideoPlayer/Component'
+import { VideoCardBlock } from '@/blocks/VideoCard/Component'
 import { Carousel } from '@/blocks/Carousel/Component'
 
 const blockComponents = {
@@ -27,6 +28,7 @@ const blockComponents = {
   mediaBlock: MediaBlock,
   imageMasonryGrid: ImageMasonryGrid,
   videoPlayer: VideoPlayer,
+  videoCard: VideoCardBlock,
   carousel: Carousel,
 }
 

@@ -2,19 +2,22 @@ import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
-import { Archive } from '../../blocks/ArchiveBlock/config'
-import { CallToAction } from '../../blocks/CallToAction/config'
-import { Carousel } from '../../blocks/Carousel/config'
-import { Content } from '../../blocks/Content/config'
-import { ContentCard } from '../../blocks/ContentCard/config'
-import { DraggableCards } from '../../blocks/DraggableCards/config'
-import { TechStackCanvas } from '../../blocks/TechStackCanvas/config'
-import { FormBlock } from '../../blocks/Form/config'
-import { Grid } from '../../blocks/Grid/config'
-import { ImageMasonryGrid } from '../../blocks/ImageMasonryGrid/config'
-import { MediaBlock } from '../../blocks/MediaBlock/config'
-import { VideoPlayer } from '../../blocks/VideoPlayer/config'
-import { generatePreviewPath } from '../../utilities/generatePreviewPath'
+import {
+  Archive,
+  CallToAction,
+  Carousel,
+  Content,
+  ContentCard,
+  DraggableCards,
+  FormBlock,
+  Grid,
+  ImageMasonryGrid,
+  MediaBlock,
+  TechStackCanvas,
+  VideoCard,
+  VideoPlayer,
+} from '../../blocks'
+import { generatePreviewPath } from './lib/generatePreviewPath'
 
 import {
   MetaDescriptionField,
@@ -51,18 +54,16 @@ export const Projects: CollectionConfig<'projects'> = {
   admin: {
     defaultColumns: ['title', 'projectType', 'slug', 'updatedAt'],
     livePreview: {
-      url: ({ data, req }) =>
+      url: ({ data }) =>
         generatePreviewPath({
           slug: data?.slug,
           collection: 'projects',
-          req,
         }),
     },
-    preview: (data, { req }) =>
+    preview: (data) =>
       generatePreviewPath({
         slug: data?.slug as string,
         collection: 'projects',
-        req,
       }),
     useAsTitle: 'title',
   },
@@ -120,6 +121,7 @@ export const Projects: CollectionConfig<'projects'> = {
                 FormBlock,
                 ImageMasonryGrid,
                 VideoPlayer,
+                VideoCard,
                 Carousel,
               ],
               required: true,
