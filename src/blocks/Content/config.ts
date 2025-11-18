@@ -11,6 +11,15 @@ import {
 import { link } from '@/fields/link'
 import { ContentCard } from '@/blocks/ContentCard/config'
 import { TechStackCanvas } from '@/blocks/TechStackCanvas/config'
+import { Carousel } from '@/blocks/Carousel/config'
+import { VideoCard } from '@/blocks/VideoCard/config'
+import { VideoPlayer } from '@/blocks/VideoPlayer/config'
+import { FormBlock } from '@/blocks/Form/config'
+import { DraggableCards } from '@/blocks/DraggableCards/config'
+import { Banner } from '@/blocks/Banner/config'
+import { MediaBlock } from '@/blocks/MediaBlock/config'
+import { Code } from '@/blocks/Code/config'
+import { BlocksFeature } from '@payloadcms/richtext-lexical'
 
 const columnFields: Field[] = [
   {
@@ -44,6 +53,7 @@ const columnFields: Field[] = [
         return [
           ...rootFeatures,
           HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
+          BlocksFeature({ blocks: [Banner, Code, MediaBlock] }),
           FixedToolbarFeature(),
           InlineToolbarFeature(),
           UnorderedListFeature(),
@@ -66,21 +76,20 @@ const columnFields: Field[] = [
     },
   }),
   {
-    name: 'contentCard',
+    name: 'children',
     type: 'blocks',
-    label: 'Content Card',
-    blocks: [ContentCard],
+    label: 'Add Blocks',
+    blocks: [
+      ContentCard,
+      TechStackCanvas,
+      Carousel,
+      VideoCard,
+      VideoPlayer,
+      FormBlock,
+      DraggableCards,
+    ],
     admin: {
-      description: 'Optionally add a content card to this column',
-    },
-  },
-  {
-    name: 'techStackCanvas',
-    type: 'blocks',
-    label: 'Tech Stack Canvas',
-    blocks: [TechStackCanvas],
-    admin: {
-      description: 'Optionally add a tech stack canvas to this column',
+      initCollapsed: true,
     },
   },
 ]

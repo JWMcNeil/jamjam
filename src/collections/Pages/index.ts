@@ -13,6 +13,7 @@ import {
   MediaBlock,
   TechStackCanvas,
   VideoCard,
+  Carousel,
 } from '../../blocks'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
@@ -77,7 +78,19 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, ContentCard, DraggableCards, TechStackCanvas, Grid, MediaBlock, Archive, FormBlock, VideoCard],
+              blocks: [
+                CallToAction,
+                Content,
+                ContentCard,
+                DraggableCards,
+                TechStackCanvas,
+                Grid,
+                MediaBlock,
+                Archive,
+                FormBlock,
+                VideoCard,
+                Carousel,
+              ],
               required: true,
               admin: {
                 initCollapsed: true,

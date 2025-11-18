@@ -7,11 +7,13 @@ import {
   HorizontalRuleFeature,
   InlineToolbarFeature,
   lexicalEditor,
+  UnorderedListFeature,
+  OrderedListFeature,
 } from '@payloadcms/richtext-lexical'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
-import { Banner, Code, MediaBlock } from '../../blocks'
+import { Banner, Code, Content, MediaBlock } from '../../blocks'
 import { generatePreviewPath } from './lib/generatePreviewPath'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
@@ -85,10 +87,12 @@ export const Posts: CollectionConfig<'posts'> = {
                   return [
                     ...rootFeatures,
                     HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                    BlocksFeature({ blocks: [Banner, Code, MediaBlock] }),
+                    BlocksFeature({ blocks: [Banner, Code, Content, MediaBlock] }),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
                     HorizontalRuleFeature(),
+                    UnorderedListFeature(),
+                    OrderedListFeature(),
                   ]
                 },
               }),

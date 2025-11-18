@@ -24,15 +24,11 @@ export const FormBlock: React.FC<
     id?: string
   } & FormBlockType
 > = (props) => {
-  const {
-    enableIntro,
-    form: formFromProps,
-    form: { id: formID, confirmationMessage, confirmationType, redirect, submitButtonLabel } = {},
-    introContent,
-  } = props
+  const { enableIntro, form: formFromProps, introContent } = props
 
+  // All hooks must be called before any conditional returns
   const formMethods = useForm({
-    defaultValues: formFromProps.fields,
+    defaultValues: formFromProps?.fields || {},
   })
   const {
     control,
@@ -46,8 +42,18 @@ export const FormBlock: React.FC<
   const [error, setError] = useState<{ message: string; status?: string } | undefined>()
   const router = useRouter()
 
+  const {
+    id: formID,
+    confirmationMessage,
+    confirmationType,
+    redirect,
+    submitButtonLabel,
+  } = formFromProps || {}
+
   const onSubmit = useCallback(
     (data: FormFieldBlock[]) => {
+      if (!formFromProps || !formID) return
+
       let loadingTimerID: ReturnType<typeof setTimeout>
       const submitForm = async () => {
         setError(undefined)
@@ -110,8 +116,12 @@ export const FormBlock: React.FC<
 
       void submitForm()
     },
-    [router, formID, redirect, confirmationType],
+    [router, formID, redirect, confirmationType, formFromProps],
   )
+
+  if (!formFromProps) {
+    return null
+  }
 
   return (
     <div className="container lg:max-w-[48rem]">

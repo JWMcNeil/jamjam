@@ -6,11 +6,21 @@ import type {
   ContentBlock as ContentBlockProps,
   ContentCardBlock,
   TechStackCanvasBlock,
+  CarouselBlock,
+  VideoCardBlock,
+  VideoPlayerBlock,
+  DraggableCardsBlock,
+  FormBlock,
 } from '@/payload-types'
 
 import { CMSLink } from '../../components/Link'
 import { ContentCardBlock as ContentCardBlockComponent } from '@/blocks/ContentCard/Component'
 import { TechStackCanvasBlock as TechStackCanvasBlockComponent } from '@/blocks/TechStackCanvas/Component'
+import { Carousel } from '@/blocks/Carousel/Component'
+import { VideoCardBlock as VideoCardBlockComponent } from '@/blocks/VideoCard/Component'
+import { VideoPlayer } from '@/blocks/VideoPlayer/Component'
+import { FormBlock as FormBlockComponent } from '@/blocks/Form/Component'
+import { DraggableCardsBlock as DraggableCardsBlockComponent } from '@/blocks/DraggableCards/Component'
 
 export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
   const { columns } = props
@@ -27,17 +37,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
       {columns && columns.length > 0 && (
         <div className="grid grid-cols-4 lg:grid-cols-12 gap-y-8 gap-x-16">
           {columns.map((col, index) => {
-            const { enableLink, link, richText, size } = col
-            const contentCard = (
-              col as typeof col & {
-                contentCard?: ContentCardBlock[]
-              }
-            ).contentCard
-            const techStackCanvas = (
-              col as typeof col & {
-                techStackCanvas?: TechStackCanvasBlock[]
-              }
-            ).techStackCanvas
+            const { enableLink, link, richText, size, children } = col
 
             return (
               <div
@@ -47,25 +47,77 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                 key={index}
               >
                 {richText && <RichText data={richText} enableGutter={false} />}
-                {contentCard && contentCard.length > 0 && (
+                {children && children.length > 0 && (
                   <div className="mt-4">
-                    {contentCard.map((block: ContentCardBlock, blockIndex: number) => {
-                      return (
-                        <div key={block.id || blockIndex}>
-                          <ContentCardBlockComponent {...block} />
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-                {techStackCanvas && techStackCanvas.length > 0 && (
-                  <div className="mt-8 md:mt-0">
-                    {techStackCanvas.map((block: TechStackCanvasBlock, blockIndex: number) => {
-                      return (
-                        <div key={block.id || blockIndex}>
-                          <TechStackCanvasBlockComponent {...block} />
-                        </div>
-                      )
+                    {children.map((block, blockIndex: number) => {
+                      const { blockType } = block as {
+                        blockType?: string
+                        id?: string | null
+                      }
+
+                      if (blockType === 'contentCard') {
+                        return (
+                          <div key={(block as ContentCardBlock).id || blockIndex}>
+                            <ContentCardBlockComponent {...(block as ContentCardBlock)} />
+                          </div>
+                        )
+                      }
+
+                      if (blockType === 'techStackCanvas') {
+                        return (
+                          <div
+                            key={(block as TechStackCanvasBlock).id || blockIndex}
+                            className="mt-8 md:mt-0"
+                          >
+                            <TechStackCanvasBlockComponent {...(block as TechStackCanvasBlock)} />
+                          </div>
+                        )
+                      }
+
+                      if (blockType === 'carousel') {
+                        return (
+                          <div key={(block as CarouselBlock).id || blockIndex} className="mt-4">
+                            <Carousel {...(block as CarouselBlock)} disableInnerContainer />
+                          </div>
+                        )
+                      }
+
+                      if (blockType === 'videoCard') {
+                        return (
+                          <div key={(block as VideoCardBlock).id || blockIndex} className="mt-4">
+                            <VideoCardBlockComponent {...(block as VideoCardBlock)} />
+                          </div>
+                        )
+                      }
+
+                      if (blockType === 'videoPlayer') {
+                        return (
+                          <div key={(block as VideoPlayerBlock).id || blockIndex} className="mt-4">
+                            <VideoPlayer {...(block as VideoPlayerBlock)} disableInnerContainer />
+                          </div>
+                        )
+                      }
+
+                      if (blockType === 'formBlock') {
+                        return (
+                          <div key={(block as FormBlock).id || blockIndex} className="mt-4">
+                            <FormBlockComponent {...(block as FormBlock)} />
+                          </div>
+                        )
+                      }
+
+                      if (blockType === 'draggableCards') {
+                        return (
+                          <div
+                            key={(block as DraggableCardsBlock).id || blockIndex}
+                            className="mt-4"
+                          >
+                            <DraggableCardsBlockComponent {...(block as DraggableCardsBlock)} />
+                          </div>
+                        )
+                      }
+
+                      return null
                     })}
                   </div>
                 )}

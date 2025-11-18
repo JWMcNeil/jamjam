@@ -308,6 +308,7 @@ export interface Page {
     | ArchiveBlock
     | FormBlock
     | VideoCardBlock
+    | CarouselBlock
   )[];
   meta?: {
     title?: string | null;
@@ -679,14 +680,17 @@ export interface ContentBlock {
            */
           size?: 'default' | null;
         };
-        /**
-         * Optionally add a content card to this column
-         */
-        contentCard?: ContentCardBlock[] | null;
-        /**
-         * Optionally add a tech stack canvas to this column
-         */
-        techStackCanvas?: TechStackCanvasBlock[] | null;
+        children?:
+          | (
+              | ContentCardBlock
+              | TechStackCanvasBlock
+              | CarouselBlock
+              | VideoCardBlock
+              | VideoPlayerBlock
+              | FormBlock
+              | DraggableCardsBlock
+            )[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -807,125 +811,171 @@ export interface TechStackCanvasBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "DraggableCardsBlock".
+ * via the `definition` "CarouselBlock".
  */
-export interface DraggableCardsBlock {
-  /**
-   * Optional title to display above the draggable cards
-   */
-  title?: string | null;
-  /**
-   * Optional description to display above the draggable cards
-   */
-  description?: string | null;
-  /**
-   * Add draggable cards. Each card can have a title and an image (SVG or regular image).
-   */
-  cards: {
-    title: string;
+export interface CarouselBlock {
+  slides: {
+    media: number | Media;
     /**
-     * Upload an image or SVG file. This will be displayed in the card.
+     * Optional caption for this slide
      */
-    image?: (number | null) | Media;
-    /**
-     * Optional category for organizing cards. Used for filtering and grouping.
-     */
-    category?: ('frontend' | 'backend' | 'database' | 'infrastructure' | 'tooling') | null;
-    /**
-     * Select the size of the card (small, medium, or large).
-     */
-    size?: ('sm' | 'md' | 'lg') | null;
-    positions?: {
-      mobile?: {
-        normalizedX?: number | null;
-        normalizedY?: number | null;
+    caption?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
       };
-      tablet?: {
-        normalizedX?: number | null;
-        normalizedY?: number | null;
-      };
-      desktop?: {
-        normalizedX?: number | null;
-        normalizedY?: number | null;
-      };
-    };
+      [k: string]: unknown;
+    } | null;
     id?: string | null;
   }[];
-  containerWidth?: ('full' | 'container') | null;
   /**
-   * Minimum height of the draggable container in pixels
+   * Automatically advance slides
    */
-  containerHeight?: number | null;
+  autoplay?: boolean | null;
+  /**
+   * Time in milliseconds between slide changes
+   */
+  autoplayInterval?: number | null;
+  /**
+   * Show previous/next navigation arrows
+   */
+  showNavigation?: boolean | null;
+  /**
+   * Show dot indicators for slide position
+   */
+  showIndicators?: boolean | null;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'draggableCards';
+  blockType: 'carousel';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "GridBlock".
+ * via the `definition` "VideoCardBlock".
  */
-export interface GridBlock {
+export interface VideoCardBlock {
   /**
-   * Add multiple content cards or content blocks to display in a grid layout
+   * Select a video from Mux
    */
-  contentCards: (ContentCardBlock | ContentBlock)[];
+  video: number | MuxVideo;
+  aspectRatio?: ('auto' | 'square' | 'landscape' | 'portrait') | null;
   /**
-   * Number of columns in the grid (responsive: fewer columns on smaller screens)
+   * When enabled, videos will autoplay. When disabled, videos show as thumbnails and play on hover.
    */
-  columns?: ('2' | '3' | '4') | null;
+  videoAutoplay?: boolean | null;
+  enableLink?: boolean | null;
+  link?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null)
+      | ({
+          relationTo: 'projects';
+          value: number | Project;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  enableFooter?: boolean | null;
+  /**
+   * Add meta information to display in the footer.
+   */
+  footerMeta?: {
+    title?: string | null;
+    description?: string | null;
+    location?: string | null;
+    customText?: string | null;
+  };
   id?: string | null;
   blockName?: string | null;
-  blockType: 'grid';
+  blockType: 'videoCard';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "MediaBlock".
+ * via the `definition` "mux-video".
  */
-export interface MediaBlock {
-  media: number | Media;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'mediaBlock';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ArchiveBlock".
- */
-export interface ArchiveBlock {
-  introContent?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  populateBy?: ('collection' | 'selection') | null;
-  relationTo?: ('posts' | 'projects') | null;
-  categories?: (number | Category)[] | null;
-  limit?: number | null;
-  selectedDocs?:
-    | (
-        | {
-            relationTo: 'posts';
-            value: number | Post;
-          }
-        | {
-            relationTo: 'projects';
-            value: number | Project;
-          }
-      )[]
+export interface MuxVideo {
+  id: number;
+  /**
+   * A unique title for this video that will help you identify it later.
+   */
+  title: string;
+  assetId?: string | null;
+  duration?: number | null;
+  /**
+   * Pick a timestamp (in seconds) from the video to be used as the poster image. When unset, defaults to the middle of the video.
+   */
+  posterTimestamp?: number | null;
+  aspectRatio?: string | null;
+  maxWidth?: number | null;
+  maxHeight?: number | null;
+  playbackOptions?:
+    | {
+        playbackId?: string | null;
+        playbackPolicy?: ('signed' | 'public') | null;
+        playbackUrl?: string | null;
+        posterUrl?: string | null;
+        gifUrl?: string | null;
+        id?: string | null;
+      }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoPlayerBlock".
+ */
+export interface VideoPlayerBlock {
+  /**
+   * Choose between Mux video asset or external video URL
+   */
+  videoType: 'mux' | 'external';
+  /**
+   * Mux asset playback ID
+   */
+  muxAssetId?: string | null;
+  /**
+   * YouTube or Vimeo video URL
+   */
+  externalUrl?: string | null;
+  /**
+   * Poster image shown before video plays
+   */
+  poster?: (number | null) | Media;
+  /**
+   * Automatically play video when page loads
+   */
+  autoplay?: boolean | null;
+  /**
+   * Show video player controls
+   */
+  controls?: boolean | null;
+  /**
+   * Loop video playback
+   */
+  loop?: boolean | null;
+  /**
+   * Start video muted
+   */
+  muted?: boolean | null;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'archive';
+  blockType: 'videoPlayer';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1199,6 +1249,128 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DraggableCardsBlock".
+ */
+export interface DraggableCardsBlock {
+  /**
+   * Optional title to display above the draggable cards
+   */
+  title?: string | null;
+  /**
+   * Optional description to display above the draggable cards
+   */
+  description?: string | null;
+  /**
+   * Add draggable cards. Each card can have a title and an image (SVG or regular image).
+   */
+  cards: {
+    title: string;
+    /**
+     * Upload an image or SVG file. This will be displayed in the card.
+     */
+    image?: (number | null) | Media;
+    /**
+     * Optional category for organizing cards. Used for filtering and grouping.
+     */
+    category?: ('frontend' | 'backend' | 'database' | 'infrastructure' | 'tooling') | null;
+    /**
+     * Select the size of the card (small, medium, or large).
+     */
+    size?: ('sm' | 'md' | 'lg') | null;
+    positions?: {
+      mobile?: {
+        normalizedX?: number | null;
+        normalizedY?: number | null;
+      };
+      tablet?: {
+        normalizedX?: number | null;
+        normalizedY?: number | null;
+      };
+      desktop?: {
+        normalizedX?: number | null;
+        normalizedY?: number | null;
+      };
+    };
+    id?: string | null;
+  }[];
+  containerWidth?: ('full' | 'container') | null;
+  /**
+   * Minimum height of the draggable container in pixels
+   */
+  containerHeight?: number | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'draggableCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GridBlock".
+ */
+export interface GridBlock {
+  /**
+   * Add multiple content cards or content blocks to display in a grid layout
+   */
+  contentCards: (ContentCardBlock | ContentBlock)[];
+  /**
+   * Number of columns in the grid (responsive: fewer columns on smaller screens)
+   */
+  columns?: ('2' | '3' | '4') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'grid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MediaBlock".
+ */
+export interface MediaBlock {
+  media: number | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mediaBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ArchiveBlock".
+ */
+export interface ArchiveBlock {
+  introContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  populateBy?: ('collection' | 'selection') | null;
+  relationTo?: ('posts' | 'projects') | null;
+  categories?: (number | Category)[] | null;
+  limit?: number | null;
+  selectedDocs?:
+    | (
+        | {
+            relationTo: 'posts';
+            value: number | Post;
+          }
+        | {
+            relationTo: 'projects';
+            value: number | Project;
+          }
+      )[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'archive';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ImageMasonryGridBlock".
  */
 export interface ImageMasonryGridBlock {
@@ -1214,174 +1386,6 @@ export interface ImageMasonryGridBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'imageMasonryGrid';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "VideoPlayerBlock".
- */
-export interface VideoPlayerBlock {
-  /**
-   * Choose between Mux video asset or external video URL
-   */
-  videoType: 'mux' | 'external';
-  /**
-   * Mux asset playback ID
-   */
-  muxAssetId?: string | null;
-  /**
-   * YouTube or Vimeo video URL
-   */
-  externalUrl?: string | null;
-  /**
-   * Poster image shown before video plays
-   */
-  poster?: (number | null) | Media;
-  /**
-   * Automatically play video when page loads
-   */
-  autoplay?: boolean | null;
-  /**
-   * Show video player controls
-   */
-  controls?: boolean | null;
-  /**
-   * Loop video playback
-   */
-  loop?: boolean | null;
-  /**
-   * Start video muted
-   */
-  muted?: boolean | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'videoPlayer';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "VideoCardBlock".
- */
-export interface VideoCardBlock {
-  /**
-   * Select a video from Mux
-   */
-  video: number | MuxVideo;
-  aspectRatio?: ('auto' | 'square' | 'landscape' | 'portrait') | null;
-  /**
-   * When enabled, videos will autoplay. When disabled, videos show as thumbnails and play on hover.
-   */
-  videoAutoplay?: boolean | null;
-  enableLink?: boolean | null;
-  link?: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: number | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
-        } | null)
-      | ({
-          relationTo: 'projects';
-          value: number | Project;
-        } | null);
-    url?: string | null;
-    label?: string | null;
-  };
-  enableFooter?: boolean | null;
-  /**
-   * Add meta information to display in the footer.
-   */
-  footerMeta?: {
-    title?: string | null;
-    description?: string | null;
-    location?: string | null;
-    customText?: string | null;
-  };
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'videoCard';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "mux-video".
- */
-export interface MuxVideo {
-  id: number;
-  /**
-   * A unique title for this video that will help you identify it later.
-   */
-  title: string;
-  assetId?: string | null;
-  duration?: number | null;
-  /**
-   * Pick a timestamp (in seconds) from the video to be used as the poster image. When unset, defaults to the middle of the video.
-   */
-  posterTimestamp?: number | null;
-  aspectRatio?: string | null;
-  maxWidth?: number | null;
-  maxHeight?: number | null;
-  playbackOptions?:
-    | {
-        playbackId?: string | null;
-        playbackPolicy?: ('signed' | 'public') | null;
-        playbackUrl?: string | null;
-        posterUrl?: string | null;
-        gifUrl?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CarouselBlock".
- */
-export interface CarouselBlock {
-  slides: {
-    media: number | Media;
-    /**
-     * Optional caption for this slide
-     */
-    caption?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    id?: string | null;
-  }[];
-  /**
-   * Automatically advance slides
-   */
-  autoplay?: boolean | null;
-  /**
-   * Time in milliseconds between slide changes
-   */
-  autoplayInterval?: number | null;
-  /**
-   * Show previous/next navigation arrows
-   */
-  showNavigation?: boolean | null;
-  /**
-   * Show dot indicators for slide position
-   */
-  showIndicators?: boolean | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'carousel';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1756,6 +1760,7 @@ export interface PagesSelect<T extends boolean = true> {
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
         videoCard?: T | VideoCardBlockSelect<T>;
+        carousel?: T | CarouselBlockSelect<T>;
       };
   meta?:
     | T
@@ -1818,15 +1823,16 @@ export interface ContentBlockSelect<T extends boolean = true> {
               appearance?: T;
               size?: T;
             };
-        contentCard?:
+        children?:
           | T
           | {
               contentCard?: T | ContentCardBlockSelect<T>;
-            };
-        techStackCanvas?:
-          | T
-          | {
               techStackCanvas?: T | TechStackCanvasBlockSelect<T>;
+              carousel?: T | CarouselBlockSelect<T>;
+              videoCard?: T | VideoCardBlockSelect<T>;
+              videoPlayer?: T | VideoPlayerBlockSelect<T>;
+              formBlock?: T | FormBlockSelect<T>;
+              draggableCards?: T | DraggableCardsBlockSelect<T>;
             };
         id?: T;
       };
@@ -1911,6 +1917,82 @@ export interface TechStackCanvasBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CarouselBlock_select".
+ */
+export interface CarouselBlockSelect<T extends boolean = true> {
+  slides?:
+    | T
+    | {
+        media?: T;
+        caption?: T;
+        id?: T;
+      };
+  autoplay?: T;
+  autoplayInterval?: T;
+  showNavigation?: T;
+  showIndicators?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoCardBlock_select".
+ */
+export interface VideoCardBlockSelect<T extends boolean = true> {
+  video?: T;
+  aspectRatio?: T;
+  videoAutoplay?: T;
+  enableLink?: T;
+  link?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  enableFooter?: T;
+  footerMeta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        location?: T;
+        customText?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoPlayerBlock_select".
+ */
+export interface VideoPlayerBlockSelect<T extends boolean = true> {
+  videoType?: T;
+  muxAssetId?: T;
+  externalUrl?: T;
+  poster?: T;
+  autoplay?: T;
+  controls?: T;
+  loop?: T;
+  muted?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FormBlock_select".
+ */
+export interface FormBlockSelect<T extends boolean = true> {
+  form?: T;
+  enableIntro?: T;
+  introContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "DraggableCardsBlock_select".
  */
 export interface DraggableCardsBlockSelect<T extends boolean = true> {
@@ -1987,47 +2069,6 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   categories?: T;
   limit?: T;
   selectedDocs?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FormBlock_select".
- */
-export interface FormBlockSelect<T extends boolean = true> {
-  form?: T;
-  enableIntro?: T;
-  introContent?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "VideoCardBlock_select".
- */
-export interface VideoCardBlockSelect<T extends boolean = true> {
-  video?: T;
-  aspectRatio?: T;
-  videoAutoplay?: T;
-  enableLink?: T;
-  link?:
-    | T
-    | {
-        type?: T;
-        newTab?: T;
-        reference?: T;
-        url?: T;
-        label?: T;
-      };
-  enableFooter?: T;
-  footerMeta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        location?: T;
-        customText?: T;
-      };
   id?: T;
   blockName?: T;
 }
@@ -2259,41 +2300,6 @@ export interface ImageMasonryGridBlockSelect<T extends boolean = true> {
         id?: T;
       };
   gap?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "VideoPlayerBlock_select".
- */
-export interface VideoPlayerBlockSelect<T extends boolean = true> {
-  videoType?: T;
-  muxAssetId?: T;
-  externalUrl?: T;
-  poster?: T;
-  autoplay?: T;
-  controls?: T;
-  loop?: T;
-  muted?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CarouselBlock_select".
- */
-export interface CarouselBlockSelect<T extends boolean = true> {
-  slides?:
-    | T
-    | {
-        media?: T;
-        caption?: T;
-        id?: T;
-      };
-  autoplay?: T;
-  autoplayInterval?: T;
-  showNavigation?: T;
-  showIndicators?: T;
   id?: T;
   blockName?: T;
 }
