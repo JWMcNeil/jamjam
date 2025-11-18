@@ -99,9 +99,24 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                       }
 
                       if (blockType === 'formBlock') {
+                        const formBlock = block as FormBlock
+                        // Skip if form is not populated (just an ID)
+                        if (typeof formBlock.form === 'number') {
+                          return null
+                        }
+                        const { id, blockName, enableIntro, form, introContent, ...rest } =
+                          formBlock
+                        const props = {
+                          ...rest,
+                          form: form as unknown as Parameters<typeof FormBlockComponent>[0]['form'],
+                          ...(id != null ? { id } : {}),
+                          ...(blockName != null ? { blockName } : {}),
+                          ...(introContent != null ? { introContent } : {}),
+                          enableIntro: enableIntro ?? false,
+                        }
                         return (
-                          <div key={(block as FormBlock).id || blockIndex} className="mt-4">
-                            <FormBlockComponent {...(block as FormBlock)} />
+                          <div key={id || blockIndex} className="mt-4">
+                            <FormBlockComponent {...props} />
                           </div>
                         )
                       }

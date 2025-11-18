@@ -101,6 +101,22 @@ export const TechStackCanvas: Block = {
           ],
         },
         {
+          name: 'description',
+          type: 'textarea',
+          label: 'Description',
+          admin: {
+            description: 'Optional description that appears when the card is expanded.',
+          },
+        },
+        {
+          name: 'websiteUrl',
+          type: 'text',
+          label: 'Website URL',
+          admin: {
+            description: 'Optional URL to the app/website. A link button will appear when the card is expanded.',
+          },
+        },
+        {
           type: 'collapsible',
           label: 'Responsive Positions',
           admin: {

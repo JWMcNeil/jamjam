@@ -20,6 +20,7 @@ import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { RotateCcw } from 'lucide-react'
+import { getCardDimensions } from '@/utilities/getCardDimensions'
 
 type TechStackCanvasProps = {
   cards: DraggableCardData[]
@@ -208,11 +209,7 @@ const generateNonOverlappingPosition = (
 }
 
 // Calculate required height based on cards
-const calculateRequiredHeight = (
-  cards: DraggableCardData[],
-  cardHeight: number,
-  padding: number = 20,
-): number => {
+const calculateRequiredHeight = (cards: DraggableCardData[], padding: number = 20): number => {
   const categoryCounts: Record<TechCategory, number> = {
     frontend: 0,
     backend: 0,
@@ -228,21 +225,31 @@ const calculateRequiredHeight = (
   })
 
   // Calculate height needed for each category
-  // Each card needs cardHeight + padding, plus extra space for distribution
+  // Each card needs its height + padding, plus extra space for distribution
   const cardsPerRow = 4 // Approximate cards per row
   let totalHeight = 0
+  let maxCardHeight = 0
 
   CATEGORIES.forEach(({ value }) => {
     const count = categoryCounts[value]
     if (count > 0) {
+      // Calculate average card height for this category
+      const categoryCards = cards.filter((c) => c.category === value)
+      let categoryMaxHeight = 0
+      categoryCards.forEach((card) => {
+        const dimensions = getCardDimensions(card.size)
+        categoryMaxHeight = Math.max(categoryMaxHeight, dimensions.height)
+      })
+      maxCardHeight = Math.max(maxCardHeight, categoryMaxHeight)
+
       const rows = Math.ceil(count / cardsPerRow)
-      const categoryHeight = rows * (cardHeight + padding) + padding * 2
+      const categoryHeight = rows * (categoryMaxHeight + padding) + padding * 2
       totalHeight += categoryHeight
     }
   })
 
   // Minimum height and add extra padding
-  return Math.max(600, totalHeight + padding * 2)
+  return Math.max(600, totalHeight + padding * 2, maxCardHeight * 2 + padding * 2)
 }
 
 // Calculate proportional zone heights based on card distribution
@@ -315,14 +322,12 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all')
   const [showZones, setShowZones] = useState(false)
   const [resetTrigger, setResetTrigger] = useState(0)
-  const cardWidth = 200
-  const cardHeight = 200
   const currentBreakpoint = useBreakpoint()
 
   // Calculate required height based on cards
   const requiredHeight = useMemo(() => {
-    return calculateRequiredHeight(cards, cardHeight)
-  }, [cards, cardHeight])
+    return calculateRequiredHeight(cards)
+  }, [cards])
 
   useEffect(() => {
     const updateSize = () => {
@@ -355,6 +360,13 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
     return calculateZoneHeights(cards, containerSize.height)
   }, [cards, containerSize.height])
 
+  // Memoize card positions key to detect actual changes (not just array reference)
+  const cardPositionsKey = useMemo(
+    () =>
+      cards.map((c) => `${c.id}:${c.size || 'md'}:${JSON.stringify(c.positions || {})}`).join('|'),
+    [cards],
+  )
+
   // Update positions when container size or breakpoint changes
   useEffect(() => {
     if (containerSize.width === 0 || containerSize.height === 0 || zones.length === 0) return
@@ -379,6 +391,7 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
       }
 
       cards.forEach((card) => {
+        const cardDimensions = getCardDimensions(card.size)
         const breakpointPosition = getPositionForBreakpoint(card, currentBreakpoint)
         const cardCategory = card.category || 'uncategorized'
 
@@ -388,11 +401,19 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
         ) {
           const x =
             breakpointPosition.normalizedX !== undefined
-              ? normalizedToPixels(breakpointPosition.normalizedX, containerSize.width, cardWidth)
+              ? normalizedToPixels(
+                  breakpointPosition.normalizedX,
+                  containerSize.width,
+                  cardDimensions.width,
+                )
               : (prev[card.id]?.x ?? 0)
           const y =
             breakpointPosition.normalizedY !== undefined
-              ? normalizedToPixels(breakpointPosition.normalizedY, containerSize.height, cardHeight)
+              ? normalizedToPixels(
+                  breakpointPosition.normalizedY,
+                  containerSize.height,
+                  cardDimensions.height,
+                )
               : (prev[card.id]?.y ?? 0)
 
           updated[card.id] = { x, y }
@@ -400,8 +421,8 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
             existingPositionsByCategory[cardCategory].push({
               x,
               y,
-              width: cardWidth,
-              height: cardHeight,
+              width: cardDimensions.width,
+              height: cardDimensions.height,
             })
           }
         } else {
@@ -416,8 +437,8 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
           const autoPosition = generateNonOverlappingPosition(
             containerSize.width,
             containerSize.height,
-            cardWidth,
-            cardHeight,
+            cardDimensions.width,
+            cardDimensions.height,
             existingPositions,
             zone,
           )
@@ -426,8 +447,8 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
             existingPositionsByCategory[cardCategory].push({
               x: autoPosition.x,
               y: autoPosition.y,
-              width: cardWidth,
-              height: cardHeight,
+              width: cardDimensions.width,
+              height: cardDimensions.height,
             })
           }
         }
@@ -438,12 +459,11 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
   }, [
     containerSize.width,
     containerSize.height,
-    cards,
-    cardWidth,
-    cardHeight,
+    cardPositionsKey,
     currentBreakpoint,
     zones,
     resetTrigger,
+    cards,
   ])
 
   const sensors = useSensors(
@@ -472,14 +492,26 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
       const newX = current.x + delta.x
       const newY = current.y + delta.y
 
-      const maxX = Math.max(0, containerSize.width - cardWidth)
-      const maxY = Math.max(0, containerSize.height - cardHeight)
+      // Find the card to get its dimensions
+      const card = cards.find((c) => c.id === active.id)
+      const cardDimensions = getCardDimensions(card?.size)
+
+      const maxX = Math.max(0, containerSize.width - cardDimensions.width)
+      const maxY = Math.max(0, containerSize.height - cardDimensions.height)
 
       const constrainedX = Math.max(0, Math.min(newX, maxX))
       const constrainedY = Math.max(0, Math.min(newY, maxY))
 
-      const normalizedX = pixelsToNormalized(constrainedX, containerSize.width, cardWidth)
-      const normalizedY = pixelsToNormalized(constrainedY, containerSize.height, cardHeight)
+      const normalizedX = pixelsToNormalized(
+        constrainedX,
+        containerSize.width,
+        cardDimensions.width,
+      )
+      const normalizedY = pixelsToNormalized(
+        constrainedY,
+        containerSize.height,
+        cardDimensions.height,
+      )
 
       if (typeof window !== 'undefined') {
         window.dispatchEvent(
@@ -644,7 +676,9 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
               <DraggableCard
                 key={card.id}
                 card={card}
-                className="w-[200px] transition-opacity duration-300 ease-in-out m-4"
+                resetTrigger={resetTrigger}
+                containerSize={containerSize}
+                className="transition-opacity duration-300 ease-in-out m-4"
                 style={{
                   left: `${position.x}px`,
                   top: `${position.y}px`,

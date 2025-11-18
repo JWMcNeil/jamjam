@@ -128,6 +128,8 @@ export const CustomHero: React.FC<CustomHeroType> = ({
             desktop?: { normalizedX?: number | null; normalizedY?: number | null }
           }
           size?: 'sm' | 'md' | 'lg' | null
+          description?: string | null
+          websiteUrl?: string | null
         }
 
         const positions = cardWithPositions.positions && typeof cardWithPositions.positions === 'object'
@@ -159,6 +161,8 @@ export const CustomHero: React.FC<CustomHeroType> = ({
           ...(imageUrl && { image: imageUrl }),
           ...(cardWithPositions.size && { size: cardWithPositions.size as DraggableCardData['size'] }),
           ...(positions && Object.keys(positions).length > 0 && { positions }),
+          ...(cardWithPositions.description && { description: cardWithPositions.description }),
+          ...(cardWithPositions.websiteUrl && { websiteUrl: cardWithPositions.websiteUrl }),
         }
         return cardData
       })

@@ -22,4 +22,6 @@ export type DraggableCardData = {
   category?: TechCategory
   size?: CardSize
   positions?: BreakpointPositions // Breakpoint-specific positions
+  description?: string
+  websiteUrl?: string
 }

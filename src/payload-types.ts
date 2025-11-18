@@ -275,6 +275,14 @@ export interface Page {
          * Select the size of the card (small, medium, or large).
          */
         size?: ('sm' | 'md' | 'lg') | null;
+        /**
+         * Optional description that appears when the card is expanded.
+         */
+        description?: string | null;
+        /**
+         * Optional URL to the app/website. A link button will appear when the card is expanded.
+         */
+        websiteUrl?: string | null;
         positions?: {
           mobile?: {
             normalizedX?: number | null;
@@ -786,6 +794,14 @@ export interface TechStackCanvasBlock {
      * Select the size of the card (small, medium, or large).
      */
     size?: ('sm' | 'md' | 'lg') | null;
+    /**
+     * Optional description that appears when the card is expanded.
+     */
+    description?: string | null;
+    /**
+     * Optional URL to the app/website. A link button will appear when the card is expanded.
+     */
+    websiteUrl?: string | null;
     mobile?: {
       normalizedX?: number | null;
       normalizedY?: number | null;
@@ -1277,6 +1293,14 @@ export interface DraggableCardsBlock {
      * Select the size of the card (small, medium, or large).
      */
     size?: ('sm' | 'md' | 'lg') | null;
+    /**
+     * Optional description that appears when the card is expanded.
+     */
+    description?: string | null;
+    /**
+     * Optional URL to the app/website. A link button will appear when the card is expanded.
+     */
+    websiteUrl?: string | null;
     positions?: {
       mobile?: {
         normalizedX?: number | null;
@@ -1720,6 +1744,8 @@ export interface PagesSelect<T extends boolean = true> {
                     title?: T;
                     image?: T;
                     size?: T;
+                    description?: T;
+                    websiteUrl?: T;
                     positions?:
                       | T
                       | {
@@ -1890,6 +1916,8 @@ export interface TechStackCanvasBlockSelect<T extends boolean = true> {
         image?: T;
         category?: T;
         size?: T;
+        description?: T;
+        websiteUrl?: T;
         mobile?:
           | T
           | {
@@ -2005,6 +2033,8 @@ export interface DraggableCardsBlockSelect<T extends boolean = true> {
         image?: T;
         category?: T;
         size?: T;
+        description?: T;
+        websiteUrl?: T;
         positions?:
           | T
           | {

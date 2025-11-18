@@ -8,7 +8,7 @@ import { getMediaUrl } from '@/utilities/getMediaUrl'
 import type { Media as MediaType } from '@/payload-types'
 
 export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) => {
-  const { title, description, cards, containerWidth = 'full', containerHeight = 600 } = props
+  const { title, description, cards, containerWidth = 'full' } = props
 
   if (!cards || cards.length === 0) {
     return null
@@ -49,28 +49,32 @@ export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) =
       const cardId = card.id || `card-${card.title}-${index}`.toLowerCase().replace(/\s+/g, '-')
 
       // Extract breakpoint positions if they exist
-      const positions = card.positions && typeof card.positions === 'object'
-        ? {
-            ...(card.positions.mobile && typeof card.positions.mobile === 'object' && {
-              mobile: {
-                normalizedX: card.positions.mobile.normalizedX ?? undefined,
-                normalizedY: card.positions.mobile.normalizedY ?? undefined,
-              },
-            }),
-            ...(card.positions.tablet && typeof card.positions.tablet === 'object' && {
-              tablet: {
-                normalizedX: card.positions.tablet.normalizedX ?? undefined,
-                normalizedY: card.positions.tablet.normalizedY ?? undefined,
-              },
-            }),
-            ...(card.positions.desktop && typeof card.positions.desktop === 'object' && {
-              desktop: {
-                normalizedX: card.positions.desktop.normalizedX ?? undefined,
-                normalizedY: card.positions.desktop.normalizedY ?? undefined,
-              },
-            }),
-          }
-        : undefined
+      const positions =
+        card.positions && typeof card.positions === 'object'
+          ? {
+              ...(card.positions.mobile &&
+                typeof card.positions.mobile === 'object' && {
+                  mobile: {
+                    normalizedX: card.positions.mobile.normalizedX ?? undefined,
+                    normalizedY: card.positions.mobile.normalizedY ?? undefined,
+                  },
+                }),
+              ...(card.positions.tablet &&
+                typeof card.positions.tablet === 'object' && {
+                  tablet: {
+                    normalizedX: card.positions.tablet.normalizedX ?? undefined,
+                    normalizedY: card.positions.tablet.normalizedY ?? undefined,
+                  },
+                }),
+              ...(card.positions.desktop &&
+                typeof card.positions.desktop === 'object' && {
+                  desktop: {
+                    normalizedX: card.positions.desktop.normalizedX ?? undefined,
+                    normalizedY: card.positions.desktop.normalizedY ?? undefined,
+                  },
+                }),
+            }
+          : undefined
 
       const cardData: DraggableCardData = {
         id: cardId,
@@ -79,6 +83,8 @@ export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) =
         ...(card.category && { category: card.category as DraggableCardData['category'] }),
         ...(card.size && { size: card.size as DraggableCardData['size'] }),
         ...(positions && Object.keys(positions).length > 0 && { positions }),
+        ...(card.description && { description: card.description }),
+        ...(card.websiteUrl && { websiteUrl: card.websiteUrl }),
       }
       return cardData
     })
@@ -94,12 +100,7 @@ export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) =
           {description && <p className="text-muted-foreground">{description}</p>}
         </div>
       )}
-      <DraggableZoneClientWrapper
-        cards={draggableCards}
-        width="w-full"
-        height={`min-h-[${containerHeight}px]`}
-        className="bg-background"
-      />
+      <DraggableZoneClientWrapper cards={draggableCards} width="w-full" className="bg-background" />
     </div>
   )
 }

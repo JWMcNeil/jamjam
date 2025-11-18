@@ -11,24 +11,37 @@ import {
 } from '@dnd-kit/core'
 import { restrictToParentElement } from '@dnd-kit/modifiers'
 import { cn } from '@/utilities/ui'
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 
 import { DraggableCard } from '@/components/DraggableCard'
-import type { DraggableCardData, CardSize } from '@/components/DraggableCard/types'
+import type { DraggableCardData } from '@/components/DraggableCard/types'
 import { useBreakpoint, type Breakpoint } from '@/hooks/useBreakpoint'
+import { getCardDimensions } from '@/utilities/getCardDimensions'
 
-// Card dimension estimates based on size (width, height)
-const getCardDimensions = (size: CardSize = 'md'): { width: number; height: number } => {
-  switch (size) {
-    case 'sm':
-      return { width: 125, height: 160 } // ~100-150px width, title bar + content
-    case 'md':
-      return { width: 200, height: 220 } // ~150-250px width, title bar + content
-    case 'lg':
-      return { width: 275, height: 280 } // ~200-350px width, title bar + content
-    default:
-      return { width: 200, height: 220 }
-  }
+// Calculate minimum height estimate based on cards (for initial render to prevent glitching)
+const calculateMinimumHeight = (cards: DraggableCardData[]): number => {
+  if (cards.length === 0) return 500 // Default minimum
+
+  // Estimate height if cards were stacked vertically with spacing
+  // This gives us a safe minimum that prevents layout shifts
+  const cardSpacing = 20
+  let totalHeight = 0
+  let maxCardHeight = 0
+
+  cards.forEach((card) => {
+    const dimensions = getCardDimensions(card.size)
+    totalHeight += dimensions.height + cardSpacing
+    maxCardHeight = Math.max(maxCardHeight, dimensions.height)
+  })
+
+  // Remove last spacing
+  totalHeight -= cardSpacing
+
+  // Add padding at top and bottom
+  const padding = 40
+
+  // Use the larger of: stacked height or a reasonable minimum based on largest card
+  return Math.max(totalHeight + padding, maxCardHeight * 2 + padding, 500)
 }
 
 type DraggableZoneProps = {
@@ -37,6 +50,7 @@ type DraggableZoneProps = {
   width?: string
   height?: string
   style?: React.CSSProperties
+  resetTrigger?: number
 }
 
 // Helper functions moved outside component for stability
@@ -139,19 +153,26 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
   cards,
   className,
   width = 'w-full',
-  height = 'min-h-[500px]',
+  height: _height = 'min-h-[500px]',
   style,
+  resetTrigger,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
   const currentBreakpoint = useBreakpoint()
 
+  // Calculate minimum height upfront to prevent glitching on initial render
+  const minimumHeight = useMemo(() => calculateMinimumHeight(cards), [cards])
+
   useEffect(() => {
     const updateSize = () => {
       if (containerRef.current) {
+        const measuredHeight = containerRef.current.offsetHeight
+        // Use minimum height if measured height is 0 or very small (before layout)
+        const height = measuredHeight > 0 ? measuredHeight : minimumHeight
         setContainerSize({
           width: containerRef.current.offsetWidth,
-          height: containerRef.current.offsetHeight,
+          height,
         })
       }
     }
@@ -159,9 +180,53 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
     updateSize()
     window.addEventListener('resize', updateSize)
     return () => window.removeEventListener('resize', updateSize)
-  }, [])
+  }, [minimumHeight])
 
   const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({})
+
+  // Calculate dynamic height based on card positions
+  const dynamicHeight = useMemo(() => {
+    if (Object.keys(positions).length === 0) return undefined
+
+    let maxBottom = 0
+    cards.forEach((card) => {
+      const position = positions[card.id]
+      if (position) {
+        const cardDimensions = getCardDimensions(card.size)
+        const bottom = position.y + cardDimensions.height
+        maxBottom = Math.max(maxBottom, bottom)
+      }
+    })
+
+    // Add some padding at the bottom (e.g., 40px)
+    // Ensure it's at least the minimum height to prevent shrinking
+    const calculatedHeight = maxBottom > 0 ? maxBottom + 40 : undefined
+    return calculatedHeight ? Math.max(calculatedHeight, minimumHeight) : undefined
+  }, [positions, cards, minimumHeight])
+
+  // Update container size when dynamic height changes
+  useEffect(() => {
+    if (dynamicHeight && containerRef.current) {
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        if (containerRef.current) {
+          setContainerSize({
+            width: containerRef.current.offsetWidth,
+            height: containerRef.current.offsetHeight,
+          })
+        }
+      })
+    }
+  }, [dynamicHeight])
+
+  // Memoize card positions key to detect actual changes (not just array reference)
+  const cardPositionsKey = useMemo(
+    () =>
+      cards
+        .map((c) => `${c.id}:${c.size || 'md'}:${JSON.stringify(c.positions || {})}`)
+        .join('|'),
+    [cards],
+  )
 
   // Update positions when container size or breakpoint changes
   useEffect(() => {
@@ -225,7 +290,7 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
 
       return updated
     })
-  }, [containerSize.width, containerSize.height, cards, currentBreakpoint])
+  }, [containerSize.width, containerSize.height, cardPositionsKey, currentBreakpoint, cards])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -241,11 +306,11 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
     }),
   )
 
-  const handleDragStart = (_event: DragStartEvent) => {
+  const handleDragStart = useCallback((_event: DragStartEvent) => {
     // Optional: Add any visual feedback on drag start
-  }
+  }, [])
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, delta } = event
 
     setPositions((prev) => {
@@ -303,7 +368,7 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
         },
       }
     })
-  }
+  }, [cards, containerSize.width, containerSize.height, currentBreakpoint])
 
   return (
     <DndContext
@@ -314,8 +379,11 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
     >
       <div
         ref={containerRef}
-        className={cn('relative overflow-hidden mt-4  ', width, height, className)}
-        style={style}
+        className={cn('relative overflow-hidden mt-4', width, className)}
+        style={{
+          ...style,
+          minHeight: dynamicHeight ? `${dynamicHeight}px` : `${minimumHeight}px`,
+        }}
       >
         {cards.map((card) => {
           const position = positions[card.id] || { x: 0, y: 0 }
@@ -323,6 +391,8 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
             <DraggableCard
               key={card.id}
               card={card}
+              resetTrigger={resetTrigger}
+              containerSize={containerSize}
               style={{
                 left: `${position.x}px`,
                 top: `${position.y}px`,

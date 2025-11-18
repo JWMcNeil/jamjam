@@ -79,6 +79,8 @@ export const TechStackCanvasBlock: React.FC<TechStackCanvasBlockProps> = (props)
         ...(card.category && { category: card.category as DraggableCardData['category'] }),
         ...(card.size && { size: card.size as DraggableCardData['size'] }),
         ...(positions && Object.keys(positions).length > 0 && { positions }),
+        ...(card.description && { description: card.description }),
+        ...(card.websiteUrl && { websiteUrl: card.websiteUrl }),
       }
       return cardData
     })
