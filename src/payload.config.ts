@@ -11,6 +11,7 @@ import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Projects } from './collections/Projects'
+import { StaticPages } from './collections/StaticPages'
 import { Users } from './collections/Users'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
@@ -73,7 +74,7 @@ export default buildConfig({
     // Use push mode in development - Payload will auto-sync schema
     push: true,
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Projects],
+  collections: [Pages, Posts, Media, Categories, Users, Projects, StaticPages],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, Sidebar],
   plugins: [

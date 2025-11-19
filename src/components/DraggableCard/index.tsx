@@ -102,7 +102,7 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
     }
   }, [isExpanded])
 
-  // Reset position adjustment when dragging starts to avoid interference
+  // Reset position adjustment when dragging starts
   useEffect(() => {
     if (isDragging) {
       setPositionAdjustment({ x: 0, y: 0 })
@@ -653,8 +653,11 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
       : 0
     const baseTop = externalStyle?.top ? parseFloat(String(externalStyle.top).replace('px', '')) : 0
 
-    const adjustedLeft = baseLeft + positionAdjustment.x
-    const adjustedTop = baseTop + positionAdjustment.y
+    // Only apply positionAdjustment when expanded and not dragging
+    // During normal dragging, use the position directly from externalStyle
+    const shouldApplyAdjustment = isExpanded && !isDragging && !isResizing
+    const adjustedLeft = shouldApplyAdjustment ? baseLeft + positionAdjustment.x : baseLeft
+    const adjustedTop = shouldApplyAdjustment ? baseTop + positionAdjustment.y : baseTop
 
     // Prioritize constrained size over custom size
     const effectiveSize = constrainedSize || customSize
@@ -690,6 +693,8 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
     constrainedSize,
     positionAdjustment,
     isExpanded,
+    isDragging,
+    isResizing,
     dynamicConstraints,
   ])
 
@@ -702,12 +707,11 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
       style={style}
       className={cn(
         'absolute select-none',
-        'bg-background border border-border rounded-lg shadow-lg',
+        'bg-card border border-border rounded-lg shadow-lg',
         'overflow-hidden', // Prevent content from breaking out
         // Only transition non-transform properties to avoid repaints during drag
-        isDragging || isResizing
-          ? ''
-          : 'transition-[width,height,shadow,left,top] duration-300 ease-in-out',
+        // Removed left/top transitions to prevent bounce-back animation
+        isDragging || isResizing ? '' : 'transition-[width,height,shadow] duration-300 ease-in-out',
         !constrainedSize && !customSize && 'w-auto',
         // Apply size constraints via Tailwind only when NOT expanded (expanded uses inline styles)
         // Expanded cards use dynamic constraints calculated from container size
@@ -722,8 +726,8 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
       onClick={canExpand ? handleCardClick : undefined}
     >
       {/* Title bar with drag handle and window controls */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-background rounded-t-lg">
-        <h3 className="text-sm font-medium text-foreground truncate flex-1 min-w-0">
+      <div className="flex gap-2 items-center justify-between px-2 py-2 border-b border-border bg-card rounded-t-lg">
+        <h3 className="font-mono text-sm font-medium text-foreground truncate flex-1 min-w-0">
           {card.title}
         </h3>
         {/* Drag Handle */}
@@ -751,18 +755,21 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
         {card.image && (
           <div
             className={cn(
-              'relative w-full aspect-square mx-auto',
-              effectiveConfig.imageMaxWidth,
-              'max-w-[120px]', // Absolute maximum to prevent image from getting too large
+              'relative w-full overflow-hidden rounded-lg',
+              isExpanded
+                ? 'w-full aspect-square'
+                : cn('aspect-square mx-auto', effectiveConfig.imageMaxWidth, 'max-w-[150px]'),
             )}
           >
-            <Image
-              src={card.image}
-              alt={card.title}
-              className="object-contain rounded"
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
+            <div className="absolute inset-0 rounded-lg overflow-hidden">
+              <Image
+                src={card.image}
+                alt={card.title}
+                className="object-cover"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            </div>
           </div>
         )}
         {!card.icon && !card.image && (
@@ -822,7 +829,7 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
           }}
           className={cn(
             'absolute bottom-0 right-0 w-6 h-6 cursor-nwse-resize',
-            'bg-muted/50 hover:bg-muted border-l border-t border-border rounded-br-lg',
+            'bg-background hover:bg-muted border-l border-t border-border rounded-br-lg',
             'flex items-center justify-center',
             'transition-colors touch-none z-10',
             isResizing && 'bg-muted',

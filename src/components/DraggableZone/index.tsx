@@ -11,7 +11,7 @@ import {
 } from '@dnd-kit/core'
 import { restrictToParentElement } from '@dnd-kit/modifiers'
 import { cn } from '@/utilities/ui'
-import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useRef, useState, useEffect, useMemo } from 'react'
 
 import { DraggableCard } from '@/components/DraggableCard'
 import type { DraggableCardData } from '@/components/DraggableCard/types'
@@ -125,6 +125,7 @@ const generateNonOverlappingPosition = (
   cardWidth: number,
   cardHeight: number,
   existingPositions: Array<{ x: number; y: number; width: number; height: number }>,
+  heroTextBounds?: { left: number; right: number; top: number; bottom: number },
   maxAttempts: number = 100,
 ): { x: number; y: number } => {
   const padding = 20
@@ -136,17 +137,42 @@ const generateNonOverlappingPosition = (
     const x = Math.random() * maxX
     const y = Math.random() * maxY
 
-    if (!checkCollision(x, y, cardWidth, cardHeight, existingPositions, padding)) {
-      return { x, y }
+    // Check collision with existing positions
+    if (checkCollision(x, y, cardWidth, cardHeight, existingPositions, padding)) {
+      continue
     }
+
+    // Check collision with hero text area if provided
+    if (heroTextBounds) {
+      const cardRight = x + cardWidth
+      const cardBottom = y + cardHeight
+      if (
+        x < heroTextBounds.right &&
+        cardRight > heroTextBounds.left &&
+        y < heroTextBounds.bottom &&
+        cardBottom > heroTextBounds.top
+      ) {
+        continue
+      }
+    }
+
+    return { x, y }
   }
 
-  // Fallback: stack vertically
+  // Fallback: stack vertically, avoiding hero text area
   const lastY =
     existingPositions.length > 0
       ? Math.max(...existingPositions.map((p) => p.y + p.height)) + padding
       : 0
-  return { x: 0, y: Math.min(lastY, maxY) }
+  
+  let fallbackY = Math.min(lastY, maxY)
+  
+  // If fallback position overlaps with hero text, move it
+  if (heroTextBounds && fallbackY < heroTextBounds.bottom && fallbackY + cardHeight > heroTextBounds.top) {
+    fallbackY = Math.max(heroTextBounds.bottom + padding, fallbackY)
+  }
+  
+  return { x: 0, y: Math.min(fallbackY, maxY) }
 }
 
 export const DraggableZone: React.FC<DraggableZoneProps> = ({
@@ -167,12 +193,11 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
   useEffect(() => {
     const updateSize = () => {
       if (containerRef.current) {
-        const measuredHeight = containerRef.current.offsetHeight
-        // Use minimum height if measured height is 0 or very small (before layout)
-        const height = measuredHeight > 0 ? measuredHeight : minimumHeight
+        // Use calculated minimum height instead of offsetHeight
+        const calculatedHeight = Math.max(minimumHeight, containerRef.current.offsetHeight)
         setContainerSize({
           width: containerRef.current.offsetWidth,
-          height,
+          height: calculatedHeight,
         })
       }
     }
@@ -184,55 +209,35 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
 
   const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({})
 
-  // Calculate dynamic height based on card positions
-  const dynamicHeight = useMemo(() => {
-    if (Object.keys(positions).length === 0) return undefined
-
-    let maxBottom = 0
-    cards.forEach((card) => {
-      const position = positions[card.id]
-      if (position) {
-        const cardDimensions = getCardDimensions(card.size)
-        const bottom = position.y + cardDimensions.height
-        maxBottom = Math.max(maxBottom, bottom)
-      }
-    })
-
-    // Add some padding at the bottom (e.g., 40px)
-    // Ensure it's at least the minimum height to prevent shrinking
-    const calculatedHeight = maxBottom > 0 ? maxBottom + 40 : undefined
-    return calculatedHeight ? Math.max(calculatedHeight, minimumHeight) : undefined
-  }, [positions, cards, minimumHeight])
-
-  // Update container size when dynamic height changes
-  useEffect(() => {
-    if (dynamicHeight && containerRef.current) {
-      // Use requestAnimationFrame to ensure DOM has updated
-      requestAnimationFrame(() => {
-        if (containerRef.current) {
-          setContainerSize({
-            width: containerRef.current.offsetWidth,
-            height: containerRef.current.offsetHeight,
-          })
-        }
-      })
-    }
-  }, [dynamicHeight])
-
   // Memoize card positions key to detect actual changes (not just array reference)
   const cardPositionsKey = useMemo(
     () =>
-      cards
-        .map((c) => `${c.id}:${c.size || 'md'}:${JSON.stringify(c.positions || {})}`)
-        .join('|'),
+      cards.map((c) => `${c.id}:${c.size || 'md'}:${JSON.stringify(c.positions || {})}`).join('|'),
     [cards],
   )
+
+  // Calculate hero text bounds for collision avoidance
+  const heroTextBounds = useMemo(() => {
+    if (containerSize.width === 0 || containerSize.height === 0) return undefined
+    
+    const heroTextWidth = Math.min(640, containerSize.width - 32) // 32px padding (16px each side)
+    const heroTextLeft = (containerSize.width - heroTextWidth) / 2
+    const heroTextRight = heroTextLeft + heroTextWidth
+    const heroTextTop = Math.max(0, containerSize.height / 2 - 150)
+    const heroTextBottom = Math.min(containerSize.height, containerSize.height / 2 + 150)
+    
+    return { left: heroTextLeft, right: heroTextRight, top: heroTextTop, bottom: heroTextBottom }
+  }, [containerSize.width, containerSize.height])
 
   // Update positions when container size or breakpoint changes
   useEffect(() => {
     if (containerSize.width === 0 || containerSize.height === 0) return
 
     setPositions((prev) => {
+      // If reset was triggered, start fresh
+      if (resetTrigger !== undefined && resetTrigger > 0 && Object.keys(prev).length > 0) {
+        prev = {}
+      }
       const updated: Record<string, { x: number; y: number }> = {}
       const existingPositions: Array<{ x: number; y: number; width: number; height: number }> = []
 
@@ -270,27 +275,47 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
             height: cardDimensions.height,
           })
         } else {
-          // No explicit position - generate auto-position with collision avoidance
-          const autoPosition = generateNonOverlappingPosition(
-            containerSize.width,
-            containerSize.height,
-            cardDimensions.width,
-            cardDimensions.height,
-            existingPositions,
-          )
-          updated[card.id] = autoPosition
-          existingPositions.push({
-            x: autoPosition.x,
-            y: autoPosition.y,
-            width: cardDimensions.width,
-            height: cardDimensions.height,
-          })
+          // No explicit position - preserve existing position if it exists
+          if (prev[card.id]) {
+            updated[card.id] = prev[card.id]
+            existingPositions.push({
+              x: prev[card.id].x,
+              y: prev[card.id].y,
+              width: cardDimensions.width,
+              height: cardDimensions.height,
+            })
+          } else {
+            // No existing position - generate auto-position (avoiding hero text)
+            const autoPosition = generateNonOverlappingPosition(
+              containerSize.width,
+              containerSize.height,
+              cardDimensions.width,
+              cardDimensions.height,
+              existingPositions,
+              heroTextBounds,
+            )
+            updated[card.id] = autoPosition
+            existingPositions.push({
+              x: autoPosition.x,
+              y: autoPosition.y,
+              width: cardDimensions.width,
+              height: cardDimensions.height,
+            })
+          }
         }
       })
 
       return updated
     })
-  }, [containerSize.width, containerSize.height, cardPositionsKey, currentBreakpoint, cards])
+  }, [
+    containerSize.width,
+    containerSize.height,
+    cardPositionsKey,
+    currentBreakpoint,
+    resetTrigger,
+    cards,
+    heroTextBounds,
+  ])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -306,31 +331,67 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
     }),
   )
 
-  const handleDragStart = useCallback((_event: DragStartEvent) => {
+  const handleDragStart = (_event: DragStartEvent) => {
     // Optional: Add any visual feedback on drag start
-  }, [])
+  }
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, delta } = event
+    const cardId = active.id as string
 
     setPositions((prev) => {
-      const current = prev[active.id as string] || { x: 0, y: 0 }
+      const current = prev[cardId] || { x: 0, y: 0 }
       const newX = current.x + delta.x
       const newY = current.y + delta.y
 
       // Find the card to get its dimensions
-      const card = cards.find((c) => c.id === active.id)
+      const card = cards.find((c) => c.id === cardId)
       const cardDimensions = getCardDimensions(card?.size)
 
-      // Constrain within container bounds
       const maxX = Math.max(0, containerSize.width - cardDimensions.width)
       const maxY = Math.max(0, containerSize.height - cardDimensions.height)
 
-      const constrainedX = Math.max(0, Math.min(newX, maxX))
-      const constrainedY = Math.max(0, Math.min(newY, maxY))
+      let constrainedX = Math.max(0, Math.min(newX, maxX))
+      let constrainedY = Math.max(0, Math.min(newY, maxY))
 
-      // Convert to normalized coordinates for potential saving
-      // This could be passed to a callback or saved via API
+      // Constrain position to avoid hero text area (center of screen)
+      // Hero text is centered with max-w-[40rem] (640px) and has padding
+      const heroTextWidth = Math.min(640, containerSize.width - 32) // 32px padding (16px each side)
+      const heroTextLeft = (containerSize.width - heroTextWidth) / 2
+      const heroTextRight = heroTextLeft + heroTextWidth
+      // Hero text is vertically centered, estimate height as ~200px with padding
+      const heroTextTop = Math.max(0, containerSize.height / 2 - 150)
+      const heroTextBottom = Math.min(containerSize.height, containerSize.height / 2 + 150)
+
+      // Check if card would overlap with hero text area
+      const cardRight = constrainedX + cardDimensions.width
+      const cardBottom = constrainedY + cardDimensions.height
+
+      if (
+        constrainedX < heroTextRight &&
+        cardRight > heroTextLeft &&
+        constrainedY < heroTextBottom &&
+        cardBottom > heroTextTop
+      ) {
+        // Card overlaps with hero text - push it to the side
+        // Prefer pushing left if there's space, otherwise right
+        if (constrainedX < containerSize.width / 2) {
+          // Push left
+          constrainedX = Math.max(0, heroTextLeft - cardDimensions.width - 20)
+        } else {
+          // Push right
+          constrainedX = Math.min(maxX, heroTextRight + 20)
+        }
+        // If still overlapping vertically, push up or down
+        if (constrainedY < heroTextBottom && cardBottom > heroTextTop) {
+          if (constrainedY < containerSize.height / 2) {
+            constrainedY = Math.max(0, heroTextTop - cardDimensions.height - 20)
+          } else {
+            constrainedY = Math.min(maxY, heroTextBottom + 20)
+          }
+        }
+      }
+
       const normalizedX = pixelsToNormalized(
         constrainedX,
         containerSize.width,
@@ -342,19 +403,16 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
         cardDimensions.height,
       )
 
-      // Store normalized coordinates in a way that can be accessed later
-      // You could emit an event or call a callback here to save positions
       if (typeof window !== 'undefined') {
-        // Dispatch custom event with normalized positions for saving (including breakpoint)
         window.dispatchEvent(
           new CustomEvent('draggableCardMoved', {
             detail: {
-              cardId: active.id as string,
+              cardId,
               normalizedX,
               normalizedY,
               pixelX: constrainedX,
               pixelY: constrainedY,
-              breakpoint: currentBreakpoint, // Include current breakpoint for saving
+              breakpoint: currentBreakpoint,
             },
           }),
         )
@@ -362,13 +420,13 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
 
       return {
         ...prev,
-        [active.id as string]: {
+        [cardId]: {
           x: constrainedX,
           y: constrainedY,
         },
       }
     })
-  }, [cards, containerSize.width, containerSize.height, currentBreakpoint])
+  }
 
   return (
     <DndContext
@@ -379,10 +437,11 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
     >
       <div
         ref={containerRef}
-        className={cn('relative overflow-hidden mt-4', width, className)}
+        className={cn('relative overflow-hidden', width, className)}
         style={{
           ...style,
-          minHeight: dynamicHeight ? `${dynamicHeight}px` : `${minimumHeight}px`,
+          height: '100%',
+          minHeight: style?.minHeight || `${minimumHeight}px`,
         }}
       >
         {cards.map((card) => {

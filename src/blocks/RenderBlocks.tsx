@@ -12,6 +12,7 @@ import { FormBlock } from '@/blocks/Form/Component'
 import { GridBlock } from '@/blocks/Grid/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import { ImageMasonryGrid } from '@/blocks/ImageMasonryGrid/Component'
+import { RichTextBlockComponent } from '@/blocks/RichTextBlock/Component'
 import { VideoPlayer } from '@/blocks/VideoPlayer/Component'
 import { VideoCardBlock } from '@/blocks/VideoCard/Component'
 import { Carousel } from '@/blocks/Carousel/Component'
@@ -27,6 +28,7 @@ const blockComponents = {
   grid: GridBlock,
   mediaBlock: MediaBlock,
   imageMasonryGrid: ImageMasonryGrid,
+  richTextBlock: RichTextBlockComponent,
   videoPlayer: VideoPlayer,
   videoCard: VideoCardBlock,
   carousel: Carousel,

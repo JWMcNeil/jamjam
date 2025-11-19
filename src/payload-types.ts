@@ -73,6 +73,7 @@ export interface Config {
     categories: Category;
     users: User;
     projects: Project;
+    'static-pages': StaticPage;
     'mux-video': MuxVideo;
     redirects: Redirect;
     forms: Form;
@@ -91,6 +92,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'static-pages': StaticPagesSelect<false> | StaticPagesSelect<true>;
     'mux-video': MuxVideoSelect<false> | MuxVideoSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -1413,6 +1415,71 @@ export interface ImageMasonryGridBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "static-pages".
+ */
+export interface StaticPage {
+  id: number;
+  title: string;
+  /**
+   * Optional blocks to include in code-built pages
+   */
+  blocks?:
+    | (
+        | RichTextBlock
+        | ContentBlock
+        | MediaBlock
+        | VideoPlayerBlock
+        | VideoCardBlock
+        | CarouselBlock
+        | FormBlock
+        | DraggableCardsBlock
+        | TechStackCanvasBlock
+        | GridBlock
+      )[]
+    | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  /**
+   * Used for reference only, not routing
+   */
+  slug: string;
+  featuredImage?: (number | null) | Media;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RichTextBlock".
+ */
+export interface RichTextBlock {
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'richTextBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1607,6 +1674,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'projects';
         value: number | Project;
+      } | null)
+    | ({
+        relationTo: 'static-pages';
+        value: number | StaticPage;
       } | null)
     | ({
         relationTo: 'mux-video';
@@ -2330,6 +2401,48 @@ export interface ImageMasonryGridBlockSelect<T extends boolean = true> {
         id?: T;
       };
   gap?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "static-pages_select".
+ */
+export interface StaticPagesSelect<T extends boolean = true> {
+  title?: T;
+  blocks?:
+    | T
+    | {
+        richTextBlock?: T | RichTextBlockSelect<T>;
+        content?: T | ContentBlockSelect<T>;
+        mediaBlock?: T | MediaBlockSelect<T>;
+        videoPlayer?: T | VideoPlayerBlockSelect<T>;
+        videoCard?: T | VideoCardBlockSelect<T>;
+        carousel?: T | CarouselBlockSelect<T>;
+        formBlock?: T | FormBlockSelect<T>;
+        draggableCards?: T | DraggableCardsBlockSelect<T>;
+        techStackCanvas?: T | TechStackCanvasBlockSelect<T>;
+        grid?: T | GridBlockSelect<T>;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  slug?: T;
+  featuredImage?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RichTextBlock_select".
+ */
+export interface RichTextBlockSelect<T extends boolean = true> {
+  content?: T;
   id?: T;
   blockName?: T;
 }
