@@ -6,23 +6,13 @@ import type { StaticPage } from '../../../payload-types'
 
 export const revalidateStaticPage: CollectionAfterChangeHook<StaticPage> = ({
   doc,
-  previousDoc,
   req: { payload, context },
 }) => {
   if (!context.disableRevalidate) {
-    if (doc._status === 'published') {
-      // Static pages don't have routes, but we can revalidate the sitemap
-      payload.logger.info(`Revalidating static page: ${doc.slug}`)
+    // Static pages don't have routes, but we can revalidate the sitemap
+    payload.logger.info(`Revalidating static page: ${doc.slug}`)
 
-      revalidateTag('static-pages-sitemap')
-    }
-
-    // If the page was previously published, revalidate
-    if (previousDoc?._status === 'published' && doc._status !== 'published') {
-      payload.logger.info(`Revalidating old static page: ${previousDoc.slug}`)
-
-      revalidateTag('static-pages-sitemap')
-    }
+    revalidateTag('static-pages-sitemap')
   }
   return doc
 }

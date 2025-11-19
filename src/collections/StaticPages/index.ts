@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
-import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { authenticatedOrPublic } from '../../access/authenticatedOrPublic'
 import {
   Carousel,
   Content,
@@ -30,7 +30,7 @@ export const StaticPages: CollectionConfig<'static-pages'> = {
   access: {
     create: authenticated,
     delete: authenticated,
-    read: authenticatedOrPublished,
+    read: authenticatedOrPublic,
     update: authenticated,
   },
   defaultPopulate: {

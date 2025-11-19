@@ -9,6 +9,7 @@ import { GripVertical, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 import type { DraggableCardData, CardSize } from './types'
+import { useIsMobile } from './useIsMobile'
 
 type DraggableCardProps = {
   card: DraggableCardData
@@ -24,22 +25,47 @@ const sizeConfig: Record<
   { minWidth: string; maxWidth: string; imageMaxWidth: string; padding: string }
 > = {
   sm: {
-    minWidth: 'min-w-[100px]',
-    maxWidth: 'max-w-[150px]',
-    imageMaxWidth: 'max-w-[90px]',
-    padding: 'p-2',
+    minWidth: 'min-w-[80px]',
+    maxWidth: 'max-w-[120px]',
+    imageMaxWidth: 'max-w-[70px]',
+    padding: 'p-1.5',
   },
   md: {
-    minWidth: 'min-w-[150px]',
-    maxWidth: 'max-w-[250px]',
-    imageMaxWidth: 'max-w-[150px]',
+    minWidth: 'min-w-[120px]',
+    maxWidth: 'max-w-[180px]',
+    imageMaxWidth: 'max-w-[120px]',
     padding: 'p-2',
   },
   lg: {
-    minWidth: 'min-w-[200px]',
-    maxWidth: 'max-w-[350px]',
-    imageMaxWidth: 'max-w-[250px]',
-    padding: 'p-4',
+    minWidth: 'min-w-[160px]',
+    maxWidth: 'max-w-[240px]',
+    imageMaxWidth: 'max-w-[180px]',
+    padding: 'p-2',
+  },
+}
+
+// Mobile-specific size configurations (smaller images/icons)
+const mobileSizeConfig: Record<
+  CardSize,
+  { minWidth: string; maxWidth: string; imageMaxWidth: string; padding: string }
+> = {
+  sm: {
+    minWidth: 'min-w-[80px]',
+    maxWidth: 'max-w-[120px]',
+    imageMaxWidth: 'max-w-[50px]', // Smaller on mobile
+    padding: 'p-1.5',
+  },
+  md: {
+    minWidth: 'min-w-[120px]',
+    maxWidth: 'max-w-[180px]',
+    imageMaxWidth: 'max-w-[80px]', // Smaller on mobile
+    padding: 'p-2',
+  },
+  lg: {
+    minWidth: 'min-w-[160px]',
+    maxWidth: 'max-w-[240px]',
+    imageMaxWidth: 'max-w-[120px]', // Smaller on mobile
+    padding: 'p-2',
   },
 }
 
@@ -66,19 +92,25 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
   })
   const previousResetTrigger = useRef(resetTrigger)
   const cardRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
   const resizeStartRef = useRef<{ x: number; y: number; width: number; height: number } | null>(
     null,
   )
-  const minDimensionsRef = useRef<{ width: number; height: number } | null>(null)
-  const expandedDimensionsRef = useRef<{ width: number; height: number } | null>(null)
-  const constrainedSizeRef = useRef<{ width: number; height: number } | null>(null)
+  // Consolidated dimension refs
+  const dimensionsRef = useRef<{
+    min?: { width: number; height: number }
+    expanded?: { width: number; height: number }
+    constrained?: { width: number; height: number }
+  }>({})
+  // Use ref for position adjustment to avoid stale closures in event handlers
   const positionAdjustmentRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
+  // Mobile detection
+  const isMobile = useIsMobile(containerSize)
+
   // Memoize size calculations
-  const size: CardSize = useMemo(() => card.size || 'md', [card.size])
-  const effectiveSize: CardSize = useMemo(() => (isExpanded ? 'lg' : size), [isExpanded, size])
-  const effectiveConfig = useMemo(() => sizeConfig[effectiveSize], [effectiveSize])
+  const size: CardSize = card.size || 'md'
+  const effectiveSize: CardSize = isExpanded ? 'lg' : size
+  const effectiveConfig = isMobile ? mobileSizeConfig[effectiveSize] : sizeConfig[effectiveSize]
 
   // Reset expansion when resetTrigger changes
   useEffect(() => {
@@ -94,11 +126,11 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
     if (!isExpanded) {
       setCustomSize(null)
       setConstrainedSize(null)
-      constrainedSizeRef.current = null
+      dimensionsRef.current.constrained = undefined
       setIsResizing(false)
       setPositionAdjustment({ x: 0, y: 0 })
       positionAdjustmentRef.current = { x: 0, y: 0 }
-      expandedDimensionsRef.current = null
+      dimensionsRef.current.expanded = undefined
     }
   }, [isExpanded])
 
@@ -110,119 +142,12 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
     }
   }, [isDragging])
 
-  // Predictive overflow check when expansion starts
-  useEffect(() => {
-    if (
-      !isExpanded ||
-      !containerSize ||
-      containerSize.width === 0 ||
-      containerSize.height === 0 ||
-      isDragging ||
-      isResizing
-    ) {
-      return
-    }
-
-    // Get base position from style prop
-    const baseLeft = externalStyle?.left
-      ? parseFloat(String(externalStyle.left).replace('px', ''))
-      : 0
-    const baseTop = externalStyle?.top ? parseFloat(String(externalStyle.top).replace('px', '')) : 0
-
-    // Estimate expanded dimensions if available, otherwise use constraints
-    const expandedMaxWidth = 300
-    const estimatedWidth = expandedDimensionsRef.current?.width || expandedMaxWidth
-    const estimatedHeight = expandedDimensionsRef.current?.height || 400
-
-    // Check if card would be too large for container - constrain size first
-    const padding = 20
-    const maxAllowedWidth = Math.max(200, containerSize.width - padding)
-    const maxAllowedHeight = Math.max(200, containerSize.height - padding)
-
-    let finalWidth = estimatedWidth
-    let finalHeight = estimatedHeight
-    let needsConstraint = false
-
-    // Constrain size if too large for container (check both dimensions)
-    if (estimatedWidth > maxAllowedWidth) {
-      finalWidth = maxAllowedWidth
-      needsConstraint = true
-    }
-    if (estimatedHeight > maxAllowedHeight) {
-      finalHeight = maxAllowedHeight
-      needsConstraint = true
-    }
-
-    // Update constrained size if needed
-    if (needsConstraint) {
-      const newConstrainedSize = { width: finalWidth, height: finalHeight }
-      setConstrainedSize((prev) => {
-        if (prev?.width === finalWidth && prev?.height === finalHeight) return prev
-        constrainedSizeRef.current = newConstrainedSize
-        return newConstrainedSize
-      })
-    } else {
-      // Clear constrained size if not needed
-      setConstrainedSize(null)
-      constrainedSizeRef.current = null
-    }
-
-    // Calculate minimal position adjustment needed
-    let adjustX = 0
-    let adjustY = 0
-
-    // Check right edge overflow
-    const rightEdge = baseLeft + finalWidth
-    if (rightEdge > containerSize.width) {
-      adjustX = containerSize.width - rightEdge
-      // Ensure card doesn't go negative
-      if (baseLeft + adjustX < 0) {
-        adjustX = -baseLeft
-      }
-    }
-    // Check left edge overflow
-    else if (baseLeft < 0) {
-      adjustX = -baseLeft
-    }
-
-    // Check bottom edge overflow
-    const bottomEdge = baseTop + finalHeight
-    if (bottomEdge > containerSize.height) {
-      adjustY = containerSize.height - bottomEdge
-      // Ensure card doesn't go negative
-      if (baseTop + adjustY < 0) {
-        adjustY = -baseTop
-      }
-    }
-    // Check top edge overflow
-    else if (baseTop < 0) {
-      adjustY = -baseTop
-    }
-
-    // Apply minimal adjustment immediately
-    const newAdjustment = { x: adjustX, y: adjustY }
-    setPositionAdjustment((prev) => {
-      if (prev.x === adjustX && prev.y === adjustY) {
-        return prev
-      }
-      positionAdjustmentRef.current = newAdjustment
-      return newAdjustment
-    })
-  }, [
-    isExpanded,
-    containerSize,
-    externalStyle,
-    isDragging,
-    isResizing,
-    card.description,
-    card.websiteUrl,
-  ])
-
-  // Detect overflow when expanded and adjust position (refined check after expansion)
+  // Consolidated overflow handling - handles both predictive and refined checks
   useEffect(() => {
     if (!isExpanded || !containerSize || containerSize.width === 0 || containerSize.height === 0) {
       if (!isExpanded) {
         setPositionAdjustment({ x: 0, y: 0 })
+        positionAdjustmentRef.current = { x: 0, y: 0 }
       }
       return
     }
@@ -231,7 +156,7 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
       return
     }
 
-    // Function to check and fix overflow with improved dimension calculation
+    // Function to check and fix overflow
     const checkOverflow = () => {
       if (
         !cardRef.current ||
@@ -242,13 +167,21 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
         return
       }
 
-      // Get card dimensions - prioritize constrained size (from ref to avoid stale closure), then custom size, then actual rendered size
+      // Get base position from style prop
+      const baseLeft = externalStyle?.left
+        ? parseFloat(String(externalStyle.left).replace('px', ''))
+        : 0
+      const baseTop = externalStyle?.top
+        ? parseFloat(String(externalStyle.top).replace('px', ''))
+        : 0
+
+      // Get card dimensions - prioritize constrained size, then custom size, then actual rendered size
       const cardRect = cardRef.current.getBoundingClientRect()
       const scrollWidth = cardRef.current.scrollWidth || cardRect.width
       const scrollHeight = cardRef.current.scrollHeight || cardRect.height
 
-      // Read constrained size from ref to get current value (avoids stale closure)
-      const currentConstrainedSize = constrainedSizeRef.current
+      // Read from refs to avoid stale closures
+      const currentConstrainedSize = dimensionsRef.current.constrained
 
       // When expanded, use scroll dimensions for more accurate size
       let cardWidth =
@@ -259,23 +192,10 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
         Math.max(cardRect.height, scrollHeight)
 
       // If expanded but dimensions not yet measured, use estimated expanded size
-      if (isExpanded && !currentConstrainedSize && !customSize && expandedDimensionsRef.current) {
-        cardWidth = Math.max(cardWidth, expandedDimensionsRef.current.width)
-        cardHeight = Math.max(cardHeight, expandedDimensionsRef.current.height)
+      if (isExpanded && !currentConstrainedSize && !customSize && dimensionsRef.current.expanded) {
+        cardWidth = Math.max(cardWidth, dimensionsRef.current.expanded.width)
+        cardHeight = Math.max(cardHeight, dimensionsRef.current.expanded.height)
       }
-
-      // Get base position from style prop (accounting for current adjustment)
-      const baseLeft = externalStyle?.left
-        ? parseFloat(String(externalStyle.left).replace('px', ''))
-        : 0
-      const baseTop = externalStyle?.top
-        ? parseFloat(String(externalStyle.top).replace('px', ''))
-        : 0
-
-      // Current position includes existing adjustment (read from ref to avoid stale closure)
-      const currentAdjustment = positionAdjustmentRef.current
-      const currentLeft = baseLeft + currentAdjustment.x
-      const currentTop = baseTop + currentAdjustment.y
 
       // Check if size constraints are needed
       const padding = 20
@@ -283,8 +203,6 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
       const maxAllowedHeight = Math.max(200, containerSize.height - padding)
 
       // Constrain size if too large (apply before position adjustment)
-      // Only constrain if we don't already have a constrained size (to avoid loops)
-      // If we have constrained size, use it and don't recalculate
       if (!currentConstrainedSize) {
         let sizeChanged = false
         let constrainedWidth = cardWidth
@@ -302,9 +220,8 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
         // Update constrained size if dimensions changed
         if (sizeChanged) {
           const newConstrainedSize = { width: constrainedWidth, height: constrainedHeight }
-          constrainedSizeRef.current = newConstrainedSize
+          dimensionsRef.current.constrained = newConstrainedSize
           setConstrainedSize(newConstrainedSize)
-          // Use constrained dimensions for position calculation
           cardWidth = constrainedWidth
           cardHeight = constrainedHeight
         }
@@ -314,17 +231,19 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
         cardHeight = currentConstrainedSize.height
       }
 
+      // Current position includes existing adjustment (read from ref to avoid stale closure)
+      const currentAdjustment = positionAdjustmentRef.current
+      const currentLeft = baseLeft + currentAdjustment.x
+      const currentTop = baseTop + currentAdjustment.y
+
       // Calculate minimal adjustment needed to keep card within bounds
-      // Calculate what the final position should be
       let targetLeft = currentLeft
       let targetTop = currentTop
 
-      // Check right edge overflow - prioritize minimal adjustment
+      // Check right edge overflow
       const rightEdge = currentLeft + cardWidth
       if (rightEdge > containerSize.width) {
-        // Shift left by minimum amount needed
         targetLeft = containerSize.width - cardWidth
-        // Ensure card doesn't go negative
         if (targetLeft < 0) {
           targetLeft = 0
         }
@@ -334,12 +253,10 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
         targetLeft = 0
       }
 
-      // Check bottom edge overflow - prioritize minimal adjustment
+      // Check bottom edge overflow
       const bottomEdge = currentTop + cardHeight
       if (bottomEdge > containerSize.height) {
-        // Shift up by minimum amount needed
         targetTop = containerSize.height - cardHeight
-        // Ensure card doesn't go negative
         if (targetTop < 0) {
           targetTop = 0
         }
@@ -356,7 +273,6 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
       // Update adjustment (relative to base position)
       const newAdjustment = { x: newAdjustX, y: newAdjustY }
       setPositionAdjustment((prev) => {
-        // Only update if changed to avoid unnecessary re-renders
         if (prev.x === newAdjustX && prev.y === newAdjustY) {
           return prev
         }
@@ -369,7 +285,6 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
     if (!cardRef.current) return
 
     const resizeObserver = new ResizeObserver(() => {
-      // Debounce the check slightly to avoid excessive updates
       requestAnimationFrame(checkOverflow)
     })
 
@@ -380,32 +295,24 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
       requestAnimationFrame(checkOverflow)
     })
 
-    if (cardRef.current) {
-      mutationObserver.observe(cardRef.current, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class', 'style'],
-      })
-    }
+    mutationObserver.observe(cardRef.current, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'style'],
+    })
 
-    // Multiple checkpoints: immediate, after animation frame, after transition completes
+    // Initial check after a brief delay to allow rendering
     requestAnimationFrame(checkOverflow)
-    const timeoutId1 = setTimeout(checkOverflow, 100)
-    const timeoutId2 = setTimeout(checkOverflow, 400) // Increased from 350ms to account for CSS transitions
 
     return () => {
       resizeObserver.disconnect()
       mutationObserver.disconnect()
-      clearTimeout(timeoutId1)
-      clearTimeout(timeoutId2)
     }
   }, [
     isExpanded,
     containerSize,
     customSize,
-    // Removed constrainedSize and positionAdjustment from dependencies to prevent infinite loop
-    // They're read from refs inside the function to avoid stale closures
     externalStyle,
     isDragging,
     isResizing,
@@ -430,7 +337,7 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
         const naturalHeight = Math.max(cardRect.height, scrollHeight)
 
         // Set minimum dimensions with small buffer
-        minDimensionsRef.current = {
+        dimensionsRef.current.min = {
           width: Math.max(200, Math.ceil(naturalWidth + 4)),
           height: Math.max(200, Math.ceil(naturalHeight + 4)),
         }
@@ -445,7 +352,7 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
         )
         const estimatedExpandedHeight = naturalHeight
 
-        expandedDimensionsRef.current = {
+        dimensionsRef.current.expanded = {
           width: estimatedExpandedWidth,
           height: estimatedExpandedHeight,
         }
@@ -453,11 +360,8 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
     }
   }, [isExpanded, card.description, card.websiteUrl, customSize, constrainedSize])
 
-  // Memoize canExpand check
-  const canExpand = useMemo(
-    () => Boolean(card.description || card.websiteUrl),
-    [card.description, card.websiteUrl],
-  )
+  // Check if card can expand
+  const canExpand = Boolean(card.description || card.websiteUrl)
 
   // Memoize click handler
   const handleCardClick = useCallback(
@@ -532,8 +436,8 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
       const proposedHeight = resizeStartRef.current.height + deltaY
 
       // Use minimum dimensions from content, or fallback to 200px
-      const minWidth = minDimensionsRef.current?.width || 200
-      const minHeight = minDimensionsRef.current?.height || 200
+      const minWidth = dimensionsRef.current.min?.width || 200
+      const minHeight = dimensionsRef.current.min?.height || 200
 
       // Enforce minimum dimensions strictly
       let newWidth = Math.max(minWidth, proposedWidth)
@@ -550,7 +454,7 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
 
       // When user manually resizes, clear constrained size and use custom size
       setConstrainedSize(null)
-      constrainedSizeRef.current = null
+      dimensionsRef.current.constrained = undefined
       setCustomSize({ width: newWidth, height: newHeight })
     },
     [isResizing, containerSize],
@@ -735,7 +639,12 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
           data-drag-handle
           {...listeners}
           {...attributes}
-          className="cursor-grab active:cursor-grabbing flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted rounded px-1.5 py-1 transition-colors touch-none"
+          className={cn(
+            'flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors touch-none',
+            isMobile
+              ? 'cursor-grab active:cursor-grabbing px-2.5 py-1.5'
+              : 'cursor-grab active:cursor-grabbing px-1.5 py-1',
+          )}
           style={{ touchAction: 'none' }}
           aria-label="Drag handle"
         >
@@ -745,20 +654,27 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
 
       {/* Content area */}
       <div
-        ref={contentRef}
         className={cn(
           'flex flex-col items-center justify-center relative ',
           effectiveConfig.padding,
         )}
       >
-        {card.icon && <div className="w-full flex items-center justify-center">{card.icon}</div>}
+        {card.icon && (
+          <div className={cn('w-full flex items-center justify-center', isMobile && 'scale-75')}>
+            {card.icon}
+          </div>
+        )}
         {card.image && (
           <div
             className={cn(
               'relative w-full overflow-hidden rounded-lg',
               isExpanded
                 ? 'w-full aspect-square'
-                : cn('aspect-square mx-auto', effectiveConfig.imageMaxWidth, 'max-w-[150px]'),
+                : cn(
+                    'aspect-square mx-auto',
+                    effectiveConfig.imageMaxWidth,
+                    isMobile ? 'max-w-[100px]' : 'max-w-[150px]',
+                  ),
             )}
           >
             <div className="absolute inset-0 rounded-lg overflow-hidden">
@@ -815,8 +731,8 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
         </div>
       </div>
 
-      {/* Resize Handle - Only show when expanded */}
-      {isExpanded && (
+      {/* Resize Handle - Only show when expanded and not on mobile */}
+      {isExpanded && !isMobile && (
         <div
           data-resize-handle
           onMouseDown={(e) => {
