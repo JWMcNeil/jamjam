@@ -847,7 +847,12 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
           // Use Link with asChild when button is active on mobile (second click ready)
           if (isMobile && isActive) {
             return (
-              <div key={item.label} className="relative inline-block">
+              <div
+                key={item.label}
+                className="relative inline-block"
+                onMouseEnter={() => handleLinkHover(item.blurbIndex)}
+                onMouseLeave={handleLinkLeave}
+              >
                 <Button
                   ref={(el) => {
                     if (el) buttonRefs.current[item.blurbIndex] = el
@@ -856,7 +861,7 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
                   variant="outline"
                   size="lg"
                   className={cn(
-                    'text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 flex-shrink-0 relative',
+                    'text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 flex-shrink-0 relative w-full',
                     activeClasses,
                   )}
                   onClick={(e) => handleLinkClick(item, e)}
@@ -888,22 +893,26 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
           }
 
           return (
-            <div key={item.label} className="relative inline-block">
+            <div
+              key={item.label}
+              className="relative inline-block"
+              onMouseEnter={() => handleLinkHover(item.blurbIndex)}
+              onMouseLeave={handleLinkLeave}
+            >
               <Button
                 ref={(el) => {
                   if (el) buttonRefs.current[item.blurbIndex] = el
                 }}
+                asChild
                 variant="outline"
                 size="lg"
                 className={cn(
                   'text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 flex-shrink-0 relative',
                   activeClasses,
                 )}
-                onMouseEnter={() => handleLinkHover(item.blurbIndex)}
-                onMouseLeave={handleLinkLeave}
                 onClick={(e) => handleLinkClick(item, e)}
               >
-                {buttonText}
+                <Link href={item.url}>{buttonText}</Link>
               </Button>
               {/* SVG Countdown Path */}
               {isButtonActive && (

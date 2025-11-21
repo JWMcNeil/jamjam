@@ -39,20 +39,8 @@ const mobileNavItems = [
   {
     link: {
       type: 'reference' as const,
-      label: 'Photography',
-      url: '/photography',
-      reference: null,
-      newTab: null,
-      appearance: null,
-      size: null,
-      icon: null,
-    },
-  },
-  {
-    link: {
-      type: 'reference' as const,
-      label: 'Videography',
-      url: '/videography',
+      label: 'Content',
+      url: '/content',
       reference: null,
       newTab: null,
       appearance: null,
