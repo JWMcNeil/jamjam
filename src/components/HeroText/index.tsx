@@ -7,6 +7,7 @@ import SplitText from '@benjaminlooi/splittext'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useIsMobile } from '@/components/DraggableCard/useIsMobile'
+import { cn } from '@/utilities/ui'
 
 // Helper function to find first matching word in collection
 function findFirstMatch(word: string, collection: HTMLElement[]): number {
@@ -339,6 +340,13 @@ const highlightedWords: Record<number, string[]> = {
 
 const WELCOME_BLURB_INDEX = 0
 
+// Button color scheme for active state (matching TechStackCanvas style)
+const BUTTON_ACTIVE_STYLES = {
+  border: 'border-primary',
+  text: 'text-primary',
+  bg: 'bg-primary/10',
+}
+
 const navigationItems = [
   {
     label: 'web',
@@ -363,7 +371,11 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
   const isAnimatingRef = useRef<boolean>(false)
   const returnToWelcomeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [activeButtonIndex, setActiveButtonIndex] = useState<number | null>(null)
+  const [hoveredButtonIndex, setHoveredButtonIndex] = useState<number | null>(null)
+  const [countdownButtonIndex, setCountdownButtonIndex] = useState<number | null>(null)
   const isMobile = useIsMobile()
+  const strokeAnimationRefs = useRef<Record<number, gsap.core.Tween | null>>({})
+  const buttonRefs = useRef<Record<number, HTMLButtonElement | null>>({})
 
   // Function to completely clean up an element (remove all SplitText wrappers and reset)
   const cleanupElement = (element: HTMLElement, text: string) => {
@@ -444,6 +456,12 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
           // Reset button state when returning to welcome blurb
           if (targetIndex === WELCOME_BLURB_INDEX) {
             setActiveButtonIndex(null)
+            setHoveredButtonIndex(null)
+            setCountdownButtonIndex(null)
+            // Stop all stroke animations
+            Object.keys(strokeAnimationRefs.current).forEach((key) => {
+              stopStrokeAnimation(Number(key))
+            })
           }
 
           // Note: Don't swap text content here - the transition function handles the visual swap
@@ -458,13 +476,38 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
   // Handle hover on navigation items (desktop only)
   const handleLinkHover = (blurbIndex: number) => {
     if (!isMobile) {
+      // Stop previous button's animation if any
+      if (hoveredButtonIndex !== null && hoveredButtonIndex !== blurbIndex) {
+        stopStrokeAnimation(hoveredButtonIndex)
+      }
+      // Clear countdown state if switching buttons
+      if (countdownButtonIndex !== null && countdownButtonIndex !== blurbIndex) {
+        stopStrokeAnimation(countdownButtonIndex)
+        setCountdownButtonIndex(null)
+      }
+      setHoveredButtonIndex(blurbIndex)
       transitionToBlurb(blurbIndex)
+      // Show full stroke immediately on hover
+      showFullStroke(blurbIndex)
     }
   }
 
   // Handle mouse leave - return to welcome blurb after timeout (desktop only)
   const handleLinkLeave = () => {
     if (!isMobile) {
+      // Start countdown animation when leaving hover (anticlockwise)
+      if (hoveredButtonIndex !== null) {
+        const blurbIndex = hoveredButtonIndex
+        setCountdownButtonIndex(blurbIndex) // Keep SVG visible during countdown
+        setHoveredButtonIndex(null)
+        startStrokeAnimation(blurbIndex, 2000, false) // false = anticlockwise
+
+        // Clear countdown state when animation completes
+        setTimeout(() => {
+          setCountdownButtonIndex(null)
+        }, 2000)
+      }
+
       // Clear any existing timeout
       if (returnToWelcomeTimeoutRef.current) {
         clearTimeout(returnToWelcomeTimeoutRef.current)
@@ -489,10 +532,16 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
       return
     }
 
+    // Stop any existing stroke animation
+    if (activeButtonIndex !== null) {
+      stopStrokeAnimation(activeButtonIndex)
+    }
+
     // First click: prevent navigation and transition to blurb
     e.preventDefault()
     setActiveButtonIndex(item.blurbIndex)
     transitionToBlurb(item.blurbIndex)
+    startStrokeAnimation(item.blurbIndex, 5000, true) // 5 seconds for mobile, true = clockwise
 
     // Set timeout to return to welcome blurb on mobile
     if (returnToWelcomeTimeoutRef.current) {
@@ -503,9 +552,245 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
       if (currentBlurbIndexRef.current !== WELCOME_BLURB_INDEX) {
         transitionToBlurb(WELCOME_BLURB_INDEX)
         setActiveButtonIndex(null)
+        stopStrokeAnimation(item.blurbIndex)
       }
       returnToWelcomeTimeoutRef.current = null
     }, 5000) // 5 second delay before returning to welcome blurb on mobile
+  }
+
+  // Show full stroke immediately (for desktop hover)
+  const showFullStroke = (blurbIndex: number) => {
+    // Use double requestAnimationFrame to ensure React has rendered the SVG
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const button = buttonRefs.current[blurbIndex]
+        if (!button) return
+
+        const wrapper = button.parentElement
+        if (!wrapper) return
+
+        const svgPath = wrapper.querySelector(
+          `[data-stroke-path="${blurbIndex}"]`,
+        ) as SVGPathElement
+        if (!svgPath) {
+          // If SVG not found, try again after a short delay (for first hover)
+          setTimeout(() => showFullStroke(blurbIndex), 10)
+          return
+        }
+
+        // Get button dimensions and border radius
+        const rect = button.getBoundingClientRect()
+        const width = rect.width
+        const height = rect.height
+        const computedStyle = window.getComputedStyle(button)
+        // Parse border-radius - get the first value if it's shorthand
+        const borderRadiusStr =
+          computedStyle.borderTopLeftRadius || computedStyle.borderRadius || '0.375rem'
+        // Handle both px and rem values
+        let borderRadius = parseFloat(borderRadiusStr)
+        if (borderRadiusStr.includes('rem')) {
+          borderRadius = borderRadius * 16 // Convert rem to px (assuming 16px base)
+        }
+        if (!borderRadius || isNaN(borderRadius)) {
+          borderRadius = 6 // Default fallback
+        }
+        const strokeWidth = 2
+
+        // Create rounded rectangle path
+        const pathData = createRoundedRectPath(width, height, borderRadius, strokeWidth, false) // anticlockwise
+        svgPath.setAttribute('d', pathData)
+
+        const pathLength = svgPath.getTotalLength()
+
+        const svg = svgPath.closest('svg')
+        if (svg) {
+          svg.setAttribute('viewBox', `0 0 ${width} ${height}`)
+        }
+
+        // Set full stroke (offset 0)
+        svgPath.style.strokeDasharray = `${pathLength}`
+        svgPath.style.strokeDashoffset = `0`
+
+        // Stop any existing animation
+        stopStrokeAnimation(blurbIndex)
+      })
+    })
+  }
+
+  // Start stroke animation for countdown
+  const startStrokeAnimation = (
+    blurbIndex: number,
+    duration: number,
+    clockwise: boolean = false,
+  ) => {
+    // Use requestAnimationFrame to ensure DOM is updated
+    requestAnimationFrame(() => {
+      const button = buttonRefs.current[blurbIndex]
+      if (!button) return
+
+      // Find the SVG path element (it's in the parent div wrapper)
+      const wrapper = button.parentElement
+      if (!wrapper) return
+
+      const svgPath = wrapper.querySelector(`[data-stroke-path="${blurbIndex}"]`) as SVGPathElement
+      if (!svgPath) return
+
+      // Get button dimensions and border radius
+      const rect = button.getBoundingClientRect()
+      const width = rect.width
+      const height = rect.height
+      const computedStyle = window.getComputedStyle(button)
+      // Parse border-radius - get the first value if it's shorthand
+      const borderRadiusStr =
+        computedStyle.borderTopLeftRadius || computedStyle.borderRadius || '0.375rem'
+      // Handle both px and rem values
+      let borderRadius = parseFloat(borderRadiusStr)
+      if (borderRadiusStr.includes('rem')) {
+        borderRadius = borderRadius * 16 // Convert rem to px (assuming 16px base)
+      }
+      if (!borderRadius || isNaN(borderRadius)) {
+        borderRadius = 6 // Default fallback
+      }
+      const strokeWidth = 2
+
+      // Create rounded rectangle path (clockwise or anticlockwise based on parameter)
+      const pathData = createRoundedRectPath(width, height, borderRadius, strokeWidth, clockwise)
+      svgPath.setAttribute('d', pathData)
+
+      // Calculate path length
+      const pathLength = svgPath.getTotalLength()
+
+      // Set SVG viewBox to match button dimensions
+      const svg = svgPath.closest('svg')
+      if (svg) {
+        svg.setAttribute('viewBox', `0 0 ${width} ${height}`)
+      }
+
+      // Set initial stroke-dasharray and stroke-dashoffset (start full, offset 0)
+      svgPath.style.strokeDasharray = `${pathLength}`
+      svgPath.style.strokeDashoffset = `0`
+
+      // Stop any existing animation for this button
+      stopStrokeAnimation(blurbIndex)
+
+      // Animate stroke-dashoffset from 0 to pathLength (emptying)
+      const tween = gsap.to(svgPath, {
+        strokeDashoffset: pathLength,
+        duration: duration / 1000, // Convert ms to seconds
+        ease: 'linear',
+      })
+
+      strokeAnimationRefs.current[blurbIndex] = tween
+    })
+  }
+
+  // Create rounded rectangle path (clockwise or anticlockwise)
+  const createRoundedRectPath = (
+    width: number,
+    height: number,
+    borderRadius: number,
+    strokeWidth: number,
+    clockwise: boolean = false,
+  ): string => {
+    // Position path to align with button's border
+    // Button has border-radius, our path should match it exactly
+    // Position at border center (0.5px offset for 1px border)
+    const halfStroke = strokeWidth / 2
+    const x = 0.5 - halfStroke // Center stroke on button's border
+    const y = 0.5 - halfStroke
+    const w = width - 1 + strokeWidth
+    const h = height - 1 + strokeWidth
+    // Use the button's exact border-radius - this is what creates the rounded corners
+    const maxRadius = Math.min(w / 2, h / 2)
+    const r = Math.max(0, Math.min(borderRadius, maxRadius))
+
+    if (clockwise) {
+      // Clockwise: start from top-left, go right → down → left → up
+      const startX = x + r
+      const startY = y
+
+      // Top edge: move right
+      const topRightX = x + w - r
+      const topRightY = y
+
+      // Top-right corner: arc down (clockwise, sweep flag 0)
+      const rightTopX = x + w
+      const rightTopY = y + r
+
+      // Right edge: move down
+      const rightBottomX = x + w
+      const rightBottomY = y + h - r
+
+      // Bottom-right corner: arc left (clockwise)
+      const bottomRightX = x + w - r
+      const bottomRightY = y + h
+
+      // Bottom edge: move left
+      const bottomLeftX = x + r
+      const bottomLeftY = y + h
+
+      // Bottom-left corner: arc up (clockwise)
+      const leftBottomX = x
+      const leftBottomY = y + h - r
+
+      // Left edge: move up
+      const leftTopX = x
+      const leftTopY = y + r
+
+      // Top-left corner: arc right back to start (clockwise)
+      return `M ${startX},${startY} L ${topRightX},${topRightY} A ${r},${r} 0 0 0 ${rightTopX},${rightTopY} L ${rightBottomX},${rightBottomY} A ${r},${r} 0 0 0 ${bottomRightX},${bottomRightY} L ${bottomLeftX},${bottomLeftY} A ${r},${r} 0 0 0 ${leftBottomX},${leftBottomY} L ${leftTopX},${leftTopY} A ${r},${r} 0 0 0 ${startX},${startY} Z`
+    } else {
+      // Anticlockwise: start from top-left, go right → down → left → up (same as before)
+      const startX = x + r
+      const startY = y
+
+      const topRightX = x + w - r
+      const topRightY = y
+
+      const rightTopX = x + w
+      const rightTopY = y + r
+
+      const rightBottomX = x + w
+      const rightBottomY = y + h - r
+
+      const bottomRightX = x + w - r
+      const bottomRightY = y + h
+
+      const bottomLeftX = x + r
+      const bottomLeftY = y + h
+
+      const leftBottomX = x
+      const leftBottomY = y + h - r
+
+      const leftTopX = x
+      const leftTopY = y + r
+
+      return `M ${startX},${startY} L ${topRightX},${topRightY} A ${r},${r} 0 0 1 ${rightTopX},${rightTopY} L ${rightBottomX},${rightBottomY} A ${r},${r} 0 0 1 ${bottomRightX},${bottomRightY} L ${bottomLeftX},${bottomLeftY} A ${r},${r} 0 0 1 ${leftBottomX},${leftBottomY} L ${leftTopX},${leftTopY} A ${r},${r} 0 0 1 ${startX},${startY} Z`
+    }
+  }
+
+  // Stop stroke animation
+  const stopStrokeAnimation = (blurbIndex: number) => {
+    const tween = strokeAnimationRefs.current[blurbIndex]
+    if (tween) {
+      tween.kill()
+      strokeAnimationRefs.current[blurbIndex] = null
+    }
+
+    // Reset stroke (make it full again)
+    const button = buttonRefs.current[blurbIndex]
+    if (button) {
+      const wrapper = button.parentElement
+      if (wrapper) {
+        const svgPath = wrapper.querySelector(
+          `[data-stroke-path="${blurbIndex}"]`,
+        ) as SVGPathElement
+        if (svgPath) {
+          const pathLength = svgPath.getTotalLength()
+          svgPath.style.strokeDashoffset = `0` // Reset to full
+        }
+      }
+    }
   }
 
   useEffect(() => {
@@ -524,6 +809,10 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
       if (returnToWelcomeTimeoutRef.current) {
         clearTimeout(returnToWelcomeTimeoutRef.current)
       }
+      // Cleanup stroke animations
+      Object.keys(strokeAnimationRefs.current).forEach((key) => {
+        stopStrokeAnimation(Number(key))
+      })
     }
   }, [])
 
@@ -545,36 +834,98 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
       <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 md:gap-10 justify-center items-center w-full">
         {navigationItems.map((item) => {
           const isActive = activeButtonIndex === item.blurbIndex
+          const isHovered = hoveredButtonIndex === item.blurbIndex
+          const isCountdown = countdownButtonIndex === item.blurbIndex
+          const isButtonActive = isActive || (!isMobile && (isHovered || isCountdown))
           const buttonText = isActive ? item.secondaryLabel : item.label
+
+          // Determine active styling
+          const activeClasses = isButtonActive
+            ? `${BUTTON_ACTIVE_STYLES.border} ${BUTTON_ACTIVE_STYLES.text} ${BUTTON_ACTIVE_STYLES.bg}`
+            : ''
 
           // Use Link with asChild when button is active on mobile (second click ready)
           if (isMobile && isActive) {
             return (
-              <Button
-                key={item.label}
-                asChild
-                variant="outline"
-                size="lg"
-                className="text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 flex-shrink-0"
-                onClick={(e) => handleLinkClick(item, e)}
-              >
-                <Link href={item.url}>{buttonText}</Link>
-              </Button>
+              <div key={item.label} className="relative inline-block">
+                <Button
+                  ref={(el) => {
+                    if (el) buttonRefs.current[item.blurbIndex] = el
+                  }}
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className={cn(
+                    'text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 flex-shrink-0 relative',
+                    activeClasses,
+                  )}
+                  onClick={(e) => handleLinkClick(item, e)}
+                >
+                  <Link href={item.url}>{buttonText}</Link>
+                </Button>
+                {/* SVG Countdown Path */}
+                {isButtonActive && (
+                  <svg
+                    className="absolute inset-0 w-full h-full pointer-events-none overflow-visible"
+                    preserveAspectRatio="none"
+                  >
+                    <path
+                      data-stroke-path={item.blurbIndex}
+                      fill="none"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{
+                        strokeDasharray: '0',
+                        strokeDashoffset: '0',
+                      }}
+                    />
+                  </svg>
+                )}
+              </div>
             )
           }
 
           return (
-            <Button
-              key={item.label}
-              variant="outline"
-              size="lg"
-              className="text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 flex-shrink-0"
-              onMouseEnter={() => handleLinkHover(item.blurbIndex)}
-              onMouseLeave={handleLinkLeave}
-              onClick={(e) => handleLinkClick(item, e)}
-            >
-              {buttonText}
-            </Button>
+            <div key={item.label} className="relative inline-block">
+              <Button
+                ref={(el) => {
+                  if (el) buttonRefs.current[item.blurbIndex] = el
+                }}
+                variant="outline"
+                size="lg"
+                className={cn(
+                  'text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 flex-shrink-0 relative',
+                  activeClasses,
+                )}
+                onMouseEnter={() => handleLinkHover(item.blurbIndex)}
+                onMouseLeave={handleLinkLeave}
+                onClick={(e) => handleLinkClick(item, e)}
+              >
+                {buttonText}
+              </Button>
+              {/* SVG Countdown Path */}
+              {isButtonActive && (
+                <svg
+                  className="absolute inset-0 w-full h-full pointer-events-none overflow-visible"
+                  preserveAspectRatio="none"
+                >
+                  <path
+                    data-stroke-path={item.blurbIndex}
+                    fill="none"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{
+                      strokeDasharray: '0',
+                      strokeDashoffset: '0',
+                    }}
+                  />
+                </svg>
+              )}
+            </div>
           )
         })}
       </div>
