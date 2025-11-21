@@ -1,9 +1,12 @@
 'use client'
 
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { gsap } from 'gsap'
 // @ts-ignore - SplitText may not have types
 import SplitText from '@benjaminlooi/splittext'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { useIsMobile } from '@/components/DraggableCard/useIsMobile'
 
 // Helper function to find first matching word in collection
 function findFirstMatch(word: string, collection: HTMLElement[]): number {
@@ -55,6 +58,7 @@ function compareSplits(s1: any, s2: any) {
 function transition(
   element1: HTMLElement | null,
   element2: HTMLElement | null,
+  targetBlurbIndex: number,
   vars?: gsap.TimelineVars,
   useDefaultColor: boolean = false,
 ): gsap.core.Timeline | null {
@@ -118,8 +122,41 @@ function transition(
     word.style.whiteSpace = 'nowrap'
   })
 
-  const data = compareSplits(split1, split2)
-  const l = data.matches1.length
+  // Compare element1 to element2 for animation (which words move)
+  const animationData = compareSplits(split1, split2)
+  const l = animationData.matches1.length
+
+  // Get words to highlight for the target blurb
+  const wordsToHighlight = highlightedWords[targetBlurbIndex] || []
+  const words2ToHighlight: HTMLElement[] = []
+  const words2NotHighlighted: HTMLElement[] = []
+
+  // Helper function to normalize words for comparison (remove punctuation, lowercase, trim)
+  const normalizeWord = (word: string): string => {
+    return word
+      .trim()
+      .toLowerCase()
+      .replace(/[^\w\s]/g, '') // Remove punctuation (keeps only word characters and spaces)
+      .replace(/\s+/g, '') // Remove all whitespace for exact word matching
+      .trim()
+  }
+
+  words2.forEach((word2: HTMLElement) => {
+    const word2Text = word2.textContent || ''
+    const normalizedWord2 = normalizeWord(word2Text)
+
+    const shouldHighlight = wordsToHighlight.some((highlightWord) => {
+      const normalizedHighlight = normalizeWord(highlightWord)
+      return normalizedWord2 === normalizedHighlight
+    })
+
+    if (shouldHighlight) {
+      words2ToHighlight.push(word2)
+    } else {
+      words2NotHighlighted.push(word2)
+    }
+  })
+
   const tl = gsap.timeline(vars)
 
   // Get computed color values from CSS variables (GSAP can't parse CSS vars directly)
@@ -135,6 +172,7 @@ function transition(
   const accentColor = primaryColor ? `hsl(${primaryColor})` : '#7ab87a' // fallback color
 
   // Determine color for moving words
+  // Matching words: green when transitioning between blurbs, white when going to welcome
   const movingWordColor = useDefaultColor ? defaultColor : accentColor
 
   // Set initial states
@@ -146,22 +184,24 @@ function transition(
 
   // Set color on all words from block 1 synchronously before timeline starts
   // This prevents white flash during transitions
-  // Matching words: use movingWordColor (accent when between blurbs, white when going to welcome)
-  data.matches1.forEach((word1: HTMLElement) => {
-    gsap.set(word1, { color: movingWordColor })
+  // Matching words: green if they should be highlighted in target blurb (and not going to welcome), white otherwise
+  animationData.matches1.forEach((word1: HTMLElement, index: number) => {
+    const correspondingWord2 = animationData.matches2[index]
+    const shouldHighlight = words2ToHighlight.includes(correspondingWord2)
+    const wordColor = shouldHighlight && !useDefaultColor ? accentColor : defaultColor
+    gsap.set(word1, { color: wordColor })
   })
 
-  // Unmatched words from old blurb: keep accent color when fading out between blurbs,
-  // fade to white when transitioning to welcome blurb
-  const fadeOutColor = useDefaultColor ? defaultColor : accentColor
-  data.unmatched1.forEach((word1: HTMLElement) => {
+  // Unmatched words from old blurb: always fade out in white (default color)
+  const fadeOutColor = defaultColor
+  animationData.unmatched1.forEach((word1: HTMLElement) => {
     gsap.set(word1, { color: fadeOutColor })
   })
 
   // Animate matching words from position 1 to position 2
   for (let i = 0; i < l; i++) {
-    const word1 = data.matches1[i]
-    const word2 = data.matches2[i]
+    const word1 = animationData.matches1[i]
+    const word2 = animationData.matches2[i]
 
     // Find indices in original arrays to get stored positions
     const idx1 = words1.indexOf(word1)
@@ -194,7 +234,7 @@ function transition(
 
   // Fade out unmatched words from block 1
   tl.to(
-    data.unmatched1,
+    animationData.unmatched1,
     {
       duration: 0.3,
       autoAlpha: 0,
@@ -206,24 +246,51 @@ function transition(
   // Last word starts at (l-1) * 0.03 and has duration 1, so it finishes at (l-1) * 0.03 + 1
   const lastWordFinishTime = l > 0 ? (l - 1) * 0.03 + 1 : 0
 
-  // Determine target color for unmatched words (colors already calculated above)
-  const targetColor = useDefaultColor ? defaultColor : accentColor
-
-  tl.to(
-    data.unmatched2,
-    {
-      duration: 0.5,
-      opacity: 1,
-      visibility: 'visible',
-      color: targetColor,
-    },
-    0,
+  // Separate matched and unmatched words2 for different timing
+  const matchedWords2 = animationData.matches2
+  const unmatchedWords2ToHighlight = words2ToHighlight.filter(
+    (word) => !matchedWords2.includes(word),
   )
+  const unmatchedWords2NotHighlighted = words2NotHighlighted.filter(
+    (word) => !matchedWords2.includes(word),
+  )
+
+  // Show unmatched words from element2 at time 0
+  // Words that should be highlighted should be green (unless going to welcome), others white
+  unmatchedWords2ToHighlight.forEach((word: HTMLElement) => {
+    tl.to(
+      word,
+      {
+        duration: 0.5,
+        opacity: 1,
+        visibility: 'visible',
+        color: useDefaultColor ? defaultColor : accentColor,
+      },
+      0,
+    )
+  })
+
+  unmatchedWords2NotHighlighted.forEach((word: HTMLElement) => {
+    tl.to(
+      word,
+      {
+        duration: 0.5,
+        opacity: 1,
+        visibility: 'visible',
+        color: defaultColor,
+      },
+      0,
+    )
+  })
 
   // Show matching words from block 2 AFTER all word movements are complete
   // Instantly hide word1 and show word2 to avoid flickering
-  data.matches2.forEach((word: HTMLElement, index: number) => {
-    const word1 = data.matches1[index]
+  animationData.matches2.forEach((word: HTMLElement, index: number) => {
+    const word1 = animationData.matches1[index]
+
+    // Determine color based on whether this word should be highlighted
+    const shouldHighlight = words2ToHighlight.includes(word)
+    const wordColor = shouldHighlight && !useDefaultColor ? accentColor : defaultColor
 
     // Instantly hide word1 and show word2 at the exact same time
     // This prevents any flickering from overlapping elements
@@ -241,7 +308,7 @@ function transition(
       {
         opacity: 1,
         visibility: 'visible',
-        color: useDefaultColor ? targetColor : undefined, // Reset color to default if needed
+        color: wordColor, // Green if should be highlighted (and not going to welcome), white otherwise
       },
       lastWordFinishTime,
     )
@@ -250,30 +317,44 @@ function transition(
   return tl
 }
 
-type HeroCanvasProps = {
+type HeroTextProps = {
   heroBlock?: any
   cardsBlock?: any
 }
 
 // Define your blurbs - index 0 is the welcome blurb (default)
 const blurbs = [
-  "Welcome! This is the default blurb that appears when you're not hovering over any links.",
-  'Building things for the web comes naturally, from small pages to ideas that grow together over time.',
-  'Some things feel worth capturing, and light and timing come together when the shot finally works.',
-  'Motion pulls things into focus, and scenes come together when the story starts to feel right.',
-  'Thoughts, notes, and half-formed ideas live here, where writing helps put things together.',
+  'Step into jamjam.dev — where web experiences that work beautifully, content that resonates authentically, and thoughtful design that brings it all together.',
+  'Intuitive web experiences that work seamlessly and beautifully — where every interaction feels natural and users want to explore.',
+  'Strategic content that resonates with your audience authentically — meaningful connections, stories with purpose.',
 ]
+
+// Define which words to highlight (green) in each blurb
+// Words should match exactly as they appear in the blurb (case-sensitive, including punctuation)
+const highlightedWords: Record<number, string[]> = {
+  0: [], // Welcome blurb - no highlights (all white)
+  1: ['web', 'experiences', 'that', 'work', 'beautifully'],
+  2: ['content', 'that', 'resonates', 'authentically'],
+}
 
 const WELCOME_BLURB_INDEX = 0
 
 const navigationItems = [
-  { label: 'Blurb 1', blurbIndex: 1 },
-  { label: 'Blurb 2', blurbIndex: 2 },
-  { label: 'Blurb 3', blurbIndex: 3 },
-  { label: 'Blurb 4', blurbIndex: 4 },
+  {
+    label: 'web',
+    secondaryLabel: 'Learn more about web',
+    blurbIndex: 1,
+    url: '/web',
+  },
+  {
+    label: 'content',
+    secondaryLabel: 'Learn more about content',
+    blurbIndex: 2,
+    url: '/content',
+  },
 ]
 
-export const HeroCanvas = ({ heroBlock, cardsBlock }: HeroCanvasProps = {}) => {
+export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const blurb1Ref = useRef<HTMLDivElement>(null)
   const blurb2Ref = useRef<HTMLDivElement>(null)
@@ -281,6 +362,8 @@ export const HeroCanvas = ({ heroBlock, cardsBlock }: HeroCanvasProps = {}) => {
   const currentBlurbIndexRef = useRef<number>(WELCOME_BLURB_INDEX)
   const isAnimatingRef = useRef<boolean>(false)
   const returnToWelcomeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [activeButtonIndex, setActiveButtonIndex] = useState<number | null>(null)
+  const isMobile = useIsMobile()
 
   // Function to completely clean up an element (remove all SplitText wrappers and reset)
   const cleanupElement = (element: HTMLElement, text: string) => {
@@ -346,7 +429,7 @@ export const HeroCanvas = ({ heroBlock, cardsBlock }: HeroCanvasProps = {}) => {
       // Trigger the transition animation
       // Use default color when transitioning to welcome blurb
       const useDefaultColor = targetIndex === WELCOME_BLURB_INDEX
-      const tl = transition(sourceRef, targetRef, undefined, useDefaultColor)
+      const tl = transition(sourceRef, targetRef, targetIndex, undefined, useDefaultColor)
 
       if (tl) {
         currentTimelineRef.current = tl
@@ -358,6 +441,11 @@ export const HeroCanvas = ({ heroBlock, cardsBlock }: HeroCanvasProps = {}) => {
           isAnimatingRef.current = false
           currentTimelineRef.current = null
 
+          // Reset button state when returning to welcome blurb
+          if (targetIndex === WELCOME_BLURB_INDEX) {
+            setActiveButtonIndex(null)
+          }
+
           // Note: Don't swap text content here - the transition function handles the visual swap
           // We just need to track which blurb is now visible
         })
@@ -367,25 +455,57 @@ export const HeroCanvas = ({ heroBlock, cardsBlock }: HeroCanvasProps = {}) => {
     })
   }
 
-  // Handle hover on navigation items
+  // Handle hover on navigation items (desktop only)
   const handleLinkHover = (blurbIndex: number) => {
-    transitionToBlurb(blurbIndex)
+    if (!isMobile) {
+      transitionToBlurb(blurbIndex)
+    }
   }
 
-  // Handle mouse leave - return to welcome blurb after timeout
+  // Handle mouse leave - return to welcome blurb after timeout (desktop only)
   const handleLinkLeave = () => {
-    // Clear any existing timeout
+    if (!isMobile) {
+      // Clear any existing timeout
+      if (returnToWelcomeTimeoutRef.current) {
+        clearTimeout(returnToWelcomeTimeoutRef.current)
+      }
+
+      // Set timeout to return to welcome blurb
+      returnToWelcomeTimeoutRef.current = setTimeout(() => {
+        if (currentBlurbIndexRef.current !== WELCOME_BLURB_INDEX) {
+          transitionToBlurb(WELCOME_BLURB_INDEX)
+        }
+        returnToWelcomeTimeoutRef.current = null
+      }, 2000) // 2 second delay before returning to welcome blurb
+    }
+  }
+
+  // Handle click on navigation items (mobile only)
+  const handleLinkClick = (item: (typeof navigationItems)[0], e: React.MouseEvent) => {
+    if (!isMobile) return
+
+    // If this button is already active, let Link handle navigation
+    if (activeButtonIndex === item.blurbIndex) {
+      return
+    }
+
+    // First click: prevent navigation and transition to blurb
+    e.preventDefault()
+    setActiveButtonIndex(item.blurbIndex)
+    transitionToBlurb(item.blurbIndex)
+
+    // Set timeout to return to welcome blurb on mobile
     if (returnToWelcomeTimeoutRef.current) {
       clearTimeout(returnToWelcomeTimeoutRef.current)
     }
 
-    // Set timeout to return to welcome blurb
     returnToWelcomeTimeoutRef.current = setTimeout(() => {
       if (currentBlurbIndexRef.current !== WELCOME_BLURB_INDEX) {
         transitionToBlurb(WELCOME_BLURB_INDEX)
+        setActiveButtonIndex(null)
       }
       returnToWelcomeTimeoutRef.current = null
-    }, 2000) // 2 second delay before returning to welcome blurb
+    }, 5000) // 5 second delay before returning to welcome blurb on mobile
   }
 
   useEffect(() => {
@@ -408,8 +528,11 @@ export const HeroCanvas = ({ heroBlock, cardsBlock }: HeroCanvasProps = {}) => {
   }, [])
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-[30px] py-5">
-      <div ref={containerRef} className="w-[550px] relative h-[50vh] text-5xl text-foreground mb-8">
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 md:px-8 lg:px-12 py-5 w-full">
+      <div
+        ref={containerRef}
+        className="w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl relative h-[40vh] sm:h-[45vh] md:h-[50vh] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-foreground mb-4 sm:mb-6 md:mb-8 text-center"
+      >
         <div ref={blurb1Ref} className="absolute top-0 left-0 w-full">
           {blurbs[WELCOME_BLURB_INDEX]}
         </div>
@@ -419,18 +542,42 @@ export const HeroCanvas = ({ heroBlock, cardsBlock }: HeroCanvasProps = {}) => {
       </div>
 
       {/* Navigation links */}
-      <nav className="flex gap-4 flex-wrap justify-center">
-        {navigationItems.map((item) => (
-          <button
-            key={item.label}
-            onMouseEnter={() => handleLinkHover(item.blurbIndex)}
-            onMouseLeave={handleLinkLeave}
-            className="hover:text-primary transition-colors cursor-pointer"
-          >
-            {item.label}
-          </button>
-        ))}
-      </nav>
+      <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 md:gap-10 justify-center items-center w-full">
+        {navigationItems.map((item) => {
+          const isActive = activeButtonIndex === item.blurbIndex
+          const buttonText = isActive ? item.secondaryLabel : item.label
+
+          // Use Link with asChild when button is active on mobile (second click ready)
+          if (isMobile && isActive) {
+            return (
+              <Button
+                key={item.label}
+                asChild
+                variant="outline"
+                size="lg"
+                className="text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 flex-shrink-0"
+                onClick={(e) => handleLinkClick(item, e)}
+              >
+                <Link href={item.url}>{buttonText}</Link>
+              </Button>
+            )
+          }
+
+          return (
+            <Button
+              key={item.label}
+              variant="outline"
+              size="lg"
+              className="text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 flex-shrink-0"
+              onMouseEnter={() => handleLinkHover(item.blurbIndex)}
+              onMouseLeave={handleLinkLeave}
+              onClick={(e) => handleLinkClick(item, e)}
+            >
+              {buttonText}
+            </Button>
+          )
+        })}
+      </div>
     </div>
   )
 }

@@ -5,7 +5,7 @@ import React, { cache } from 'react'
 
 import { getBlockByName } from '@/utilities/getBlocksByName'
 import type { RichTextBlock, DraggableCardsBlock } from '@/payload-types'
-import { HeroCanvas } from '@/components/HeroCanvas'
+import { HeroText } from '@/components/HeroText'
 
 const queryStaticPageBySlug = cache(async ({ slug }: { slug: string }) => {
   const { isEnabled: draft } = await draftMode()
@@ -41,7 +41,7 @@ export default async function HomePage() {
 
   return (
     <div className="h-full w-full">
-      <HeroCanvas heroBlock={heroBlock} cardsBlock={heroCardsBlock} />
+      <HeroText heroBlock={heroBlock} cardsBlock={heroCardsBlock} />
     </div>
   )
 }
