@@ -1434,123 +1434,135 @@ export interface DraggableCardsBlock {
  */
 export interface PricingCardBlock {
   /**
-   * Optional cost indicator (e.g., "$", "€", "A$")
+   * Add one or more pricing cards. Tabs will appear when there are 2+ cards.
    */
-  costIndicator?: string | null;
-  icon:
-    | 'HomeIcon'
-    | 'UserIcon'
-    | 'UsersIcon'
-    | 'DocumentIcon'
-    | 'DocumentsIcon'
-    | 'FolderIcon'
-    | 'MagnifyingGlassIcon'
-    | 'Cog6ToothIcon'
-    | 'BellIcon'
-    | 'HeartIcon'
-    | 'StarIcon'
-    | 'BookmarkIcon'
-    | 'CalendarIcon'
-    | 'ClockIcon'
-    | 'ChartBarIcon'
-    | 'Squares2X2Icon'
-    | 'Bars3Icon'
-    | 'Bars3BottomLeftIcon'
-    | 'ArrowRightIcon'
-    | 'ArrowLeftIcon'
-    | 'ArrowUpIcon'
-    | 'ArrowDownIcon'
-    | 'ChevronRightIcon'
-    | 'ChevronLeftIcon'
-    | 'PlusIcon'
-    | 'MinusIcon'
-    | 'XMarkIcon'
-    | 'CheckIcon'
-    | 'InformationCircleIcon'
-    | 'ExclamationTriangleIcon'
-    | 'QuestionMarkCircleIcon'
-    | 'LockClosedIcon'
-    | 'LockOpenIcon'
-    | 'KeyIcon'
-    | 'ShieldCheckIcon'
-    | 'EyeIcon'
-    | 'EyeSlashIcon'
-    | 'PencilIcon'
-    | 'TrashIcon'
-    | 'ShareIcon'
-    | 'LinkIcon'
-    | 'PhotoIcon'
-    | 'VideoCameraIcon'
-    | 'MusicalNoteIcon'
-    | 'EnvelopeIcon'
-    | 'PhoneIcon'
-    | 'GlobeAltIcon'
-    | 'MapPinIcon'
-    | 'ShoppingCartIcon'
-    | 'CreditCardIcon'
-    | 'TagIcon'
-    | 'FireIcon'
-    | 'BoltIcon'
-    | 'SunIcon'
-    | 'MoonIcon'
-    | 'CloudIcon'
-    | 'SignalIcon';
-  title: string;
-  description?: string | null;
-  /**
-   * Price text (e.g., "A$450", "$450", "450€")
-   */
-  startingPrice: string;
-  includes?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Text displayed on the link button
-   */
-  linkButtonText?: string | null;
-  link?: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: number | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
-        } | null)
-      | ({
-          relationTo: 'web';
-          value: number | Web;
-        } | null)
-      | ({
-          relationTo: 'content';
-          value: number | Content;
-        } | null);
-    url?: string | null;
-    label?: string | null;
-    /**
-     * Choose how the link should be rendered.
-     */
-    appearance?: ('default' | 'outline') | null;
-    /**
-     * Choose the size of the link button.
-     */
-    size?: ('default' | 'lg') | null;
-  };
+  cards?:
+    | {
+        /**
+         * Label displayed on the tab button
+         */
+        tabLabel: string;
+        /**
+         * Optional cost indicator (e.g., "$", "€", "A$")
+         */
+        costIndicator?: string | null;
+        icon:
+          | 'HomeIcon'
+          | 'UserIcon'
+          | 'UsersIcon'
+          | 'DocumentIcon'
+          | 'DocumentsIcon'
+          | 'FolderIcon'
+          | 'MagnifyingGlassIcon'
+          | 'Cog6ToothIcon'
+          | 'BellIcon'
+          | 'HeartIcon'
+          | 'StarIcon'
+          | 'BookmarkIcon'
+          | 'CalendarIcon'
+          | 'ClockIcon'
+          | 'ChartBarIcon'
+          | 'Squares2X2Icon'
+          | 'Bars3Icon'
+          | 'Bars3BottomLeftIcon'
+          | 'ArrowRightIcon'
+          | 'ArrowLeftIcon'
+          | 'ArrowUpIcon'
+          | 'ArrowDownIcon'
+          | 'ChevronRightIcon'
+          | 'ChevronLeftIcon'
+          | 'PlusIcon'
+          | 'MinusIcon'
+          | 'XMarkIcon'
+          | 'CheckIcon'
+          | 'InformationCircleIcon'
+          | 'ExclamationTriangleIcon'
+          | 'QuestionMarkCircleIcon'
+          | 'LockClosedIcon'
+          | 'LockOpenIcon'
+          | 'KeyIcon'
+          | 'ShieldCheckIcon'
+          | 'EyeIcon'
+          | 'EyeSlashIcon'
+          | 'PencilIcon'
+          | 'TrashIcon'
+          | 'ShareIcon'
+          | 'LinkIcon'
+          | 'PhotoIcon'
+          | 'VideoCameraIcon'
+          | 'MusicalNoteIcon'
+          | 'EnvelopeIcon'
+          | 'PhoneIcon'
+          | 'GlobeAltIcon'
+          | 'MapPinIcon'
+          | 'ShoppingCartIcon'
+          | 'CreditCardIcon'
+          | 'TagIcon'
+          | 'FireIcon'
+          | 'BoltIcon'
+          | 'SunIcon'
+          | 'MoonIcon'
+          | 'CloudIcon'
+          | 'SignalIcon';
+        title: string;
+        description?: string | null;
+        /**
+         * Price text (e.g., "A$450", "$450", "450€")
+         */
+        startingPrice: string;
+        includes?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        /**
+         * Text displayed on the link button
+         */
+        linkButtonText?: string | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'web';
+                value: number | Web;
+              } | null)
+            | ({
+                relationTo: 'content';
+                value: number | Content;
+              } | null);
+          url?: string | null;
+          label?: string | null;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+          /**
+           * Choose the size of the link button.
+           */
+          size?: ('default' | 'lg') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'pricingCard';
@@ -2385,23 +2397,29 @@ export interface DraggableCardsBlockSelect<T extends boolean = true> {
  * via the `definition` "PricingCardBlock_select".
  */
 export interface PricingCardBlockSelect<T extends boolean = true> {
-  costIndicator?: T;
-  icon?: T;
-  title?: T;
-  description?: T;
-  startingPrice?: T;
-  includes?: T;
-  linkButtonText?: T;
-  link?:
+  cards?:
     | T
     | {
-        type?: T;
-        newTab?: T;
-        reference?: T;
-        url?: T;
-        label?: T;
-        appearance?: T;
-        size?: T;
+        tabLabel?: T;
+        costIndicator?: T;
+        icon?: T;
+        title?: T;
+        description?: T;
+        startingPrice?: T;
+        includes?: T;
+        linkButtonText?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              appearance?: T;
+              size?: T;
+            };
+        id?: T;
       };
   id?: T;
   blockName?: T;
