@@ -13,6 +13,7 @@ import {
   Grid,
   ImageMasonryGrid,
   MediaBlock,
+  PricingCard,
   TechStackCanvas,
   VideoCard,
   VideoPlayer,
@@ -123,6 +124,7 @@ export const Projects: CollectionConfig<'projects'> = {
                 VideoPlayer,
                 VideoCard,
                 Carousel,
+                PricingCard,
               ],
               required: true,
               admin: {

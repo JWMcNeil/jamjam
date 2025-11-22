@@ -16,6 +16,7 @@ import { VideoCard } from '@/blocks/VideoCard/config'
 import { VideoPlayer } from '@/blocks/VideoPlayer/config'
 import { FormBlock } from '@/blocks/Form/config'
 import { DraggableCards } from '@/blocks/DraggableCards/config'
+import { PricingCard } from '@/blocks/PricingCard/config'
 import { Banner } from '@/blocks/Banner/config'
 import { MediaBlock } from '@/blocks/MediaBlock/config'
 import { Code } from '@/blocks/Code/config'
@@ -87,6 +88,7 @@ const columnFields: Field[] = [
       VideoPlayer,
       FormBlock,
       DraggableCards,
+      PricingCard,
     ],
     admin: {
       initCollapsed: true,

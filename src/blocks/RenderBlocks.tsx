@@ -16,6 +16,7 @@ import { RichTextBlockComponent } from '@/blocks/RichTextBlock/Component'
 import { VideoPlayer } from '@/blocks/VideoPlayer/Component'
 import { VideoCardBlock } from '@/blocks/VideoCard/Component'
 import { Carousel } from '@/blocks/Carousel/Component'
+import { PricingCardBlock } from '@/blocks/PricingCard/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -32,6 +33,7 @@ const blockComponents = {
   videoPlayer: VideoPlayer,
   videoCard: VideoCardBlock,
   carousel: Carousel,
+  pricingCard: PricingCardBlock,
 }
 
 export const RenderBlocks: React.FC<{

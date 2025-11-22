@@ -1,8 +1,10 @@
 'use client'
 
+import * as React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import { useMediaQuery } from '@/hooks/use-media-query'
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -12,7 +14,27 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
+import { Button } from '@/components/ui/button'
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { useBreadcrumbOverride } from '@/providers/Breadcrumb'
+
+const ITEMS_TO_DISPLAY_DESKTOP = 3
+const ITEMS_TO_DISPLAY_MOBILE = 2
 
 function formatBreadcrumbLabel(segment: string): string {
   // Decode URI component and replace hyphens/underscores with spaces
@@ -22,8 +44,11 @@ function formatBreadcrumbLabel(segment: string): string {
 }
 
 export function BreadcrumbCollapsed() {
+  const [open, setOpen] = React.useState(false)
   const pathname = usePathname()
   const { override } = useBreadcrumbOverride()
+  const isDesktop = useMediaQuery('(min-width: 768px)')
+  const itemsToDisplay = isDesktop ? ITEMS_TO_DISPLAY_DESKTOP : ITEMS_TO_DISPLAY_MOBILE
 
   // Split pathname into segments, filtering out empty strings
   const segments = pathname.split('/').filter(Boolean)
@@ -41,76 +66,122 @@ export function BreadcrumbCollapsed() {
     )
   }
 
-  // Build breadcrumb items
-  const breadcrumbItems = []
-  const lastSegment = segments[segments.length - 1]
-  const hasMultipleSegments = segments.length > 1
+  // Build items array with { href, label } structure
+  const items: Array<{ href?: string; label: string }> = [
+    { href: '/', label: 'Home' },
+  ]
 
-  // Show Home link - always visible
-  breadcrumbItems.push(
-    <BreadcrumbItem key="home" className="min-w-0">
-      <BreadcrumbLink asChild>
-        <Link href="/">Home</Link>
-      </BreadcrumbLink>
-    </BreadcrumbItem>,
-  )
+  segments.forEach((segment, index) => {
+    const isLast = index === segments.length - 1
+    const href = '/' + segments.slice(0, index + 1).join('/')
 
-  // On larger screens (md+): show full path
-  // On smaller screens: collapse with ellipsis
-  if (hasMultipleSegments) {
-    // Show all segments on larger screens
-    segments.forEach((segment, index) => {
-      const isLast = index === segments.length - 1
-      const href = '/' + segments.slice(0, index + 1).join('/')
+    // Apply breadcrumb override if it exists for this segment index
+    let displayLabel = formatBreadcrumbLabel(segment)
+    let displayHref = href
 
-      // Apply breadcrumb override if it exists for this segment index
-      let displayLabel = formatBreadcrumbLabel(segment)
-      let displayHref = href
+    if (override && override.segmentIndex === index && !isLast) {
+      displayLabel = override.label
+      displayHref = override.href
+    }
 
-      if (override && override.segmentIndex === index && !isLast) {
-        displayLabel = override.label
-        displayHref = override.href
-      }
-
-      breadcrumbItems.push(
-        <BreadcrumbSeparator key={`sep-${index}`} className="hidden md:flex" />,
-        <BreadcrumbItem key={`item-${index}`} className="min-w-0 hidden md:inline-flex">
-          {isLast ? (
-            <BreadcrumbPage>{displayLabel}</BreadcrumbPage>
-          ) : (
-            <BreadcrumbLink asChild>
-              <Link href={displayHref}>{displayLabel}</Link>
-            </BreadcrumbLink>
-          )}
-        </BreadcrumbItem>,
-      )
+    items.push({
+      href: isLast ? undefined : displayHref,
+      label: displayLabel,
     })
-
-    // On smaller screens: show ellipsis instead of full path
-    breadcrumbItems.push(
-      <BreadcrumbSeparator key="sep-collapsed" className="md:hidden" />,
-      <BreadcrumbItem key="ellipsis" className="flex-shrink-0 md:hidden">
-        <BreadcrumbEllipsis />
-      </BreadcrumbItem>,
-      <BreadcrumbSeparator key="sep-collapsed-2" className="md:hidden" />,
-      // Show last segment on smaller screens (it's already shown in loop above for larger screens)
-      <BreadcrumbItem key="item-last" className="min-w-0 md:hidden">
-        <BreadcrumbPage>{formatBreadcrumbLabel(lastSegment)}</BreadcrumbPage>
-      </BreadcrumbItem>,
-    )
-  } else {
-    // Single segment: show separator and segment (always visible)
-    breadcrumbItems.push(
-      <BreadcrumbSeparator key="sep-1" />,
-      <BreadcrumbItem key="item-last" className="min-w-0">
-        <BreadcrumbPage>{formatBreadcrumbLabel(lastSegment)}</BreadcrumbPage>
-      </BreadcrumbItem>,
-    )
-  }
+  })
 
   return (
     <Breadcrumb>
-      <BreadcrumbList>{breadcrumbItems}</BreadcrumbList>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink asChild>
+            <Link href={items[0].href ?? '/'}>{items[0].label}</Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        {items.length > itemsToDisplay ? (
+          <>
+            <BreadcrumbItem>
+              {isDesktop ? (
+                <DropdownMenu open={open} onOpenChange={setOpen}>
+                  <DropdownMenuTrigger
+                    className="flex items-center gap-1"
+                    aria-label="Toggle menu"
+                  >
+                    <BreadcrumbEllipsis className="size-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    {items.slice(1, -(itemsToDisplay - 1)).map((item, index) => (
+                      <DropdownMenuItem key={index} asChild>
+                        <Link href={item.href ? item.href : '#'}>
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Drawer open={open} onOpenChange={setOpen}>
+                  <DrawerTrigger 
+                    aria-label="Toggle Menu"
+                    className="touch-manipulation"
+                  >
+                    <BreadcrumbEllipsis className="h-4 w-4" />
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <DrawerHeader className="text-left">
+                      <DrawerTitle>Navigate to</DrawerTitle>
+                      <DrawerDescription>
+                        Select a page to navigate to.
+                      </DrawerDescription>
+                    </DrawerHeader>
+                    <div className="grid gap-1 px-4">
+                      {items.slice(1, -(itemsToDisplay - 1)).map((item, index) => (
+                        <Link
+                          key={index}
+                          href={item.href ? item.href : '#'}
+                          className="py-2 text-sm hover:text-foreground transition-colors"
+                          onClick={() => setOpen(false)}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                    <DrawerFooter className="pt-4">
+                      <DrawerClose asChild>
+                        <Button variant="outline">Close</Button>
+                      </DrawerClose>
+                    </DrawerFooter>
+                  </DrawerContent>
+                </Drawer>
+              )}
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+          </>
+        ) : null}
+        {(items.length > itemsToDisplay
+          ? items.slice(-(itemsToDisplay - 1))
+          : items.slice(1)
+        ).map((item, index, array) => (
+          <React.Fragment key={index}>
+            <BreadcrumbItem>
+              {item.href ? (
+                <BreadcrumbLink
+                  asChild
+                  className="max-w-[120px] truncate sm:max-w-[200px] md:max-w-none"
+                >
+                  <Link href={item.href}>{item.label}</Link>
+                </BreadcrumbLink>
+              ) : (
+                <BreadcrumbPage className="max-w-[120px] truncate sm:max-w-[200px] md:max-w-none">
+                  {item.label}
+                </BreadcrumbPage>
+              )}
+            </BreadcrumbItem>
+            {index < array.length - 1 && <BreadcrumbSeparator />}
+          </React.Fragment>
+        ))}
+      </BreadcrumbList>
     </Breadcrumb>
   )
 }

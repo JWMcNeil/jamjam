@@ -686,6 +686,7 @@ export interface Content {
     | VideoPlayerBlock
     | VideoCardBlock
     | CarouselBlock
+    | PricingCardBlock
   )[];
   relatedProjects?:
     | (
@@ -789,6 +790,7 @@ export interface ContentBlock {
               | VideoPlayerBlock
               | FormBlock
               | DraggableCardsBlock
+              | PricingCardBlock
             )[]
           | null;
         id?: string | null;
@@ -1428,6 +1430,133 @@ export interface DraggableCardsBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PricingCardBlock".
+ */
+export interface PricingCardBlock {
+  /**
+   * Optional cost indicator (e.g., "$", "€", "A$")
+   */
+  costIndicator?: string | null;
+  icon:
+    | 'HomeIcon'
+    | 'UserIcon'
+    | 'UsersIcon'
+    | 'DocumentIcon'
+    | 'DocumentsIcon'
+    | 'FolderIcon'
+    | 'MagnifyingGlassIcon'
+    | 'Cog6ToothIcon'
+    | 'BellIcon'
+    | 'HeartIcon'
+    | 'StarIcon'
+    | 'BookmarkIcon'
+    | 'CalendarIcon'
+    | 'ClockIcon'
+    | 'ChartBarIcon'
+    | 'Squares2X2Icon'
+    | 'Bars3Icon'
+    | 'Bars3BottomLeftIcon'
+    | 'ArrowRightIcon'
+    | 'ArrowLeftIcon'
+    | 'ArrowUpIcon'
+    | 'ArrowDownIcon'
+    | 'ChevronRightIcon'
+    | 'ChevronLeftIcon'
+    | 'PlusIcon'
+    | 'MinusIcon'
+    | 'XMarkIcon'
+    | 'CheckIcon'
+    | 'InformationCircleIcon'
+    | 'ExclamationTriangleIcon'
+    | 'QuestionMarkCircleIcon'
+    | 'LockClosedIcon'
+    | 'LockOpenIcon'
+    | 'KeyIcon'
+    | 'ShieldCheckIcon'
+    | 'EyeIcon'
+    | 'EyeSlashIcon'
+    | 'PencilIcon'
+    | 'TrashIcon'
+    | 'ShareIcon'
+    | 'LinkIcon'
+    | 'PhotoIcon'
+    | 'VideoCameraIcon'
+    | 'MusicalNoteIcon'
+    | 'EnvelopeIcon'
+    | 'PhoneIcon'
+    | 'GlobeAltIcon'
+    | 'MapPinIcon'
+    | 'ShoppingCartIcon'
+    | 'CreditCardIcon'
+    | 'TagIcon'
+    | 'FireIcon'
+    | 'BoltIcon'
+    | 'SunIcon'
+    | 'MoonIcon'
+    | 'CloudIcon'
+    | 'SignalIcon';
+  title: string;
+  description?: string | null;
+  /**
+   * Price text (e.g., "A$450", "$450", "450€")
+   */
+  startingPrice: string;
+  includes?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Text displayed on the link button
+   */
+  linkButtonText?: string | null;
+  link?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null)
+      | ({
+          relationTo: 'web';
+          value: number | Web;
+        } | null)
+      | ({
+          relationTo: 'content';
+          value: number | Content;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+    /**
+     * Choose how the link should be rendered.
+     */
+    appearance?: ('default' | 'outline') | null;
+    /**
+     * Choose the size of the link button.
+     */
+    size?: ('default' | 'lg') | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pricingCard';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "GridBlock".
  */
 export interface GridBlock {
@@ -1633,10 +1762,19 @@ export interface Search {
   id: number;
   title?: string | null;
   priority?: number | null;
-  doc: {
-    relationTo: 'posts';
-    value: number | Post;
-  };
+  doc:
+    | {
+        relationTo: 'web';
+        value: number | Web;
+      }
+    | {
+        relationTo: 'content';
+        value: number | Content;
+      }
+    | {
+        relationTo: 'posts';
+        value: number | Post;
+      };
   slug?: string | null;
   meta?: {
     title?: string | null;
@@ -2036,6 +2174,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
               videoPlayer?: T | VideoPlayerBlockSelect<T>;
               formBlock?: T | FormBlockSelect<T>;
               draggableCards?: T | DraggableCardsBlockSelect<T>;
+              pricingCard?: T | PricingCardBlockSelect<T>;
             };
         id?: T;
       };
@@ -2238,6 +2377,32 @@ export interface DraggableCardsBlockSelect<T extends boolean = true> {
       };
   containerWidth?: T;
   containerHeight?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PricingCardBlock_select".
+ */
+export interface PricingCardBlockSelect<T extends boolean = true> {
+  costIndicator?: T;
+  icon?: T;
+  title?: T;
+  description?: T;
+  startingPrice?: T;
+  includes?: T;
+  linkButtonText?: T;
+  link?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+        appearance?: T;
+        size?: T;
+      };
   id?: T;
   blockName?: T;
 }
@@ -2533,6 +2698,7 @@ export interface ContentSelect<T extends boolean = true> {
         videoPlayer?: T | VideoPlayerBlockSelect<T>;
         videoCard?: T | VideoCardBlockSelect<T>;
         carousel?: T | CarouselBlockSelect<T>;
+        pricingCard?: T | PricingCardBlockSelect<T>;
       };
   relatedProjects?: T;
   categories?: T;

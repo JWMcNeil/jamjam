@@ -15,4 +15,5 @@ export { RichTextBlock } from './RichTextBlock/config'
 export { TechStackCanvas } from './TechStackCanvas/config'
 export { VideoCard } from './VideoCard/config'
 export { VideoPlayer } from './VideoPlayer/config'
+export { PricingCard } from './PricingCard/config'
 

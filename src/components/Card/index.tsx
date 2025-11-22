@@ -12,6 +12,7 @@ export type CardPostData = Pick<Post, 'slug' | 'categories' | 'meta' | 'title' |
 export type CardWebData = Pick<Web, 'slug' | 'categories' | 'meta' | 'title' | 'heroImage'>
 export type CardContentData = Pick<Content, 'slug' | 'categories' | 'meta' | 'title' | 'heroImage'>
 export type CardData = CardPostData | CardWebData | CardContentData
+export type CardDataWithRelation = CardData & { relationTo?: 'posts' | 'web' | 'content' }
 
 export const Card: React.FC<{
   alignItems?: 'center'

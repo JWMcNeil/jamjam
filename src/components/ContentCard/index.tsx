@@ -203,6 +203,8 @@ export const ContentCard: React.FC<ContentCardProps> = (props) => {
       <div
         className={cn(
           'relative w-full overflow-hidden transition-[aspect-ratio] duration-500 ease-in-out',
+          enableLink && 'transition-transform duration-300 ease-in-out',
+          enableLink && isHovered && 'scale-[1.02]',
           aspectRatioClass,
         )}
         style={containerStyle}
