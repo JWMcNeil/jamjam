@@ -4,7 +4,7 @@ import { getIcon } from '@/utilities/icons'
 import Link from 'next/link'
 import React from 'react'
 
-import type { Page, Post, Project } from '@/payload-types'
+import type { Page, Post, Web, Content } from '@/payload-types'
 
 type CMSLinkType = {
   appearance?: 'inline' | ButtonProps['variant']
@@ -14,8 +14,8 @@ type CMSLinkType = {
   label?: string | null
   newTab?: boolean | null
   reference?: {
-    relationTo: 'pages' | 'posts' | 'projects'
-    value: Page | Post | Project | string | number
+    relationTo: 'pages' | 'posts' | 'web' | 'content'
+    value: Page | Post | Web | Content | string | number
   } | null
   size?: ButtonProps['size'] | null
   type?: 'custom' | 'reference' | null

@@ -1,0 +1,45 @@
+import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
+
+import { revalidatePath, revalidateTag } from 'next/cache'
+
+import type { Web } from '../../../payload-types'
+
+export const revalidateWeb: CollectionAfterChangeHook<Web> = ({
+  doc,
+  previousDoc,
+  req: { payload, context },
+}) => {
+  if (!context.disableRevalidate) {
+    if (doc._status === 'published') {
+      const path = `/web/${doc.slug}`
+
+      payload.logger.info(`Revalidating web project at path: ${path}`)
+
+      revalidatePath(path)
+      revalidateTag('web-sitemap')
+    }
+
+    // If the project was previously published, we need to revalidate the old path
+    if (previousDoc._status === 'published' && doc._status !== 'published') {
+      const oldPath = `/web/${previousDoc.slug}`
+
+      payload.logger.info(`Revalidating old web project at path: ${oldPath}`)
+
+      revalidatePath(oldPath)
+      revalidateTag('web-sitemap')
+    }
+  }
+  return doc
+}
+
+export const revalidateDelete: CollectionAfterDeleteHook<Web> = ({ doc, req: { context } }) => {
+  if (!context.disableRevalidate) {
+    const path = `/web/${doc?.slug}`
+
+    revalidatePath(path)
+    revalidateTag('web-sitemap')
+  }
+
+  return doc
+}
+

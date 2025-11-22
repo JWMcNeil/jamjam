@@ -1,4 +1,4 @@
-import type { Post, Project, ArchiveBlock as ArchiveBlockProps } from '@/payload-types'
+import type { Post, Web, Content, ArchiveBlock as ArchiveBlockProps } from '@/payload-types'
 
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -25,7 +25,7 @@ export const ArchiveBlock: React.FC<
   const limit = limitFromProps || 3
   const collection = relationTo || 'posts'
 
-  let docs: (Post | Project)[] = []
+  let docs: (Post | Web | Content)[] = []
 
   if (populateBy === 'collection') {
     const payload = await getPayload({ config: configPromise })
@@ -36,7 +36,7 @@ export const ArchiveBlock: React.FC<
     })
 
     const fetchedDocs = await payload.find({
-      collection: collection as 'posts' | 'projects',
+      collection: collection as 'posts' | 'web' | 'content',
       depth: 1,
       limit,
       ...(flattenedCategories && flattenedCategories.length > 0
@@ -50,7 +50,7 @@ export const ArchiveBlock: React.FC<
         : {}),
     })
 
-    docs = fetchedDocs.docs as (Post | Project)[]
+    docs = fetchedDocs.docs as (Post | Web | Content)[]
   } else {
     if (selectedDocs?.length) {
       const filteredSelectedDocs = selectedDocs
@@ -58,7 +58,7 @@ export const ArchiveBlock: React.FC<
           if (typeof doc.value === 'object') return doc.value
           return null
         })
-        .filter((doc): doc is Post | Project => doc !== null)
+        .filter((doc): doc is Post | Web | Content => doc !== null)
 
       docs = filteredSelectedDocs
     }
@@ -71,7 +71,7 @@ export const ArchiveBlock: React.FC<
           <RichText className="ms-0 max-w-[48rem]" data={introContent} enableGutter={false} />
         </div>
       )}
-      <CollectionArchive posts={docs} relationTo={collection as 'posts' | 'projects'} />
+      <CollectionArchive posts={docs} relationTo={collection as 'posts' | 'web' | 'content'} />
     </div>
   )
 }

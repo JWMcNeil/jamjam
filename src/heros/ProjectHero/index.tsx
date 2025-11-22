@@ -1,16 +1,16 @@
 import React from 'react'
 
-import type { Project } from '@/payload-types'
+import type { Web, Content } from '@/payload-types'
 
 import { Media } from '@/components/Media'
 
 export const ProjectHero: React.FC<{
-  project: Project
+  project: Web | Content
 }> = ({ project }) => {
-  const { categories, heroImage, projectType, title } = project
+  const { categories, heroImage, title } = project
+  const projectType = 'projectType' in project ? project.projectType : undefined
 
   const projectTypeLabels = {
-    web: 'Web',
     photography: 'Photography',
     videography: 'Videography',
   }

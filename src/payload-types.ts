@@ -72,7 +72,8 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
-    projects: Project;
+    web: Web;
+    content: Content;
     'static-pages': StaticPage;
     'mux-video': MuxVideo;
     redirects: Redirect;
@@ -91,7 +92,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
-    projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    web: WebSelect<false> | WebSelect<true>;
+    content: ContentSelect<false> | ContentSelect<true>;
     'static-pages': StaticPagesSelect<false> | StaticPagesSelect<true>;
     'mux-video': MuxVideoSelect<false> | MuxVideoSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -188,8 +190,12 @@ export interface Page {
                   value: number | Post;
                 } | null)
               | ({
-                  relationTo: 'projects';
-                  value: number | Project;
+                  relationTo: 'web';
+                  value: number | Web;
+                } | null)
+              | ({
+                  relationTo: 'content';
+                  value: number | Content;
                 } | null);
             url?: string | null;
             label?: string | null;
@@ -240,8 +246,12 @@ export interface Page {
               value: number | Post;
             } | null)
           | ({
-              relationTo: 'projects';
-              value: number | Project;
+              relationTo: 'web';
+              value: number | Web;
+            } | null)
+          | ({
+              relationTo: 'content';
+              value: number | Content;
             } | null);
         url?: string | null;
         label?: string | null;
@@ -531,15 +541,11 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "projects".
+ * via the `definition` "web".
  */
-export interface Project {
+export interface Web {
   id: number;
   title: string;
-  /**
-   * Type of project
-   */
-  projectType: 'web' | 'photography' | 'videography';
   heroImage?: (number | null) | Media;
   layout: (
     | CallToActionBlock
@@ -556,7 +562,18 @@ export interface Project {
     | VideoCardBlock
     | CarouselBlock
   )[];
-  relatedProjects?: (number | Project)[] | null;
+  relatedProjects?:
+    | (
+        | {
+            relationTo: 'web';
+            value: number | Web;
+          }
+        | {
+            relationTo: 'content';
+            value: number | Content;
+          }
+      )[]
+    | null;
   categories?: (number | Category)[] | null;
   meta?: {
     title?: string | null;
@@ -618,8 +635,12 @@ export interface CallToActionBlock {
                 value: number | Post;
               } | null)
             | ({
-                relationTo: 'projects';
-                value: number | Project;
+                relationTo: 'web';
+                value: number | Web;
+              } | null)
+            | ({
+                relationTo: 'content';
+                value: number | Content;
               } | null);
           url?: string | null;
           label?: string | null;
@@ -638,6 +659,71 @@ export interface CallToActionBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'cta';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "content".
+ */
+export interface Content {
+  id: number;
+  title: string;
+  /**
+   * Type of content project
+   */
+  projectType: 'photography' | 'videography';
+  heroImage?: (number | null) | Media;
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | ContentCardBlock
+    | DraggableCardsBlock
+    | TechStackCanvasBlock
+    | GridBlock
+    | MediaBlock
+    | ArchiveBlock
+    | FormBlock
+    | ImageMasonryGridBlock
+    | VideoPlayerBlock
+    | VideoCardBlock
+    | CarouselBlock
+  )[];
+  relatedProjects?:
+    | (
+        | {
+            relationTo: 'web';
+            value: number | Web;
+          }
+        | {
+            relationTo: 'content';
+            value: number | Content;
+          }
+      )[]
+    | null;
+  categories?: (number | Category)[] | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  authors?: (number | User)[] | null;
+  populatedAuthors?:
+    | {
+        id?: string | null;
+        name?: string | null;
+      }[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -676,8 +762,12 @@ export interface ContentBlock {
                 value: number | Post;
               } | null)
             | ({
-                relationTo: 'projects';
-                value: number | Project;
+                relationTo: 'web';
+                value: number | Web;
+              } | null)
+            | ({
+                relationTo: 'content';
+                value: number | Content;
               } | null);
           url?: string | null;
           label?: string | null;
@@ -743,8 +833,12 @@ export interface ContentCardBlock {
           value: number | Post;
         } | null)
       | ({
-          relationTo: 'projects';
-          value: number | Project;
+          relationTo: 'web';
+          value: number | Web;
+        } | null)
+      | ({
+          relationTo: 'content';
+          value: number | Content;
         } | null);
     url?: string | null;
     label?: string | null;
@@ -902,8 +996,12 @@ export interface VideoCardBlock {
           value: number | Post;
         } | null)
       | ({
-          relationTo: 'projects';
-          value: number | Project;
+          relationTo: 'web';
+          value: number | Web;
+        } | null)
+      | ({
+          relationTo: 'content';
+          value: number | Content;
         } | null);
     url?: string | null;
     label?: string | null;
@@ -1376,7 +1474,7 @@ export interface ArchiveBlock {
     [k: string]: unknown;
   } | null;
   populateBy?: ('collection' | 'selection') | null;
-  relationTo?: ('posts' | 'projects') | null;
+  relationTo?: ('posts' | 'web' | 'content') | null;
   categories?: (number | Category)[] | null;
   limit?: number | null;
   selectedDocs?:
@@ -1386,8 +1484,12 @@ export interface ArchiveBlock {
             value: number | Post;
           }
         | {
-            relationTo: 'projects';
-            value: number | Project;
+            relationTo: 'web';
+            value: number | Web;
+          }
+        | {
+            relationTo: 'content';
+            value: number | Content;
           }
       )[]
     | null;
@@ -1672,8 +1774,12 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
-        relationTo: 'projects';
-        value: number | Project;
+        relationTo: 'web';
+        value: number | Web;
+      } | null)
+    | ({
+        relationTo: 'content';
+        value: number | Content;
       } | null)
     | ({
         relationTo: 'static-pages';
@@ -2342,11 +2448,10 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "projects_select".
+ * via the `definition` "web_select".
  */
-export interface ProjectsSelect<T extends boolean = true> {
+export interface WebSelect<T extends boolean = true> {
   title?: T;
-  projectType?: T;
   heroImage?: T;
   layout?:
     | T
@@ -2403,6 +2508,54 @@ export interface ImageMasonryGridBlockSelect<T extends boolean = true> {
   gap?: T;
   id?: T;
   blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "content_select".
+ */
+export interface ContentSelect<T extends boolean = true> {
+  title?: T;
+  projectType?: T;
+  heroImage?: T;
+  layout?:
+    | T
+    | {
+        cta?: T | CallToActionBlockSelect<T>;
+        content?: T | ContentBlockSelect<T>;
+        contentCard?: T | ContentCardBlockSelect<T>;
+        draggableCards?: T | DraggableCardsBlockSelect<T>;
+        techStackCanvas?: T | TechStackCanvasBlockSelect<T>;
+        grid?: T | GridBlockSelect<T>;
+        mediaBlock?: T | MediaBlockSelect<T>;
+        archive?: T | ArchiveBlockSelect<T>;
+        formBlock?: T | FormBlockSelect<T>;
+        imageMasonryGrid?: T | ImageMasonryGridBlockSelect<T>;
+        videoPlayer?: T | VideoPlayerBlockSelect<T>;
+        videoCard?: T | VideoCardBlockSelect<T>;
+        carousel?: T | CarouselBlockSelect<T>;
+      };
+  relatedProjects?: T;
+  categories?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  publishedAt?: T;
+  authors?: T;
+  populatedAuthors?:
+    | T
+    | {
+        id?: T;
+        name?: T;
+      };
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2763,8 +2916,12 @@ export interface Header {
                 value: number | Post;
               } | null)
             | ({
-                relationTo: 'projects';
-                value: number | Project;
+                relationTo: 'web';
+                value: number | Web;
+              } | null)
+            | ({
+                relationTo: 'content';
+                value: number | Content;
               } | null);
           url?: string | null;
           label?: string | null;
@@ -2804,8 +2961,12 @@ export interface Footer {
                 value: number | Post;
               } | null)
             | ({
-                relationTo: 'projects';
-                value: number | Project;
+                relationTo: 'web';
+                value: number | Web;
+              } | null)
+            | ({
+                relationTo: 'content';
+                value: number | Content;
               } | null);
           url?: string | null;
           label?: string | null;
@@ -2841,8 +3002,12 @@ export interface Sidebar {
                 value: number | Post;
               } | null)
             | ({
-                relationTo: 'projects';
-                value: number | Project;
+                relationTo: 'web';
+                value: number | Web;
+              } | null)
+            | ({
+                relationTo: 'content';
+                value: number | Content;
               } | null);
           url?: string | null;
           label?: string | null;
@@ -3033,8 +3198,12 @@ export interface TaskSchedulePublish {
           value: number | Post;
         } | null)
       | ({
-          relationTo: 'projects';
-          value: number | Project;
+          relationTo: 'web';
+          value: number | Web;
+        } | null)
+      | ({
+          relationTo: 'content';
+          value: number | Content;
         } | null);
     global?: string | null;
     user?: (number | null) | User;

@@ -2,14 +2,14 @@ import clsx from 'clsx'
 import React from 'react'
 import RichText from '@/components/RichText'
 
-import type { Project } from '@/payload-types'
+import type { Web, Content } from '@/payload-types'
 
 import { Card } from '../../components/Card'
 import { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 export type RelatedProjectsProps = {
   className?: string
-  docs?: Project[]
+  docs?: (Web | Content)[]
   introContent?: DefaultTypedEditorState
 }
 
@@ -22,9 +22,13 @@ export const RelatedProjects: React.FC<RelatedProjectsProps> = (props) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-stretch">
         {docs?.map((doc, index) => {
-          if (typeof doc === 'string') return null
+          if (typeof doc !== 'object' || doc === null) return null
 
-          return <Card key={index} doc={doc} relationTo="projects" showCategories />
+          // Determine relationTo based on the document structure
+          // Web projects don't have projectType, Content projects do
+          const relationTo = 'projectType' in doc ? 'content' : 'web'
+
+          return <Card key={index} doc={doc} relationTo={relationTo} showCategories />
         })}
       </div>
     </div>
