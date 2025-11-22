@@ -820,7 +820,7 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
     <div className="flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 md:px-8 lg:px-12 py-5 w-full">
       <div
         ref={containerRef}
-        className="w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl relative h-[40vh] sm:h-[45vh] md:h-[50vh] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-foreground mb-4 sm:mb-6 md:mb-8 text-center"
+        className=" font-black w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl relative h-[40vh] sm:h-[45vh] md:h-[50vh] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-foreground mb-4 sm:mb-6 md:mb-8 text-center"
       >
         <div ref={blurb1Ref} className="absolute top-0 left-0 w-full">
           {blurbs[WELCOME_BLURB_INDEX]}

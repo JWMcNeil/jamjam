@@ -40,6 +40,10 @@ export const hero: Field = {
           label: 'Custom',
           value: 'custom',
         },
+        {
+          label: 'Animated',
+          value: 'animated',
+        },
       ],
       required: true,
     },
@@ -72,6 +76,113 @@ export const hero: Field = {
       },
       relationTo: 'media',
       required: true,
+    },
+    {
+      name: 'dotGrid',
+      type: 'group',
+      label: 'Dot Grid Settings',
+      admin: {
+        condition: (_, { type } = {}) => type === 'animated',
+        description: 'Configure the animated dot grid background.',
+      },
+      fields: [
+        {
+          name: 'dotSize',
+          type: 'number',
+          label: 'Dot Size',
+          defaultValue: 10,
+          admin: {
+            description: 'Size of each dot in pixels',
+          },
+          min: 1,
+          max: 50,
+        },
+        {
+          name: 'gap',
+          type: 'number',
+          label: 'Gap',
+          defaultValue: 15,
+          admin: {
+            description: 'Gap between dots in pixels',
+          },
+          min: 0,
+          max: 100,
+        },
+        {
+          name: 'baseColor',
+          type: 'text',
+          label: 'Base Color',
+          defaultValue: '#5227FF',
+          admin: {
+            description: 'Base color of the dots (hex format)',
+          },
+        },
+        {
+          name: 'activeColor',
+          type: 'text',
+          label: 'Active Color',
+          defaultValue: '#5227FF',
+          admin: {
+            description: 'Active color when mouse is near (hex format)',
+          },
+        },
+        {
+          name: 'proximity',
+          type: 'number',
+          label: 'Proximity',
+          defaultValue: 120,
+          admin: {
+            description: 'Distance in pixels for color change effect',
+          },
+          min: 0,
+          max: 500,
+        },
+        {
+          name: 'shockRadius',
+          type: 'number',
+          label: 'Shock Radius',
+          defaultValue: 250,
+          admin: {
+            description: 'Radius of the click shockwave effect',
+          },
+          min: 0,
+          max: 1000,
+        },
+        {
+          name: 'shockStrength',
+          type: 'number',
+          label: 'Shock Strength',
+          defaultValue: 5,
+          admin: {
+            description: 'Strength of the click shockwave effect',
+          },
+          min: 0,
+          max: 50,
+        },
+        {
+          name: 'resistance',
+          type: 'number',
+          label: 'Resistance',
+          defaultValue: 750,
+          admin: {
+            description: 'Resistance for the animation physics',
+          },
+          min: 0,
+          max: 2000,
+        },
+        {
+          name: 'returnDuration',
+          type: 'number',
+          label: 'Return Duration',
+          defaultValue: 1.5,
+          admin: {
+            description: 'Duration in seconds for dots to return to position',
+          },
+          min: 0,
+          max: 10,
+          step: 0.1,
+        },
+      ],
     },
     {
       name: 'contentCard',

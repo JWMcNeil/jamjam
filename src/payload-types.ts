@@ -159,7 +159,7 @@ export interface Page {
   id: number;
   title: string;
   hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact' | 'custom';
+    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact' | 'custom' | 'animated';
     richText?: {
       root: {
         type: string;
@@ -212,6 +212,47 @@ export interface Page {
         }[]
       | null;
     media?: (number | null) | Media;
+    /**
+     * Configure the animated dot grid background.
+     */
+    dotGrid?: {
+      /**
+       * Size of each dot in pixels
+       */
+      dotSize?: number | null;
+      /**
+       * Gap between dots in pixels
+       */
+      gap?: number | null;
+      /**
+       * Base color of the dots (hex format)
+       */
+      baseColor?: string | null;
+      /**
+       * Active color when mouse is near (hex format)
+       */
+      activeColor?: string | null;
+      /**
+       * Distance in pixels for color change effect
+       */
+      proximity?: number | null;
+      /**
+       * Radius of the click shockwave effect
+       */
+      shockRadius?: number | null;
+      /**
+       * Strength of the click shockwave effect
+       */
+      shockStrength?: number | null;
+      /**
+       * Resistance for the animation physics
+       */
+      resistance?: number | null;
+      /**
+       * Duration in seconds for dots to return to position
+       */
+      returnDuration?: number | null;
+    };
     /**
      * Add a content card to display on the right side of the hero (desktop only).
      */
@@ -2029,6 +2070,19 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
             };
         media?: T;
+        dotGrid?:
+          | T
+          | {
+              dotSize?: T;
+              gap?: T;
+              baseColor?: T;
+              activeColor?: T;
+              proximity?: T;
+              shockRadius?: T;
+              shockStrength?: T;
+              resistance?: T;
+              returnDuration?: T;
+            };
         contentCard?:
           | T
           | {
