@@ -125,7 +125,6 @@ const generateNonOverlappingPosition = (
   cardWidth: number,
   cardHeight: number,
   existingPositions: Array<{ x: number; y: number; width: number; height: number }>,
-  heroTextBounds?: { left: number; right: number; top: number; bottom: number },
   maxAttempts: number = 100,
 ): { x: number; y: number } => {
   const isMobile = containerWidth < 768
@@ -145,39 +144,16 @@ const generateNonOverlappingPosition = (
       continue
     }
 
-    // Check collision with hero text area if provided
-    if (heroTextBounds) {
-      const cardRight = x + cardWidth
-      const cardBottom = y + cardHeight
-      if (
-        x < heroTextBounds.right &&
-        cardRight > heroTextBounds.left &&
-        y < heroTextBounds.bottom &&
-        cardBottom > heroTextBounds.top
-      ) {
-        continue
-      }
-    }
-
     return { x, y }
   }
 
-  // Fallback: stack vertically, avoiding hero text area
+  // Fallback: stack vertically
   const lastY =
     existingPositions.length > 0
       ? Math.max(...existingPositions.map((p) => p.y + p.height)) + padding
       : 0
 
-  let fallbackY = Math.min(lastY, maxY)
-
-  // If fallback position overlaps with hero text, move it (with responsive spacing)
-  if (
-    heroTextBounds &&
-    fallbackY < heroTextBounds.bottom &&
-    fallbackY + cardHeight > heroTextBounds.top
-  ) {
-    fallbackY = Math.max(heroTextBounds.bottom + padding, fallbackY)
-  }
+  const fallbackY = Math.min(lastY, maxY)
 
   return { x: 0, y: Math.min(fallbackY, maxY) }
 }
@@ -222,29 +198,6 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
       cards.map((c) => `${c.id}:${c.size || 'md'}:${JSON.stringify(c.positions || {})}`).join('|'),
     [cards],
   )
-
-  // Calculate hero text bounds for collision avoidance (responsive)
-  const heroTextBounds = useMemo(() => {
-    if (containerSize.width === 0 || containerSize.height === 0) return undefined
-
-    const isMobile = containerSize.width < 768
-    // Use responsive units: 80% width on mobile, max 640px on desktop
-    const heroTextWidth = isMobile
-      ? containerSize.width * 0.8 // 80% of container width on mobile
-      : Math.min(640, containerSize.width - 32) // Max 640px on desktop with padding
-    const heroTextLeft = (containerSize.width - heroTextWidth) / 2
-    const heroTextRight = heroTextLeft + heroTextWidth
-
-    // Use responsive vertical exclusion: smaller on mobile
-    const verticalPadding = isMobile ? containerSize.height * 0.1 : 150 // 10% of height on mobile, 150px on desktop
-    const heroTextTop = Math.max(0, containerSize.height / 2 - verticalPadding)
-    const heroTextBottom = Math.min(
-      containerSize.height,
-      containerSize.height / 2 + verticalPadding,
-    )
-
-    return { left: heroTextLeft, right: heroTextRight, top: heroTextTop, bottom: heroTextBottom }
-  }, [containerSize.width, containerSize.height])
 
   // Update positions when container size or breakpoint changes
   useEffect(() => {
@@ -322,7 +275,6 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
                 cardDimensions.width,
                 cardDimensions.height,
                 existingPositions,
-                heroTextBounds,
               )
             }
 
@@ -346,7 +298,6 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
     currentBreakpoint,
     resetTrigger,
     cards,
-    heroTextBounds,
   ])
 
   const sensors = useSensors(
@@ -383,55 +334,8 @@ export const DraggableZone: React.FC<DraggableZoneProps> = ({
       const maxX = Math.max(0, containerSize.width - cardDimensions.width)
       const maxY = Math.max(0, containerSize.height - cardDimensions.height)
 
-      let constrainedX = Math.max(0, Math.min(newX, maxX))
-      let constrainedY = Math.max(0, Math.min(newY, maxY))
-
-      // Constrain position to avoid hero text area (center of screen) - disabled on mobile
-      const isMobile = containerSize.width < 768
-
-      if (!isMobile) {
-        // Use responsive units: max 640px on desktop
-        const heroTextWidth = Math.min(640, containerSize.width - 32) // Max 640px on desktop with padding
-        const heroTextLeft = (containerSize.width - heroTextWidth) / 2
-        const heroTextRight = heroTextLeft + heroTextWidth
-        // Use responsive vertical exclusion: 150px on desktop
-        const verticalPadding = 150
-        const heroTextTop = Math.max(0, containerSize.height / 2 - verticalPadding)
-        const heroTextBottom = Math.min(
-          containerSize.height,
-          containerSize.height / 2 + verticalPadding,
-        )
-
-        // Check if card would overlap with hero text area
-        const cardRight = constrainedX + cardDimensions.width
-        const cardBottom = constrainedY + cardDimensions.height
-
-        if (
-          constrainedX < heroTextRight &&
-          cardRight > heroTextLeft &&
-          constrainedY < heroTextBottom &&
-          cardBottom > heroTextTop
-        ) {
-          // Card overlaps with hero text - push it to the side
-          const pushSpacing = 20
-          // Prefer pushing left if there's space, otherwise right
-          if (constrainedX < containerSize.width / 2) {
-            // Push left
-            constrainedX = Math.max(0, heroTextLeft - cardDimensions.width - pushSpacing)
-          } else {
-            // Push right
-            constrainedX = Math.min(maxX, heroTextRight + pushSpacing)
-          }
-          // If still overlapping vertically, push up or down
-          if (constrainedY < heroTextBottom && cardBottom > heroTextTop) {
-            if (constrainedY < containerSize.height / 2) {
-              constrainedY = Math.max(0, heroTextTop - cardDimensions.height - pushSpacing)
-            } else {
-              constrainedY = Math.min(maxY, heroTextBottom + pushSpacing)
-            }
-          }
-        }
-      }
+      const constrainedX = Math.max(0, Math.min(newX, maxX))
+      const constrainedY = Math.max(0, Math.min(newY, maxY))
 
       const normalizedX = pixelsToNormalized(
         constrainedX,
