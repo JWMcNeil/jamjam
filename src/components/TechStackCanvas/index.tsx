@@ -53,6 +53,7 @@ const CATEGORIES: Array<{ value: TechCategory; label: string }> = [
   { value: 'analytics', label: 'Analytics' },
   { value: 'e-commerce', label: 'E-commerce' },
   { value: 'email-comm', label: 'Email/Comm' },
+  { value: 'low-code-no-code', label: 'Low-Code/No-Code' },
 ]
 
 // Zone colors for each category
@@ -70,6 +71,7 @@ const ZONE_COLORS: Record<TechCategory, string> = {
   analytics: 'bg-violet-500/10 border-violet-500/20',
   'e-commerce': 'bg-emerald-500/10 border-emerald-500/20',
   'email-comm': 'bg-sky-500/10 border-sky-500/20',
+  'low-code-no-code': 'bg-rose-500/10 border-rose-500/20',
 }
 
 // Tab colors for each category (matching zone colors)
@@ -187,6 +189,14 @@ const TAB_COLORS: Record<
     border: 'border-sky-500',
     outlineText: 'text-sky-500',
     outlineBg: 'bg-sky-500/10',
+  },
+  'low-code-no-code': {
+    bg: 'bg-rose-500',
+    text: 'text-white',
+    hover: 'hover:bg-rose-600',
+    border: 'border-rose-500',
+    outlineText: 'text-rose-500',
+    outlineBg: 'bg-rose-500/10',
   },
 }
 
@@ -311,6 +321,7 @@ const calculateRequiredHeight = (cards: DraggableCardData[], padding: number = 2
     analytics: 0,
     'e-commerce': 0,
     'email-comm': 0,
+    'low-code-no-code': 0,
   }
 
   cards.forEach((card) => {
@@ -366,6 +377,7 @@ const calculateZoneHeights = (
     analytics: 0,
     'e-commerce': 0,
     'email-comm': 0,
+    'low-code-no-code': 0,
   }
 
   cards.forEach((card) => {
@@ -512,6 +524,7 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
         analytics: [],
         'e-commerce': [],
         'email-comm': [],
+        'low-code-no-code': [],
         uncategorized: [],
       }
 

@@ -20,6 +20,7 @@ type PayloadCard = {
         | 'analytics'
         | 'e-commerce'
         | 'email-comm'
+        | 'low-code-no-code'
       )
     | null
   size?: ('sm' | 'md' | 'lg') | null

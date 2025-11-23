@@ -106,6 +106,10 @@ export const DraggableCards: Block = {
               label: 'Email/Comm',
               value: 'email-comm',
             },
+            {
+              label: 'Low-Code/No-Code',
+              value: 'low-code-no-code',
+            },
           ],
         },
         {

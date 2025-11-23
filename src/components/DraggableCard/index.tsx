@@ -7,8 +7,9 @@ import Image from 'next/image'
 import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react'
 import { GripVertical, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 
-import type { DraggableCardData, CardSize } from './types'
+import type { DraggableCardData, CardSize, TechCategory } from './types'
 import { useIsMobile } from './useIsMobile'
 
 type DraggableCardProps = {
@@ -69,6 +70,28 @@ const mobileSizeConfig: Record<
   },
 }
 
+// Helper function to format category labels
+const formatCategoryLabel = (category?: TechCategory): string => {
+  if (!category) return ''
+  const categoryLabels: Record<TechCategory, string> = {
+    frontend: 'Frontend',
+    backend: 'Backend/CMS',
+    database: 'Database',
+    infrastructure: 'Infrastructure/Hosting',
+    tooling: 'Tooling',
+    design: 'Design',
+    'ai-automation': 'AI/Automation',
+    devops: 'DevOps',
+    security: 'Security',
+    mobile: 'Mobile',
+    analytics: 'Analytics',
+    'e-commerce': 'E-commerce',
+    'email-comm': 'Email/Comm',
+    'low-code-no-code': 'Low-Code/No-Code',
+  }
+  return categoryLabels[category] || category
+}
+
 const DraggableCardComponent: React.FC<DraggableCardProps> = ({
   card,
   className,
@@ -81,6 +104,7 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
   })
 
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [constrainedSize, setConstrainedSize] = useState<{ width: number; height: number } | null>(
     null,
   )
@@ -107,10 +131,11 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
   const effectiveSize: CardSize = isExpanded ? 'lg' : size
   const effectiveConfig = isMobile ? mobileSizeConfig[effectiveSize] : sizeConfig[effectiveSize]
 
-  // Reset expansion when resetTrigger changes
+  // Reset expansion and drawer when resetTrigger changes
   useEffect(() => {
     if (resetTrigger !== undefined && resetTrigger !== previousResetTrigger.current) {
       setIsExpanded(false)
+      setIsDrawerOpen(false)
       previousResetTrigger.current = resetTrigger
     }
   }, [resetTrigger])
@@ -126,11 +151,12 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
     }
   }, [isExpanded])
 
-  // Reset position adjustment when dragging starts
+  // Reset position adjustment and close drawer when dragging starts
   useEffect(() => {
     if (isDragging) {
       setPositionAdjustment({ x: 0, y: 0 })
       positionAdjustmentRef.current = { x: 0, y: 0 }
+      setIsDrawerOpen(false)
     }
   }, [isDragging])
 
@@ -358,9 +384,14 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
       // Don't expand if clicking on links or buttons
       if (target.closest('a') || target.closest('button')) return
 
-      setIsExpanded((prev) => !prev)
+      // On mobile, open drawer; on desktop, expand
+      if (isMobile) {
+        setIsDrawerOpen((prev) => !prev)
+      } else {
+        setIsExpanded((prev) => !prev)
+      }
     },
-    [canExpand, isDragging],
+    [canExpand, isDragging, isMobile],
   )
 
   // Calculate dynamic size constraints based on container and position
@@ -481,145 +512,191 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
     dynamicConstraints,
   ])
 
-  return (
-    <div
-      ref={(node) => {
-        setNodeRef(node)
-        cardRef.current = node
-      }}
-      style={style}
-      className={cn(
-        'absolute select-none',
-        'bg-card border border-border rounded-lg shadow-lg',
-        'overflow-y-auto', // Prevent content from breaking out
-        // Only transition non-transform properties to avoid repaints during drag
-        // Removed left/top transitions to prevent bounce-back animation
-        isDragging ? '' : 'transition-[width,height,shadow] duration-300 ease-in-out',
-        !constrainedSize && 'w-auto',
-        // Apply size constraints via Tailwind only when NOT expanded (expanded uses inline styles)
-        // Expanded cards use dynamic constraints calculated from container size
-        !constrainedSize && !isExpanded && effectiveConfig.minWidth,
-        !constrainedSize && !isExpanded && effectiveConfig.maxWidth,
-        isDragging && 'shadow-2xl z-50',
-        isExpanded && 'z-40',
-        canExpand && 'cursor-pointer',
-        className,
+  // Helper function to render expanded content (used in both drawer and expanded card)
+  const renderExpandedContent = () => (
+    <div className="flex flex-col gap-4">
+      {card.description && (
+        <p className="text-sm text-muted-foreground leading-relaxed break-words">
+          {card.description}
+        </p>
       )}
-      onClick={canExpand ? handleCardClick : undefined}
-    >
-      {/* Title bar with drag handle and window controls */}
-      <div className="flex gap-2 items-center justify-between px-2 py-2 border-b border-border bg-card rounded-t-lg">
-        <h3 className="font-mono text-sm font-medium text-foreground truncate flex-1 min-w-0">
-          {card.title}
-        </h3>
-        {/* Drag Handle */}
-        <div
-          data-drag-handle
-          {...listeners}
-          {...attributes}
-          className={cn(
-            'flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors touch-none',
-            isMobile
-              ? 'cursor-grab active:cursor-grabbing px-2.5 py-1.5'
-              : 'cursor-grab active:cursor-grabbing px-1.5 py-1',
-          )}
-          style={{ touchAction: 'none' }}
-          aria-label="Drag handle"
+      {card.websiteUrl && (
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="w-full flex-shrink-0"
+          onClick={(e) => e.stopPropagation()}
         >
-          <GripVertical className="h-4 w-4" />
-        </div>
-      </div>
-
-      {/* Content area */}
-      <div
-        className={cn(
-          'flex flex-col items-center relative',
-          effectiveConfig.padding,
-          isExpanded ? 'justify-start min-h-0' : 'justify-center',
-        )}
-      >
-        {card.icon && (
-          <div
-            className={cn(
-              'flex items-center justify-center',
-              isMobile && 'scale-75',
-              isExpanded ? 'max-w-[120px] w-full flex-shrink-0' : 'w-full',
-            )}
+          <a
+            href={card.websiteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
           >
-            {card.icon}
-          </div>
-        )}
-        {card.image && (
-          <div
-            className={cn(
-              'relative overflow-hidden rounded-lg flex-shrink-0',
-              isExpanded
-                ? cn(
-                    'aspect-square mx-auto',
-                    isMobile ? 'max-w-[120px] w-full' : 'max-w-[150px] w-full',
-                  )
-                : cn(
-                    'aspect-square mx-auto',
-                    effectiveConfig.imageMaxWidth,
-                    isMobile ? 'w-[100px]' : 'w-[150px]', // Changed from max-w to w for explicit width
-                  ),
-            )}
-          >
-            <div className="absolute inset-0 rounded-lg overflow-hidden">
-              <Image
-                src={card.image}
-                alt={card.title}
-                className="object-cover"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-            </div>
-          </div>
-        )}
-        {!card.icon && !card.image && (
-          <div className="text-muted-foreground text-sm py-8">No content</div>
-        )}
-
-        {/* Expanded content */}
-        <div
-          className={cn(
-            'w-full min-w-0',
-            'transition-all duration-300 ease-in-out',
-            // Animate max-height and opacity based on expanded state
-            isExpanded
-              ? 'opacity-100 mt-4 pt-4 border-t border-border flex-shrink'
-              : 'max-h-0 opacity-0 mt-0 pt-0 border-t-0 overflow-hidden',
-          )}
-        >
-          <div className="flex flex-col gap-4">
-            {card.description && (
-              <p className="text-sm text-muted-foreground leading-relaxed break-words">
-                {card.description}
-              </p>
-            )}
-            {card.websiteUrl && (
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="w-full flex-shrink-0"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <a
-                  href={card.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <span className="mr-2">Visit Website</span>
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
+            <span className="mr-2">Visit Website</span>
+            <ExternalLink className="h-3 w-3" />
+          </a>
+        </Button>
+      )}
     </div>
+  )
+
+  return (
+    <>
+      <div
+        ref={(node) => {
+          setNodeRef(node)
+          cardRef.current = node
+        }}
+        style={style}
+        className={cn(
+          'absolute select-none',
+          'bg-card border border-border rounded-lg shadow-lg',
+          'overflow-y-auto', // Prevent content from breaking out
+          // Only transition non-transform properties to avoid repaints during drag
+          // Removed left/top transitions to prevent bounce-back animation
+          isDragging ? '' : 'transition-[width,height,shadow] duration-300 ease-in-out',
+          !constrainedSize && 'w-auto',
+          // Apply size constraints via Tailwind only when NOT expanded (expanded uses inline styles)
+          // Expanded cards use dynamic constraints calculated from container size
+          !constrainedSize && !isExpanded && effectiveConfig.minWidth,
+          !constrainedSize && !isExpanded && effectiveConfig.maxWidth,
+          isDragging && 'shadow-2xl z-50',
+          isExpanded && 'z-40',
+          canExpand && 'cursor-pointer',
+          className,
+        )}
+        onClick={canExpand ? handleCardClick : undefined}
+      >
+        {/* Title bar with drag handle and window controls */}
+        <div className="flex gap-2 items-center justify-between px-2 py-2 border-b border-border bg-card rounded-t-lg">
+          <h3 className="font-mono text-sm font-medium text-foreground truncate flex-1 min-w-0">
+            {card.title}
+          </h3>
+          {/* Drag Handle */}
+          <div
+            data-drag-handle
+            {...listeners}
+            {...attributes}
+            className={cn(
+              'flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors touch-none',
+              isMobile
+                ? 'cursor-grab active:cursor-grabbing px-2.5 py-1.5'
+                : 'cursor-grab active:cursor-grabbing px-1.5 py-1',
+            )}
+            style={{ touchAction: 'none' }}
+            aria-label="Drag handle"
+          >
+            <GripVertical className="h-4 w-4" />
+          </div>
+        </div>
+
+        {/* Content area */}
+        <div
+          className={cn(
+            'flex flex-col items-center relative',
+            effectiveConfig.padding,
+            isExpanded ? 'justify-start min-h-0' : 'justify-center',
+          )}
+        >
+          {card.icon && (
+            <div
+              className={cn(
+                'flex items-center justify-center',
+                isMobile && 'scale-75',
+                isExpanded ? 'max-w-[120px] w-full flex-shrink-0' : 'w-full',
+              )}
+            >
+              {card.icon}
+            </div>
+          )}
+          {card.image && (
+            <div
+              className={cn(
+                'relative overflow-hidden rounded-lg flex-shrink-0',
+                isExpanded
+                  ? cn(
+                      'aspect-square mx-auto',
+                      isMobile ? 'max-w-[120px] w-full' : 'max-w-[150px] w-full',
+                    )
+                  : cn(
+                      'aspect-square mx-auto',
+                      effectiveConfig.imageMaxWidth,
+                      isMobile ? 'w-[100px]' : 'w-[150px]', // Changed from max-w to w for explicit width
+                    ),
+              )}
+            >
+              <div className="absolute inset-0 rounded-lg overflow-hidden">
+                <Image
+                  src={card.image}
+                  alt={card.title}
+                  className="object-cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
+            </div>
+          )}
+          {!card.icon && !card.image && (
+            <div className="text-muted-foreground text-sm py-8">No content</div>
+          )}
+
+          {/* Expanded content - only shown on desktop */}
+          {!isMobile && (
+            <div
+              className={cn(
+                'w-full min-w-0',
+                'transition-all duration-300 ease-in-out',
+                // Animate max-height and opacity based on expanded state
+                isExpanded
+                  ? 'opacity-100 mt-4 pt-4 border-t border-border flex-shrink'
+                  : 'max-h-0 opacity-0 mt-0 pt-0 border-t-0 overflow-hidden',
+              )}
+            >
+              {renderExpandedContent()}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Drawer */}
+      {isMobile && canExpand && (
+        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <DrawerContent className="max-h-[85vh] px-8">
+            <DrawerHeader>
+              <DrawerTitle className="font-mono text-xl font-medium text-foreground">
+                {card.title}
+              </DrawerTitle>
+              {card.category && (
+                <div className="mt-2 w-fit mx-auto px-2 py-1 text-xs font-medium rounded bg-background/80 backdrop-blur-sm border border-border/50">
+                  {formatCategoryLabel(card.category)}
+                </div>
+              )}
+            </DrawerHeader>
+            <div className="overflow-y-auto px-4 pb-4">
+              {/* Image/Icon in drawer */}
+              {card.icon && (
+                <div className="flex items-center justify-center py-4">{card.icon}</div>
+              )}
+              {card.image && (
+                <div className="relative overflow-hidden rounded-lg aspect-square max-w-[200px] w-full mx-auto mb-4">
+                  <Image
+                    src={card.image}
+                    alt={card.title}
+                    className="object-cover"
+                    fill
+                    sizes="(max-width: 768px) 200px"
+                  />
+                </div>
+              )}
+              {/* Expanded content */}
+              {renderExpandedContent()}
+            </div>
+          </DrawerContent>
+        </Drawer>
+      )}
+    </>
   )
 }
 

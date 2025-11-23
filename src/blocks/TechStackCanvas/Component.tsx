@@ -89,7 +89,7 @@ export const TechStackCanvasBlock: React.FC<TechStackCanvasBlockProps> = (props)
   const widthClass = containerWidth === 'container' ? 'container' : 'w-full'
 
   return (
-    <div className={widthClass}>
+    <div className={`${widthClass} py-16`}>
       {(title || description) && (
         <div className="mb-8">
           {title && <h2 className="text-3xl font-bold mb-4">{title}</h2>}

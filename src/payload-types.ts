@@ -941,7 +941,8 @@ export interface TechStackCanvasBlock {
       | 'mobile'
       | 'analytics'
       | 'e-commerce'
-      | 'email-comm';
+      | 'email-comm'
+      | 'low-code-no-code';
     /**
      * Select the size of the card (small, medium, or large).
      */
@@ -1459,6 +1460,7 @@ export interface DraggableCardsBlock {
           | 'analytics'
           | 'e-commerce'
           | 'email-comm'
+          | 'low-code-no-code'
         )
       | null;
     /**

@@ -25,6 +25,7 @@ export type TechCategory =
   | 'analytics'
   | 'e-commerce'
   | 'email-comm'
+  | 'low-code-no-code'
 export type CardSize = 'sm' | 'md' | 'lg'
 
 export type DraggableCardData = {
