@@ -329,7 +329,9 @@ export const ContentCard: React.FC<ContentCardProps> = (props) => {
             <div className="font-semibold text-foreground mb-1">{currentMeta.title}</div>
           )}
           {currentMeta.description && (
-            <div className="text-sm text-muted-foreground mb-1">{currentMeta.description}</div>
+            <div className="text-sm text-muted-foreground mb-1 line-clamp-2">
+              {currentMeta.description}
+            </div>
           )}
           {currentMeta.location && (
             <div className="text-xs text-muted-foreground mb-1">{currentMeta.location}</div>

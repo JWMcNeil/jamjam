@@ -33,7 +33,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   let width: number | undefined
   let height: number | undefined
   let alt = altFromProps
-  let src: StaticImageData | string = srcFromProps || ''
+  let src: StaticImageData | string | null = srcFromProps || null
 
   if (!src && resource && typeof resource === 'object') {
     const { alt: altFromResource, height: fullHeight, url, width: fullWidth } = resource
@@ -44,7 +44,14 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
 
     const cacheTag = resource.updatedAt
 
-    src = getMediaUrl(url, cacheTag)
+    const mediaUrl = getMediaUrl(url, cacheTag)
+    // Only set src if we have a valid non-empty URL
+    src = mediaUrl && mediaUrl.trim() !== '' ? mediaUrl : null
+  }
+
+  // Don't render if src is empty or null
+  if (!src || (typeof src === 'string' && src.trim() === '')) {
+    return null
   }
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)

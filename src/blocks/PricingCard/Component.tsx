@@ -55,7 +55,7 @@ const PricingCardContent: React.FC<CardData> = ({
     <div className="bg-card rounded-lg border border-border flex flex-col gap-6 min-w-[320px]">
       {/* Top bar with Prices label and cost indicator */}
       <div className="flex items-center justify-between px-6 py-1 border-b border-border">
-        <span className="text-muted-foreground text-sm font-medium font-mono">Prices</span>
+        <span className="text-muted-foreground text-sm font-medium font-mono">Pricing</span>
         {costIndicator && (
           <span className="text-primary text-lg font-semibold">{costIndicator}</span>
         )}

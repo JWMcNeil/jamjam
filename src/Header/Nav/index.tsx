@@ -51,8 +51,8 @@ const mobileNavItems = [
   {
     link: {
       type: 'reference' as const,
-      label: 'Posts',
-      url: '/posts',
+      label: 'Blog',
+      url: '/blog',
       reference: null,
       newTab: null,
       appearance: null,
@@ -189,7 +189,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
       {/* Desktop Navigation */}
       <nav
         aria-label="Main navigation"
-        className="hidden md:flex min-w-56 gap-2 justify-around items-center px-16 "
+        className="hidden md:flex min-w-56 gap-4 justify-around items-center px-16 "
       >
         {navItems.map(({ link }, i) => {
           return (

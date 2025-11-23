@@ -128,7 +128,7 @@ export const FormBlock: React.FC<
       {enableIntro && introContent && !hasSubmitted && (
         <RichText className="mb-8 lg:mb-12" data={introContent} enableGutter={false} />
       )}
-      <div className="p-6 lg:p-8 border border-border rounded-md bg-card/50 backdrop-blur-sm shadow-lg">
+      <div className="p-6 lg:p-8 border border-border rounded-lg bg-card/50 backdrop-blur-sm shadow-lg">
         <FormProvider {...formMethods}>
           {!isLoading && hasSubmitted && confirmationType === 'message' && (
             <RichText data={confirmationMessage} />
@@ -161,7 +161,7 @@ export const FormBlock: React.FC<
                   })}
               </div>
 
-              <Button form={formID} type="submit" variant="default" className="w-full sm:w-auto">
+              <Button form={formID} type="submit" variant="outline" className="w-full sm:w-auto">
                 {submitButtonLabel}
               </Button>
             </form>

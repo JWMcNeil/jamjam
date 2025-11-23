@@ -611,7 +611,7 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
               {card.icon}
             </div>
           )}
-          {card.image && (
+          {card.image && card.image.trim() !== '' && (
             <div
               className={cn(
                 'relative overflow-hidden rounded-lg flex-shrink-0',
@@ -679,7 +679,7 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
               {card.icon && (
                 <div className="flex items-center justify-center py-4">{card.icon}</div>
               )}
-              {card.image && (
+              {card.image && card.image.trim() !== '' && (
                 <div className="relative overflow-hidden rounded-lg aspect-square max-w-[200px] w-full mx-auto mb-4">
                   <Image
                     src={card.image}
