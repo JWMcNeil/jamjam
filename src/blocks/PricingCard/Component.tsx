@@ -109,7 +109,7 @@ const PricingCardContent: React.FC<CardData> = ({
 
 export const PricingCardBlock: React.FC<PricingCardBlockProps> = (props) => {
   const { cards } = props
-  const isDesktop = useMediaQuery('(min-width: 768px)')
+  const isDesktop = useMediaQuery('(min-width: 1280px)')
   const [selectedTab, setSelectedTab] = React.useState<string>('tab-0')
 
   // If no cards or empty array, render nothing
