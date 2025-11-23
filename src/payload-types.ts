@@ -928,7 +928,20 @@ export interface TechStackCanvasBlock {
     /**
      * Category for organizing and filtering cards.
      */
-    category: 'frontend' | 'backend' | 'database' | 'infrastructure' | 'tooling';
+    category:
+      | 'frontend'
+      | 'backend'
+      | 'database'
+      | 'infrastructure'
+      | 'tooling'
+      | 'design'
+      | 'ai-automation'
+      | 'devops'
+      | 'security'
+      | 'mobile'
+      | 'analytics'
+      | 'e-commerce'
+      | 'email-comm';
     /**
      * Select the size of the card (small, medium, or large).
      */
@@ -1431,7 +1444,23 @@ export interface DraggableCardsBlock {
     /**
      * Optional category for organizing cards. Used for filtering and grouping.
      */
-    category?: ('frontend' | 'backend' | 'database' | 'infrastructure' | 'tooling') | null;
+    category?:
+      | (
+          | 'frontend'
+          | 'backend'
+          | 'database'
+          | 'infrastructure'
+          | 'tooling'
+          | 'design'
+          | 'ai-automation'
+          | 'devops'
+          | 'security'
+          | 'mobile'
+          | 'analytics'
+          | 'e-commerce'
+          | 'email-comm'
+        )
+      | null;
     /**
      * Select the size of the card (small, medium, or large).
      */

@@ -28,7 +28,11 @@ export const DraggableCardsBlock: React.FC<DraggableCardsBlockProps> = (props) =
           {description && <p className="text-muted-foreground">{description}</p>}
         </div>
       )}
-      <DraggableZoneClientWrapper cards={draggableCards} width="w-full" className="bg-background" />
+      <DraggableZoneClientWrapper
+        cards={draggableCards}
+        width="w-full"
+        className="bg-background border border-border rounded-lg"
+      />
     </div>
   )
 }

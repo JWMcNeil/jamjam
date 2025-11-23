@@ -19,6 +19,13 @@ import { useBreakpoint, type Breakpoint } from '@/hooks/useBreakpoint'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { RotateCcw } from 'lucide-react'
 import { getCardDimensions } from '@/utilities/getCardDimensions'
 
@@ -38,6 +45,14 @@ const CATEGORIES: Array<{ value: TechCategory; label: string }> = [
   { value: 'database', label: 'Database' },
   { value: 'infrastructure', label: 'Infra/Hosting' },
   { value: 'tooling', label: 'Tooling' },
+  { value: 'design', label: 'Design' },
+  { value: 'ai-automation', label: 'AI/Automation' },
+  { value: 'devops', label: 'DevOps' },
+  { value: 'security', label: 'Security' },
+  { value: 'mobile', label: 'Mobile' },
+  { value: 'analytics', label: 'Analytics' },
+  { value: 'e-commerce', label: 'E-commerce' },
+  { value: 'email-comm', label: 'Email/Comm' },
 ]
 
 // Zone colors for each category
@@ -47,6 +62,14 @@ const ZONE_COLORS: Record<TechCategory, string> = {
   database: 'bg-green-500/10 border-green-500/20',
   infrastructure: 'bg-orange-500/10 border-orange-500/20',
   tooling: 'bg-pink-500/10 border-pink-500/20',
+  design: 'bg-cyan-500/10 border-cyan-500/20',
+  'ai-automation': 'bg-indigo-500/10 border-indigo-500/20',
+  devops: 'bg-teal-500/10 border-teal-500/20',
+  security: 'bg-red-500/10 border-red-500/20',
+  mobile: 'bg-amber-500/10 border-amber-500/20',
+  analytics: 'bg-violet-500/10 border-violet-500/20',
+  'e-commerce': 'bg-emerald-500/10 border-emerald-500/20',
+  'email-comm': 'bg-sky-500/10 border-sky-500/20',
 }
 
 // Tab colors for each category (matching zone colors)
@@ -100,6 +123,70 @@ const TAB_COLORS: Record<
     border: 'border-pink-500',
     outlineText: 'text-pink-500',
     outlineBg: 'bg-pink-500/10',
+  },
+  design: {
+    bg: 'bg-cyan-500',
+    text: 'text-white',
+    hover: 'hover:bg-cyan-600',
+    border: 'border-cyan-500',
+    outlineText: 'text-cyan-500',
+    outlineBg: 'bg-cyan-500/10',
+  },
+  'ai-automation': {
+    bg: 'bg-indigo-500',
+    text: 'text-white',
+    hover: 'hover:bg-indigo-600',
+    border: 'border-indigo-500',
+    outlineText: 'text-indigo-500',
+    outlineBg: 'bg-indigo-500/10',
+  },
+  devops: {
+    bg: 'bg-teal-500',
+    text: 'text-white',
+    hover: 'hover:bg-teal-600',
+    border: 'border-teal-500',
+    outlineText: 'text-teal-500',
+    outlineBg: 'bg-teal-500/10',
+  },
+  security: {
+    bg: 'bg-red-500',
+    text: 'text-white',
+    hover: 'hover:bg-red-600',
+    border: 'border-red-500',
+    outlineText: 'text-red-500',
+    outlineBg: 'bg-red-500/10',
+  },
+  mobile: {
+    bg: 'bg-amber-500',
+    text: 'text-white',
+    hover: 'hover:bg-amber-600',
+    border: 'border-amber-500',
+    outlineText: 'text-amber-500',
+    outlineBg: 'bg-amber-500/10',
+  },
+  analytics: {
+    bg: 'bg-violet-500',
+    text: 'text-white',
+    hover: 'hover:bg-violet-600',
+    border: 'border-violet-500',
+    outlineText: 'text-violet-500',
+    outlineBg: 'bg-violet-500/10',
+  },
+  'e-commerce': {
+    bg: 'bg-emerald-500',
+    text: 'text-white',
+    hover: 'hover:bg-emerald-600',
+    border: 'border-emerald-500',
+    outlineText: 'text-emerald-500',
+    outlineBg: 'bg-emerald-500/10',
+  },
+  'email-comm': {
+    bg: 'bg-sky-500',
+    text: 'text-white',
+    hover: 'hover:bg-sky-600',
+    border: 'border-sky-500',
+    outlineText: 'text-sky-500',
+    outlineBg: 'bg-sky-500/10',
   },
 }
 
@@ -216,6 +303,14 @@ const calculateRequiredHeight = (cards: DraggableCardData[], padding: number = 2
     database: 0,
     infrastructure: 0,
     tooling: 0,
+    design: 0,
+    'ai-automation': 0,
+    devops: 0,
+    security: 0,
+    mobile: 0,
+    analytics: 0,
+    'e-commerce': 0,
+    'email-comm': 0,
   }
 
   cards.forEach((card) => {
@@ -263,6 +358,14 @@ const calculateZoneHeights = (
     database: 0,
     infrastructure: 0,
     tooling: 0,
+    design: 0,
+    'ai-automation': 0,
+    devops: 0,
+    security: 0,
+    mobile: 0,
+    analytics: 0,
+    'e-commerce': 0,
+    'email-comm': 0,
   }
 
   cards.forEach((card) => {
@@ -278,8 +381,11 @@ const calculateZoneHeights = (
   const zones: Array<{ category: TechCategory; height: number; top: number }> = []
   let currentTop = 0
 
+  // Only create zones for categories that have cards
   CATEGORIES.forEach(({ value }) => {
     const count = categoryCounts[value]
+    if (count === 0) return // Skip categories with no cards
+
     const proportion = count / totalCards
     let height = containerHeight * proportion
 
@@ -327,6 +433,17 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
   // Calculate required height based on cards
   const requiredHeight = useMemo(() => {
     return calculateRequiredHeight(cards)
+  }, [cards])
+
+  // Get available categories (categories that have at least one card)
+  const availableCategories = useMemo(() => {
+    const categorySet = new Set<TechCategory>()
+    cards.forEach((card) => {
+      if (card.category) {
+        categorySet.add(card.category)
+      }
+    })
+    return CATEGORIES.filter(({ value }) => categorySet.has(value))
   }, [cards])
 
   useEffect(() => {
@@ -387,6 +504,14 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
         database: [],
         infrastructure: [],
         tooling: [],
+        design: [],
+        'ai-automation': [],
+        devops: [],
+        security: [],
+        mobile: [],
+        analytics: [],
+        'e-commerce': [],
+        'email-comm': [],
         uncategorized: [],
       }
 
@@ -555,36 +680,52 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
       {/* Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
         {/* Category Tabs */}
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={cn(
-              'px-4 py-2 rounded text-sm font-medium transition-colors duration-300 ease-in-out border',
-              selectedCategory === 'all'
-                ? 'border-primary text-primary bg-primary/10'
-                : 'border-border text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground bg-transparent',
-            )}
-          >
-            All
-          </button>
-          {CATEGORIES.map(({ value, label }) => {
-            const tabColors = TAB_COLORS[value]
-            return (
-              <button
-                key={value}
-                onClick={() => setSelectedCategory(value)}
-                className={cn(
-                  'px-4 py-2 rounded text-sm font-medium transition-colors duration-300 ease-in-out border',
-                  selectedCategory === value
-                    ? `${tabColors.border} ${tabColors.outlineText} ${tabColors.outlineBg}`
-                    : 'border-border text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground bg-transparent',
-                )}
-              >
-                {label}
-              </button>
-            )
-          })}
-        </div>
+        {currentBreakpoint === 'mobile' ? (
+          <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value as CategoryFilter)}>
+            <SelectTrigger className="w-full sm:w-[200px]">
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              {availableCategories.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={cn(
+                'px-4 py-2 rounded text-sm font-medium transition-colors duration-300 ease-in-out border',
+                selectedCategory === 'all'
+                  ? 'border-primary text-primary bg-primary/10'
+                  : 'border-border text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground bg-transparent',
+              )}
+            >
+              All
+            </button>
+            {availableCategories.map(({ value, label }) => {
+              const tabColors = TAB_COLORS[value]
+              return (
+                <button
+                  key={value}
+                  onClick={() => setSelectedCategory(value)}
+                  className={cn(
+                    'px-4 py-2 rounded text-sm font-medium transition-colors duration-300 ease-in-out border',
+                    selectedCategory === value
+                      ? `${tabColors.border} ${tabColors.outlineText} ${tabColors.outlineBg}`
+                      : 'border-border text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground bg-transparent',
+                  )}
+                >
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {/* Controls Right Side */}
         <div className="flex items-center gap-4">

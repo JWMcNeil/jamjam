@@ -74,6 +74,38 @@ export const DraggableCards: Block = {
               label: 'Tooling',
               value: 'tooling',
             },
+            {
+              label: 'Design',
+              value: 'design',
+            },
+            {
+              label: 'AI/Automation',
+              value: 'ai-automation',
+            },
+            {
+              label: 'DevOps',
+              value: 'devops',
+            },
+            {
+              label: 'Security',
+              value: 'security',
+            },
+            {
+              label: 'Mobile',
+              value: 'mobile',
+            },
+            {
+              label: 'Analytics',
+              value: 'analytics',
+            },
+            {
+              label: 'E-commerce',
+              value: 'e-commerce',
+            },
+            {
+              label: 'Email/Comm',
+              value: 'email-comm',
+            },
           ],
         },
         {

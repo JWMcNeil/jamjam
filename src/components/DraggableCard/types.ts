@@ -11,7 +11,20 @@ export type BreakpointPositions = {
   desktop?: BreakpointPosition
 }
 
-export type TechCategory = 'frontend' | 'backend' | 'database' | 'infrastructure' | 'tooling'
+export type TechCategory =
+  | 'frontend'
+  | 'backend'
+  | 'database'
+  | 'infrastructure'
+  | 'tooling'
+  | 'design'
+  | 'ai-automation'
+  | 'devops'
+  | 'security'
+  | 'mobile'
+  | 'analytics'
+  | 'e-commerce'
+  | 'email-comm'
 export type CardSize = 'sm' | 'md' | 'lg'
 
 export type DraggableCardData = {

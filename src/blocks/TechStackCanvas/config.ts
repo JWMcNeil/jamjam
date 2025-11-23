@@ -75,6 +75,38 @@ export const TechStackCanvas: Block = {
               label: 'Tooling',
               value: 'tooling',
             },
+            {
+              label: 'Design',
+              value: 'design',
+            },
+            {
+              label: 'AI/Automation',
+              value: 'ai-automation',
+            },
+            {
+              label: 'DevOps',
+              value: 'devops',
+            },
+            {
+              label: 'Security',
+              value: 'security',
+            },
+            {
+              label: 'Mobile',
+              value: 'mobile',
+            },
+            {
+              label: 'Analytics',
+              value: 'analytics',
+            },
+            {
+              label: 'E-commerce',
+              value: 'e-commerce',
+            },
+            {
+              label: 'Email/Comm',
+              value: 'email-comm',
+            },
           ],
         },
         {
@@ -113,7 +145,8 @@ export const TechStackCanvas: Block = {
           type: 'text',
           label: 'Website URL',
           admin: {
-            description: 'Optional URL to the app/website. A link button will appear when the card is expanded.',
+            description:
+              'Optional URL to the app/website. A link button will appear when the card is expanded.',
           },
         },
         {

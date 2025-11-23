@@ -5,7 +5,23 @@ import type { Media as MediaType } from '@/payload-types'
 type PayloadCard = {
   title: string
   image?: (number | null) | MediaType
-  category?: ('frontend' | 'backend' | 'database' | 'infrastructure' | 'tooling') | null
+  category?:
+    | (
+        | 'frontend'
+        | 'backend'
+        | 'database'
+        | 'infrastructure'
+        | 'tooling'
+        | 'design'
+        | 'ai-automation'
+        | 'devops'
+        | 'security'
+        | 'mobile'
+        | 'analytics'
+        | 'e-commerce'
+        | 'email-comm'
+      )
+    | null
   size?: ('sm' | 'md' | 'lg') | null
   description?: string | null
   websiteUrl?: string | null
