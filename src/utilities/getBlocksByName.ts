@@ -7,10 +7,10 @@ import type { StaticPage } from '@/payload-types'
  */
 export function getBlocksByName(blocks: StaticPage['blocks'] | null | undefined) {
   if (!blocks || !Array.isArray(blocks)) {
-    return new Map<string, StaticPage['blocks'][0]>()
+    return new Map<string, NonNullable<StaticPage['blocks']>[number]>()
   }
 
-  const blocksMap = new Map<string, StaticPage['blocks'][0]>()
+  const blocksMap = new Map<string, NonNullable<StaticPage['blocks']>[number]>()
 
   for (const block of blocks) {
     if (block.blockName) {
@@ -28,7 +28,7 @@ export function getBlocksByName(blocks: StaticPage['blocks'] | null | undefined)
  * @param blockType - Optional block type to filter by
  * @returns The block if found, undefined otherwise
  */
-export function getBlockByName<T = StaticPage['blocks'][0]>(
+export function getBlockByName<T = NonNullable<StaticPage['blocks']>[number]>(
   blocks: StaticPage['blocks'] | null | undefined,
   blockName: string,
   blockType?: string,
@@ -43,4 +43,3 @@ export function getBlockByName<T = StaticPage['blocks'][0]>(
 
   return block as T | undefined
 }
-

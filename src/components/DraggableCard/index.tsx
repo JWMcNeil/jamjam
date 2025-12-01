@@ -477,12 +477,14 @@ const DraggableCardComponent: React.FC<DraggableCardProps> = ({
 
     // Use constrained size if available
     const effectiveSize = constrainedSize
+    const translate = CSS.Translate.toString(transform)
 
     return {
       ...externalStyle,
       left: `${adjustedLeft}px`,
       top: `${adjustedTop}px`,
-      transform: CSS.Translate.toString(transform),
+      transform: translate,
+      willChange: isDragging ? 'transform' : undefined,
       ...(effectiveSize && {
         width: `${effectiveSize.width}px`,
         height: `${effectiveSize.height}px`,

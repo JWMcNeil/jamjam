@@ -177,10 +177,10 @@ export const hero: Field = {
           defaultValue: 1.5,
           admin: {
             description: 'Duration in seconds for dots to return to position',
+            step: 0.1,
           },
           min: 0,
           max: 10,
-          step: 0.1,
         },
       ],
     },
@@ -387,7 +387,8 @@ export const hero: Field = {
               type: 'text',
               label: 'Website URL',
               admin: {
-                description: 'Optional URL to the app/website. A link button will appear when the card is expanded.',
+                description:
+                  'Optional URL to the app/website. A link button will appear when the card is expanded.',
               },
             },
             {

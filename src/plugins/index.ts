@@ -4,7 +4,7 @@ import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
-import { Plugin } from 'payload'
+import { Field, Plugin } from 'payload'
 import { muxVideoPlugin } from '@oversightstudio/mux-video'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
@@ -138,11 +138,13 @@ export const plugins: Plugin[] = [
                 },
               ],
             },
-          ],
+          ] as Field[],
         }
 
         // Find the fields field and add chips to its blocks
-        const fieldsField = updatedFields.find((field) => field.name === 'fields')
+        const fieldsField = updatedFields.find(
+          (field) => 'name' in field && field.name === 'fields',
+        )
         if (fieldsField && 'blocks' in fieldsField && Array.isArray(fieldsField.blocks)) {
           fieldsField.blocks.push(chipsBlock)
         }

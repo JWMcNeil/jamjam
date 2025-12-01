@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react'
 import { gsap } from 'gsap'
-// @ts-ignore - SplitText may not have types
+// @ts-expect-error - SplitText may not have types
 import SplitText from '@benjaminlooi/splittext'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -349,13 +349,13 @@ const BUTTON_ACTIVE_STYLES = {
 
 const navigationItems = [
   {
-    label: 'web',
+    label: 'Web',
     secondaryLabel: 'Learn more about web',
     blurbIndex: 1,
     url: '/web',
   },
   {
-    label: 'content',
+    label: 'Content',
     secondaryLabel: 'Learn more about content',
     blurbIndex: 2,
     url: '/content',
@@ -820,7 +820,7 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
     <div className="flex flex-col items-center justify-center h-full px-4 sm:px-6 md:px-8 lg:px-12 py-5 w-full">
       <div
         ref={containerRef}
-        className=" font-black w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl relative h-[40vh] sm:h-[45vh] md:h-[50vh] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-foreground mb-4 sm:mb-6 md:mb-8 text-center"
+        className=" font-black w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl relative h-[50vh] sm:h-[50vh] md:h-[55vh] lg:h-[50vh] xl:h-[50vh] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-foreground mb-8 sm:mb-10 md:mb-12 lg:mb-16 text-center"
       >
         <div ref={blurb1Ref} className="absolute top-0 left-0 w-full">
           {blurbs[WELCOME_BLURB_INDEX]}

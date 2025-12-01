@@ -1,6 +1,6 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidateTag } from 'next/cache'
 
 import type { StaticPage } from '../../../payload-types'
 
@@ -27,4 +27,3 @@ export const revalidateDelete: CollectionAfterDeleteHook<StaticPage> = ({
 
   return doc
 }
-

@@ -50,8 +50,54 @@ export function BreadcrumbCollapsed() {
   const isDesktop = useMediaQuery('(min-width: 768px)')
   const itemsToDisplay = isDesktop ? ITEMS_TO_DISPLAY_DESKTOP : ITEMS_TO_DISPLAY_MOBILE
 
-  // Split pathname into segments, filtering out empty strings
-  const segments = pathname.split('/').filter(Boolean)
+  // Memoize segments array calculation
+  const segments = React.useMemo(
+    () => pathname.split('/').filter(Boolean),
+    [pathname]
+  )
+
+  // Memoize items array calculation
+  const items = React.useMemo(() => {
+    const itemsArray: Array<{ href?: string; label: string }> = [
+      { href: '/', label: 'Home' },
+    ]
+
+    segments.forEach((segment, index) => {
+      const isLast = index === segments.length - 1
+      const href = '/' + segments.slice(0, index + 1).join('/')
+
+      // Apply breadcrumb override if it exists for this segment index
+      let displayLabel = formatBreadcrumbLabel(segment)
+      let displayHref = href
+
+      if (override && override.segmentIndex === index && !isLast) {
+        displayLabel = override.label
+        displayHref = override.href
+      }
+
+      itemsArray.push({
+        href: isLast ? undefined : displayHref,
+        label: displayLabel,
+      })
+    })
+
+    return itemsArray
+  }, [segments, override])
+
+  // Memoize collapsed items for dropdown/drawer
+  const collapsedItems = React.useMemo(
+    () => items.slice(1, -(itemsToDisplay - 1)),
+    [items, itemsToDisplay]
+  )
+
+  // Memoize visible items slice
+  const visibleItems = React.useMemo(
+    () =>
+      items.length > itemsToDisplay
+        ? items.slice(-(itemsToDisplay - 1))
+        : items.slice(1),
+    [items, itemsToDisplay]
+  )
 
   // If we're on the home page, just show Home
   if (segments.length === 0) {
@@ -65,30 +111,6 @@ export function BreadcrumbCollapsed() {
       </Breadcrumb>
     )
   }
-
-  // Build items array with { href, label } structure
-  const items: Array<{ href?: string; label: string }> = [
-    { href: '/', label: 'Home' },
-  ]
-
-  segments.forEach((segment, index) => {
-    const isLast = index === segments.length - 1
-    const href = '/' + segments.slice(0, index + 1).join('/')
-
-    // Apply breadcrumb override if it exists for this segment index
-    let displayLabel = formatBreadcrumbLabel(segment)
-    let displayHref = href
-
-    if (override && override.segmentIndex === index && !isLast) {
-      displayLabel = override.label
-      displayHref = override.href
-    }
-
-    items.push({
-      href: isLast ? undefined : displayHref,
-      label: displayLabel,
-    })
-  })
 
   return (
     <Breadcrumb>
@@ -111,7 +133,7 @@ export function BreadcrumbCollapsed() {
                     <BreadcrumbEllipsis className="size-4" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start">
-                    {items.slice(1, -(itemsToDisplay - 1)).map((item, index) => (
+                    {collapsedItems.map((item, index) => (
                       <DropdownMenuItem key={index} asChild>
                         <Link href={item.href ? item.href : '#'}>
                           {item.label}
@@ -136,7 +158,7 @@ export function BreadcrumbCollapsed() {
                       </DrawerDescription>
                     </DrawerHeader>
                     <div className="grid gap-1 px-4">
-                      {items.slice(1, -(itemsToDisplay - 1)).map((item, index) => (
+                      {collapsedItems.map((item, index) => (
                         <Link
                           key={index}
                           href={item.href ? item.href : '#'}
@@ -159,10 +181,7 @@ export function BreadcrumbCollapsed() {
             <BreadcrumbSeparator />
           </>
         ) : null}
-        {(items.length > itemsToDisplay
-          ? items.slice(-(itemsToDisplay - 1))
-          : items.slice(1)
-        ).map((item, index, array) => (
+        {visibleItems.map((item, index, array) => (
           <React.Fragment key={index}>
             <BreadcrumbItem>
               {item.href ? (

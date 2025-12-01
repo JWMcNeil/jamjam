@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 
-import type { Page, Project } from '@/payload-types'
+import type { Page, Web, Content } from '@/payload-types'
 
 import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
@@ -37,7 +37,7 @@ const blockComponents = {
 }
 
 export const RenderBlocks: React.FC<{
-  blocks: Page['layout'][0][] | Project['layout'][0][]
+  blocks: Page['layout'][0][] | Web['layout'][0][] | Content['layout'][0][]
 }> = (props) => {
   const { blocks } = props
 

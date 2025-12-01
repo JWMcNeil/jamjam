@@ -8,7 +8,7 @@ import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
 
-import type { Web } from '@/payload-types'
+import type { Content, Web } from '@/payload-types'
 
 import { ProjectHero } from '@/heros/ProjectHero'
 import { generateMeta } from '@/utilities/generateMeta'
@@ -68,7 +68,11 @@ export default async function WebProject({ params: paramsPromise }: Args) {
           {project.relatedProjects && project.relatedProjects.length > 0 && (
             <RelatedProjects
               className="mt-12 max-w-[52rem] lg:grid lg:grid-cols-subgrid col-start-1 col-span-3 grid-rows-[2fr]"
-              docs={project.relatedProjects.filter((project) => typeof project === 'object')}
+              docs={project.relatedProjects
+                .map((rel) => rel.value)
+                .filter(
+                  (value): value is Content | Web => typeof value === 'object' && value !== null,
+                )}
             />
           )}
         </div>
@@ -106,4 +110,3 @@ const queryWebBySlug = cache(async ({ slug }: { slug: string }) => {
 
   return result.docs?.[0] || null
 })
-

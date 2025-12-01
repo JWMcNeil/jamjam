@@ -11,7 +11,7 @@ import {
 } from '@dnd-kit/core'
 import { restrictToParentElement } from '@dnd-kit/modifiers'
 import { cn } from '@/utilities/ui'
-import React, { useRef, useState, useEffect, useMemo } from 'react'
+import React, { useRef, useState, useEffect, useMemo, useCallback, useTransition } from 'react'
 
 import { DraggableCard } from '@/components/DraggableCard'
 import type { DraggableCardData, TechCategory } from '@/components/DraggableCard/types'
@@ -428,6 +428,8 @@ const calculateZoneHeights = (
   return zones
 }
 
+const PERFORMANCE_MODE_THRESHOLD = 32
+
 export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
   cards,
   className,
@@ -436,11 +438,16 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
   style,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
+  const layoutFrameRef = useRef<number | null>(null)
+  const lastLayoutKeyRef = useRef<string>('')
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all')
   const [showZones, setShowZones] = useState(false)
+  const [performanceMode, setPerformanceMode] = useState(false)
   const [resetTrigger, setResetTrigger] = useState(0)
+  const [isPositioning, startPositionsTransition] = useTransition()
   const currentBreakpoint = useBreakpoint()
+  const shouldShowPerformanceToggle = cards.length >= PERFORMANCE_MODE_THRESHOLD
 
   // Calculate required height based on cards
   const requiredHeight = useMemo(() => {
@@ -457,6 +464,12 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
     })
     return CATEGORIES.filter(({ value }) => categorySet.has(value))
   }, [cards])
+
+  // Drop visual-only layers when performance mode is enabled
+  useEffect(() => {
+    if (!performanceMode) return
+    setShowZones(false)
+  }, [performanceMode])
 
   useEffect(() => {
     const updateSize = () => {
@@ -477,17 +490,99 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
 
   const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({})
 
-  // Reset positions function
-  const handleReset = () => {
+  const handleCategoryChange = useCallback((category: CategoryFilter) => {
+    setSelectedCategory(category)
+  }, [])
+
+  const handleSelectChange = useCallback(
+    (value: string) => {
+      handleCategoryChange(value as CategoryFilter)
+    },
+    [handleCategoryChange],
+  )
+
+  const categoryClickHandlers = useMemo(() => {
+    const handlerMap = new Map<CategoryFilter, () => void>()
+    handlerMap.set('all', () => handleCategoryChange('all'))
+    availableCategories.forEach(({ value }) => {
+      handlerMap.set(value, () => handleCategoryChange(value))
+    })
+    return handlerMap
+  }, [availableCategories, handleCategoryChange])
+
+  const handlePerformanceToggle = useCallback((checked: boolean) => {
+    setPerformanceMode(checked)
+  }, [])
+
+  const cardOpacityMap = useMemo(() => {
+    const map: Record<string, number> = {}
+    cards.forEach((card) => {
+      if (selectedCategory === 'all') {
+        map[card.id] = 1
+        return
+      }
+      map[card.id] = card.category === selectedCategory ? 1 : 0.25
+    })
+    return map
+  }, [cards, selectedCategory])
+
+  const visibleCards = useMemo(() => {
+    if (selectedCategory === 'all') {
+      return cards
+    }
+    return cards.filter((card) => card.category === selectedCategory)
+  }, [cards, selectedCategory])
+
+  const cardStyleMap = useMemo(() => {
+    return visibleCards.reduce<Record<string, React.CSSProperties>>((acc, card) => {
+      const position = positions[card.id] || { x: 0, y: 0 }
+      acc[card.id] = {
+        left: `${Math.round(position.x)}px`,
+        top: `${Math.round(position.y)}px`,
+        opacity: cardOpacityMap[card.id] ?? 1,
+      }
+      return acc
+    }, {})
+  }, [visibleCards, positions, cardOpacityMap])
+
+  const highlightedCategory = useMemo<TechCategory | null>(() => {
+    if (selectedCategory === 'all') return null
+    return selectedCategory
+  }, [selectedCategory])
+
+  const zoneHighlightMap = useMemo(() => {
+    if (!highlightedCategory) {
+      return {}
+    }
+    return { [highlightedCategory]: true } as Partial<Record<TechCategory, boolean>>
+  }, [highlightedCategory])
+
+  const isZoneHighlighted = useCallback(
+    (category: TechCategory): boolean => Boolean(zoneHighlightMap[category]),
+    [zoneHighlightMap],
+  )
+
+  const shouldRenderZones = showZones && !performanceMode
+  const shouldRenderGrid = !performanceMode
+
+  const handleReset = useCallback(() => {
     setPositions({})
     setResetTrigger((prev) => prev + 1)
-  }
+  }, [])
 
   // Calculate zone heights
   const zones = useMemo(() => {
     if (containerSize.height === 0) return []
     return calculateZoneHeights(cards, containerSize.height)
   }, [cards, containerSize.height])
+
+  const zoneSignature = useMemo(
+    () =>
+      zones
+        .map((zone) => `${zone.category}:${Math.round(zone.top)}:${Math.round(zone.height)}`)
+        .join('|'),
+    [zones],
+  )
 
   // Memoize card positions key to detect actual changes (not just array reference)
   const cardPositionsKey = useMemo(
@@ -496,112 +591,150 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
     [cards],
   )
 
-  // Update positions when container size or breakpoint changes
+  // Update positions when container size, breakpoint, or card definitions change
   useEffect(() => {
-    if (containerSize.width === 0 || containerSize.height === 0 || zones.length === 0) return
+    if (containerSize.width === 0 || containerSize.height === 0 || cards.length === 0) {
+      return
+    }
 
-    setPositions((prev) => {
-      // If reset was triggered, start fresh
-      if (resetTrigger > 0 && Object.keys(prev).length > 0) {
-        prev = {}
-      }
-      const updated: Record<string, { x: number; y: number }> = {}
-      // Group existing positions by category for zone-specific collision detection
-      const existingPositionsByCategory: Record<
-        TechCategory | 'uncategorized',
-        Array<{ x: number; y: number; width: number; height: number }>
-      > = {
-        frontend: [],
-        backend: [],
-        database: [],
-        infrastructure: [],
-        tooling: [],
-        design: [],
-        'ai-automation': [],
-        devops: [],
-        security: [],
-        mobile: [],
-        analytics: [],
-        'e-commerce': [],
-        'email-comm': [],
-        'low-code-no-code': [],
-        uncategorized: [],
-      }
+    const layoutKey = [
+      `${containerSize.width}x${containerSize.height}`,
+      cardPositionsKey,
+      currentBreakpoint,
+      zoneSignature,
+      resetTrigger,
+    ].join('|')
 
-      cards.forEach((card) => {
-        const cardDimensions = getCardDimensions(card.size)
-        const breakpointPosition = getPositionForBreakpoint(card, currentBreakpoint)
-        const cardCategory = card.category || 'uncategorized'
+    if (layoutKey === lastLayoutKeyRef.current) {
+      return
+    }
+    lastLayoutKeyRef.current = layoutKey
 
-        if (
-          breakpointPosition.normalizedX !== undefined ||
-          breakpointPosition.normalizedY !== undefined
-        ) {
-          const x =
-            breakpointPosition.normalizedX !== undefined
-              ? normalizedToPixels(
-                  breakpointPosition.normalizedX,
-                  containerSize.width,
-                  cardDimensions.width,
-                )
-              : (prev[card.id]?.x ?? 0)
-          const y =
-            breakpointPosition.normalizedY !== undefined
-              ? normalizedToPixels(
-                  breakpointPosition.normalizedY,
-                  containerSize.height,
-                  cardDimensions.height,
-                )
-              : (prev[card.id]?.y ?? 0)
-
-          updated[card.id] = { x, y }
-          if (cardCategory !== 'uncategorized') {
-            existingPositionsByCategory[cardCategory].push({
-              x,
-              y,
-              width: cardDimensions.width,
-              height: cardDimensions.height,
-            })
+    const runLayoutPass = () => {
+      startPositionsTransition(() => {
+        setPositions((prev) => {
+          if (resetTrigger > 0 && Object.keys(prev).length > 0) {
+            prev = {}
           }
-        } else {
-          // Find the zone for this card's category
-          const zone = card.category ? zones.find((z) => z.category === card.category) : undefined
 
-          const existingPositions =
-            cardCategory !== 'uncategorized'
-              ? existingPositionsByCategory[cardCategory]
-              : Object.values(existingPositionsByCategory).flat()
-
-          const autoPosition = generateNonOverlappingPosition(
-            containerSize.width,
-            containerSize.height,
-            cardDimensions.width,
-            cardDimensions.height,
-            existingPositions,
-            zone,
-          )
-          updated[card.id] = autoPosition
-          if (cardCategory !== 'uncategorized') {
-            existingPositionsByCategory[cardCategory].push({
-              x: autoPosition.x,
-              y: autoPosition.y,
-              width: cardDimensions.width,
-              height: cardDimensions.height,
-            })
+          const updated: Record<string, { x: number; y: number }> = {}
+          const existingPositionsByCategory: Record<
+            TechCategory | 'uncategorized',
+            Array<{ x: number; y: number; width: number; height: number }>
+          > = {
+            frontend: [],
+            backend: [],
+            database: [],
+            infrastructure: [],
+            tooling: [],
+            design: [],
+            'ai-automation': [],
+            devops: [],
+            security: [],
+            mobile: [],
+            analytics: [],
+            'e-commerce': [],
+            'email-comm': [],
+            'low-code-no-code': [],
+            uncategorized: [],
           }
-        }
+
+          cards.forEach((card) => {
+            const cardDimensions = getCardDimensions(card.size)
+            const breakpointPosition = getPositionForBreakpoint(card, currentBreakpoint)
+            const cardCategory = card.category || 'uncategorized'
+
+            if (
+              breakpointPosition.normalizedX !== undefined ||
+              breakpointPosition.normalizedY !== undefined
+            ) {
+              const x =
+                breakpointPosition.normalizedX !== undefined
+                  ? normalizedToPixels(
+                      breakpointPosition.normalizedX,
+                      containerSize.width,
+                      cardDimensions.width,
+                    )
+                  : (prev[card.id]?.x ?? 0)
+              const y =
+                breakpointPosition.normalizedY !== undefined
+                  ? normalizedToPixels(
+                      breakpointPosition.normalizedY,
+                      containerSize.height,
+                      cardDimensions.height,
+                    )
+                  : (prev[card.id]?.y ?? 0)
+
+              updated[card.id] = { x, y }
+              if (cardCategory !== 'uncategorized') {
+                existingPositionsByCategory[cardCategory].push({
+                  x,
+                  y,
+                  width: cardDimensions.width,
+                  height: cardDimensions.height,
+                })
+              }
+            } else {
+              const zone = card.category
+                ? zones.find((z) => z.category === card.category)
+                : undefined
+              const existingPositions =
+                cardCategory !== 'uncategorized'
+                  ? existingPositionsByCategory[cardCategory]
+                  : Object.values(existingPositionsByCategory).flat()
+
+              const autoPosition = generateNonOverlappingPosition(
+                containerSize.width,
+                containerSize.height,
+                cardDimensions.width,
+                cardDimensions.height,
+                existingPositions,
+                zone,
+              )
+              updated[card.id] = autoPosition
+              if (cardCategory !== 'uncategorized') {
+                existingPositionsByCategory[cardCategory].push({
+                  x: autoPosition.x,
+                  y: autoPosition.y,
+                  width: cardDimensions.width,
+                  height: cardDimensions.height,
+                })
+              }
+            }
+          })
+
+          return updated
+        })
       })
+    }
 
-      return updated
-    })
+    if (typeof window !== 'undefined') {
+      if (layoutFrameRef.current !== null) {
+        cancelAnimationFrame(layoutFrameRef.current)
+      }
+      layoutFrameRef.current = window.requestAnimationFrame(() => {
+        layoutFrameRef.current = null
+        runLayoutPass()
+      })
+    } else {
+      runLayoutPass()
+    }
+
+    return () => {
+      if (layoutFrameRef.current !== null) {
+        cancelAnimationFrame(layoutFrameRef.current)
+        layoutFrameRef.current = null
+      }
+    }
   }, [
     containerSize.width,
     containerSize.height,
     cardPositionsKey,
     currentBreakpoint,
-    zones,
+    zoneSignature,
     resetTrigger,
     cards,
+    startPositionsTransition,
   ])
 
   const sensors = useSensors(
@@ -618,75 +751,69 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
     }),
   )
 
-  const handleDragStart = (_event: DragStartEvent) => {
+  const handleDragStart = useCallback((_event: DragStartEvent) => {
     // Optional: Add any visual feedback on drag start
-  }
+  }, [])
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, delta } = event
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, delta } = event
 
-    setPositions((prev) => {
-      const current = prev[active.id as string] || { x: 0, y: 0 }
-      const newX = current.x + delta.x
-      const newY = current.y + delta.y
+      setPositions((prev) => {
+        const current = prev[active.id as string] || { x: 0, y: 0 }
+        const newX = current.x + delta.x
+        const newY = current.y + delta.y
 
-      // Find the card to get its dimensions
-      const card = cards.find((c) => c.id === active.id)
-      const cardDimensions = getCardDimensions(card?.size)
+        const card = cards.find((c) => c.id === active.id)
+        const cardDimensions = getCardDimensions(card?.size)
 
-      const maxX = Math.max(0, containerSize.width - cardDimensions.width)
-      const maxY = Math.max(0, containerSize.height - cardDimensions.height)
+        const maxX = Math.max(0, containerSize.width - cardDimensions.width)
+        const maxY = Math.max(0, containerSize.height - cardDimensions.height)
 
-      const constrainedX = Math.max(0, Math.min(newX, maxX))
-      const constrainedY = Math.max(0, Math.min(newY, maxY))
+        const constrainedX = Math.max(0, Math.min(newX, maxX))
+        const constrainedY = Math.max(0, Math.min(newY, maxY))
 
-      const normalizedX = pixelsToNormalized(
-        constrainedX,
-        containerSize.width,
-        cardDimensions.width,
-      )
-      const normalizedY = pixelsToNormalized(
-        constrainedY,
-        containerSize.height,
-        cardDimensions.height,
-      )
+        if (current.x === constrainedX && current.y === constrainedY) {
+          return prev
+        }
 
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(
-          new CustomEvent('draggableCardMoved', {
-            detail: {
-              cardId: active.id as string,
-              normalizedX,
-              normalizedY,
-              pixelX: constrainedX,
-              pixelY: constrainedY,
-              breakpoint: currentBreakpoint,
-            },
-          }),
+        const normalizedX = pixelsToNormalized(
+          constrainedX,
+          containerSize.width,
+          cardDimensions.width,
         )
-      }
+        const normalizedY = pixelsToNormalized(
+          constrainedY,
+          containerSize.height,
+          cardDimensions.height,
+        )
 
-      return {
-        ...prev,
-        [active.id as string]: {
-          x: constrainedX,
-          y: constrainedY,
-        },
-      }
-    })
-  }
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('draggableCardMoved', {
+              detail: {
+                cardId: active.id as string,
+                normalizedX,
+                normalizedY,
+                pixelX: constrainedX,
+                pixelY: constrainedY,
+                breakpoint: currentBreakpoint,
+              },
+            }),
+          )
+        }
 
-  // Get opacity for a card based on selected category
-  const getCardOpacity = (card: DraggableCardData): number => {
-    if (selectedCategory === 'all') return 1
-    return card.category === selectedCategory ? 1 : 0.25
-  }
-
-  // Check if a zone should be highlighted
-  const isZoneHighlighted = (category: TechCategory): boolean => {
-    if (selectedCategory === 'all') return false
-    return selectedCategory === category
-  }
+        return {
+          ...prev,
+          [active.id as string]: {
+            x: constrainedX,
+            y: constrainedY,
+          },
+        }
+      })
+    },
+    [cards, containerSize.height, containerSize.width, currentBreakpoint],
+  )
 
   return (
     <div className={cn('w-full', className)}>
@@ -694,7 +821,7 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
         {/* Category Tabs */}
         {currentBreakpoint === 'mobile' ? (
-          <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value as CategoryFilter)}>
+          <Select value={selectedCategory} onValueChange={handleSelectChange}>
             <SelectTrigger className="w-full sm:w-[200px]">
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
@@ -710,7 +837,7 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
         ) : (
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => setSelectedCategory('all')}
+              onClick={categoryClickHandlers.get('all')}
               className={cn(
                 'px-4 py-2 rounded text-sm font-medium transition-colors duration-300 ease-in-out border',
                 selectedCategory === 'all'
@@ -725,7 +852,7 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
               return (
                 <button
                   key={value}
-                  onClick={() => setSelectedCategory(value)}
+                  onClick={categoryClickHandlers.get(value)}
                   className={cn(
                     'px-4 py-2 rounded text-sm font-medium transition-colors duration-300 ease-in-out border',
                     selectedCategory === value
@@ -741,10 +868,28 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
         )}
 
         {/* Controls Right Side */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          {shouldShowPerformanceToggle && (
+            <div className="flex items-center gap-2">
+              <Switch
+                id="performance-mode"
+                checked={performanceMode}
+                onCheckedChange={handlePerformanceToggle}
+              />
+              <Label htmlFor="performance-mode" className="text-sm cursor-pointer">
+                Performance Mode
+              </Label>
+            </div>
+          )}
+
           {/* Show Zones Switch */}
           <div className="flex items-center gap-2">
-            <Switch id="show-zones" checked={showZones} onCheckedChange={setShowZones} />
+            <Switch
+              id="show-zones"
+              checked={showZones}
+              onCheckedChange={setShowZones}
+              disabled={performanceMode}
+            />
             <Label htmlFor="show-zones" className="text-sm cursor-pointer">
               Show Zones
             </Label>
@@ -768,6 +913,7 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
         <div
           ref={containerRef}
           className={cn('relative overflow-hidden', width)}
+          aria-busy={isPositioning}
           style={{
             ...style,
             minHeight: `${requiredHeight}px`,
@@ -775,16 +921,18 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
           }}
         >
           {/* Dotted Grid Background */}
-          <div
-            className="absolute inset-0 opacity-30 border border-border rounded-md"
-            style={{
-              backgroundImage: `radial-gradient(circle, hsl(var(--foreground)) 1px, transparent 1px)`,
-              backgroundSize: '20px 20px',
-            }}
-          />
+          {shouldRenderGrid && (
+            <div
+              className="absolute inset-0 opacity-30 border border-border rounded-md"
+              style={{
+                backgroundImage: `radial-gradient(circle, hsl(var(--foreground)) 1px, transparent 1px)`,
+                backgroundSize: '20px 20px',
+              }}
+            />
+          )}
 
           {/* Category Zones */}
-          {showZones &&
+          {shouldRenderZones &&
             zones.map((zone) => {
               const isHighlighted = isZoneHighlighted(zone.category)
               const categoryInfo = CATEGORIES.find((cat) => cat.value === zone.category)
@@ -822,9 +970,12 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
             })}
 
           {/* Draggable Cards */}
-          {cards.map((card) => {
-            const position = positions[card.id] || { x: 0, y: 0 }
-            const opacity = getCardOpacity(card)
+          {visibleCards.map((card) => {
+            const positionStyle = cardStyleMap[card.id] || {
+              left: '0px',
+              top: '0px',
+              opacity: 1,
+            }
 
             return (
               <DraggableCard
@@ -833,11 +984,7 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
                 resetTrigger={resetTrigger}
                 containerSize={containerSize}
                 className="transition-opacity duration-300 ease-in-out m-4"
-                style={{
-                  left: `${position.x}px`,
-                  top: `${position.y}px`,
-                  opacity,
-                }}
+                style={positionStyle}
               />
             )
           })}
