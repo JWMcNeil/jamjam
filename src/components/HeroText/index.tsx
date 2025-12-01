@@ -9,6 +9,11 @@ import Link from 'next/link'
 import { useIsMobile } from '@/components/DraggableCard/useIsMobile'
 import { cn } from '@/utilities/ui'
 
+// SplitText type definition (library doesn't have types)
+interface SplitTextInstance {
+  words: HTMLElement[] | ArrayLike<HTMLElement>
+}
+
 // Helper function to find first matching word in collection
 function findFirstMatch(word: string, collection: HTMLElement[]): number {
   const l = collection.length
@@ -25,7 +30,7 @@ function findFirstMatch(word: string, collection: HTMLElement[]): number {
 }
 
 // Compare two SplitText instances and find matching words
-function compareSplits(s1: any, s2: any) {
+function compareSplits(s1: SplitTextInstance, s2: SplitTextInstance) {
   const matches1: HTMLElement[] = []
   const matches2: HTMLElement[] = []
   // Convert to arrays if they're jQuery objects
@@ -172,10 +177,6 @@ function transition(
   const defaultColor = foregroundColor ? `hsl(${foregroundColor})` : '#ffffff' // fallback to white
   const accentColor = primaryColor ? `hsl(${primaryColor})` : '#7ab87a' // fallback color
 
-  // Determine color for moving words
-  // Matching words: green when transitioning between blurbs, white when going to welcome
-  const movingWordColor = useDefaultColor ? defaultColor : accentColor
-
   // Set initial states
   // Make element2 visible but keep its words hidden initially
   gsap.set(element2, { opacity: 1, visibility: 'visible' })
@@ -319,8 +320,8 @@ function transition(
 }
 
 type HeroTextProps = {
-  heroBlock?: any
-  cardsBlock?: any
+  heroBlock?: unknown
+  cardsBlock?: unknown
 }
 
 // Define your blurbs - index 0 is the welcome blurb (default)
@@ -362,7 +363,7 @@ const navigationItems = [
   },
 ]
 
-export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
+export const HeroText = ({ heroBlock: _heroBlock, cardsBlock: _cardsBlock }: HeroTextProps = {}) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const blurb1Ref = useRef<HTMLDivElement>(null)
   const blurb2Ref = useRef<HTMLDivElement>(null)
@@ -786,7 +787,6 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
           `[data-stroke-path="${blurbIndex}"]`,
         ) as SVGPathElement
         if (svgPath) {
-          const pathLength = svgPath.getTotalLength()
           svgPath.style.strokeDashoffset = `0` // Reset to full
         }
       }
@@ -801,6 +801,9 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
     blurb2Ref.current.textContent = blurbs[1]
     currentBlurbIndexRef.current = WELCOME_BLURB_INDEX
 
+    // Capture refs at effect time for cleanup
+    const strokeAnimationRefsForCleanup = strokeAnimationRefs
+
     return () => {
       // Cleanup on unmount
       if (currentTimelineRef.current) {
@@ -810,7 +813,8 @@ export const HeroText = ({ heroBlock, cardsBlock }: HeroTextProps = {}) => {
         clearTimeout(returnToWelcomeTimeoutRef.current)
       }
       // Cleanup stroke animations
-      Object.keys(strokeAnimationRefs.current).forEach((key) => {
+      const currentRefs = strokeAnimationRefsForCleanup.current
+      Object.keys(currentRefs).forEach((key) => {
         stopStrokeAnimation(Number(key))
       })
     }

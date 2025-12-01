@@ -735,6 +735,7 @@ export const TechStackCanvas: React.FC<TechStackCanvasProps> = ({
     resetTrigger,
     cards,
     startPositionsTransition,
+    zones,
   ])
 
   const sensors = useSensors(
