@@ -5,7 +5,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --experimental-build-mode compile && cross-env NODE_OPTIONS=--no-deprecation next build --experimental-build-mode generate",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --experimental-build-mode compile",
+    "build:full": "cross-env NODE_OPTIONS=--no-deprecation next build --experimental-build-mode compile && cross-env NODE_OPTIONS=--no-deprecation next build --experimental-build-mode generate",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev -p 3000",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
