@@ -24,10 +24,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_ENV production
 ENV NODE_OPTIONS=--no-deprecation
 
-# Run migrations before build (critical for Payload CMS)
-RUN pnpm run migrate || true
-
-# Build with the experimental build mode
+# Build with the experimental build mode (skip migrations during build)
 RUN pnpm run build
 
 # Production image
