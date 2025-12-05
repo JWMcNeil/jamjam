@@ -70,7 +70,7 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString:
-        process.env.DATABASE_URI || 'postgresql://payload:payload@localhost:5432/jamjam',
+        process.env.DATABASE_URL || 'postgresql://payload:payload@localhost:5432/jamjam',
     },
   }),
   collections: [Pages, Posts, Media, Categories, Users, Web, Content, StaticPages],
