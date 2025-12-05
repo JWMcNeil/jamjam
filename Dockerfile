@@ -51,11 +51,13 @@ RUN chown -R nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Payload config files (critical for Payload CMS)
-COPY --chown=nextjs:nodejs payload.config.ts* ./
-COPY --chown=nextjs:nodejs tsconfig.json* ./
-COPY --chown=nextjs:nodejs package.json ./
-COPY --chown=nextjs:nodejs next.config.mjs* ./
+# Copy src directory (contains payload.config.ts and migrations)
+COPY --from=builder --chown=nextjs:nodejs /app/src ./src
+
+# Copy root config files
+COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json* ./
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./
+COPY --from=builder --chown=nextjs:nodejs /app/next.config.mjs* ./
 
 # Copy only production dependencies
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
