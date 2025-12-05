@@ -64,4 +64,5 @@ USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+# Run migrations on startup, then start the server
+CMD ["sh", "-c", "npx payload migrate && node server.js"]

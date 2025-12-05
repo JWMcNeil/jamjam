@@ -6,6 +6,6 @@ export default defineConfig({
   schema: './src/payload-generated-schema.ts',
   out: './src/migrations',
   dbCredentials: {
-    url: process.env.DATABASE_URI || 'postgresql://payload:payload@localhost:5432/jamjam',
+    url: process.env.DATABASE_URL || 'postgresql://payload:payload@localhost:5432/jamjam',
   },
 })
