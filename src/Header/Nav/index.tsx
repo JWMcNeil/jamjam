@@ -193,7 +193,11 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
       >
         {navItems.map(({ link }, i) => {
           return (
-            <CMSLink key={i} {...link} className="text-muted-foreground hover:text-foreground" />
+            <CMSLink
+              key={i}
+              {...link}
+              className="bg-background/80 text-muted-foreground hover:text-foreground"
+            />
           )
         })}
         <Link href="/search">

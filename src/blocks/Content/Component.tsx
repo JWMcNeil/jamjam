@@ -12,6 +12,7 @@ import type {
   DraggableCardsBlock,
   FormBlock,
   PricingCardBlock,
+  BentoCTABlock,
 } from '@/payload-types'
 
 import { CMSLink } from '../../components/Link'
@@ -23,6 +24,7 @@ import { VideoPlayer } from '@/blocks/VideoPlayer/Component'
 import { FormBlock as FormBlockComponent } from '@/blocks/Form/Component'
 import { DraggableCardsBlock as DraggableCardsBlockComponent } from '@/blocks/DraggableCards/Component'
 import { PricingCardBlock as PricingCardBlockComponent } from '@/blocks/PricingCard/Component'
+import { BentoCTABlock as BentoCTABlockComponent } from '@/blocks/BentoCTA/Component'
 
 export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
   const { columns } = props
@@ -207,6 +209,14 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                           return (
                             <div key={(block as PricingCardBlock).id || blockIndex} className="">
                               <PricingCardBlockComponent {...(block as PricingCardBlock)} />
+                            </div>
+                          )
+                        }
+
+                        if (blockType === 'bentoCTA') {
+                          return (
+                            <div key={(block as BentoCTABlock).id || blockIndex} className="">
+                              <BentoCTABlockComponent {...(block as BentoCTABlock)} />
                             </div>
                           )
                         }

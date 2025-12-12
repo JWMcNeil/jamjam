@@ -37,7 +37,8 @@ export const PricingCard: Block = {
           name: 'costIndicator',
           type: 'text',
           admin: {
-            description: 'Optional cost indicator (e.g., "$", "€", "A$")',
+            description:
+              'Optional cost indicator (e.g., "$", "€", "A$") Separate with a space if more than one',
           },
           label: 'Cost Indicator',
         },
@@ -67,6 +68,14 @@ export const PricingCard: Block = {
             description: 'Price text (e.g., "A$450", "$450", "450€")',
           },
           required: true,
+        },
+        {
+          name: 'priceDescription',
+          type: 'text',
+          label: 'Price Description',
+          admin: {
+            description: 'Additional pricing information (e.g., "per month", "per year")',
+          },
         },
         {
           name: 'includes',

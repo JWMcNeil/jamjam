@@ -80,6 +80,7 @@ export interface Config {
     forms: Form;
     'form-submissions': FormSubmission;
     search: Search;
+    'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -100,6 +101,7 @@ export interface Config {
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     search: SearchSelect<false> | SearchSelect<true>;
+    'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -108,6 +110,7 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
+  fallbackLocale: null;
   globals: {
     header: Header;
     footer: Footer;
@@ -370,6 +373,7 @@ export interface Page {
     | FormBlock
     | VideoCardBlock
     | CarouselBlock
+    | BentoCTABlock
   )[];
   meta?: {
     title?: string | null;
@@ -832,6 +836,7 @@ export interface ContentBlock {
               | FormBlock
               | DraggableCardsBlock
               | PricingCardBlock
+              | BentoCTABlock
             )[]
           | null;
         id?: string | null;
@@ -1782,7 +1787,7 @@ export interface PricingCardBlock {
          */
         tabLabel: string;
         /**
-         * Optional cost indicator (e.g., "$", "€", "A$")
+         * Optional cost indicator (e.g., "$", "€", "A$") Separate with a space if more than one
          */
         costIndicator?: string | null;
         icon:
@@ -2116,6 +2121,10 @@ export interface PricingCardBlock {
          * Price text (e.g., "A$450", "$450", "450€")
          */
         startingPrice: string;
+        /**
+         * Additional pricing information (e.g., "per month", "per year")
+         */
+        priceDescription?: string | null;
         includes?: {
           root: {
             type: string;
@@ -2172,6 +2181,403 @@ export interface PricingCardBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'pricingCard';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BentoCTABlock".
+ */
+export interface BentoCTABlock {
+  /**
+   * The main image displayed in the left BentoBox
+   */
+  mainImage: number | Media;
+  /**
+   * Quotes to display in the carousel
+   */
+  quotes: {
+    quote: string;
+    /**
+     * Optional icon to display next to the quote
+     */
+    icon?:
+      | (
+          | 'AcademicCapIcon'
+          | 'AdjustmentsHorizontalIcon'
+          | 'AdjustmentsVerticalIcon'
+          | 'ArchiveBoxArrowDownIcon'
+          | 'ArchiveBoxXMarkIcon'
+          | 'ArchiveBoxIcon'
+          | 'ArrowDownCircleIcon'
+          | 'ArrowDownLeftIcon'
+          | 'ArrowDownOnSquareStackIcon'
+          | 'ArrowDownOnSquareIcon'
+          | 'ArrowDownRightIcon'
+          | 'ArrowDownTrayIcon'
+          | 'ArrowDownIcon'
+          | 'ArrowLeftCircleIcon'
+          | 'ArrowLeftEndOnRectangleIcon'
+          | 'ArrowLeftOnRectangleIcon'
+          | 'ArrowLeftStartOnRectangleIcon'
+          | 'ArrowLeftIcon'
+          | 'ArrowLongDownIcon'
+          | 'ArrowLongLeftIcon'
+          | 'ArrowLongRightIcon'
+          | 'ArrowLongUpIcon'
+          | 'ArrowPathRoundedSquareIcon'
+          | 'ArrowPathIcon'
+          | 'ArrowRightCircleIcon'
+          | 'ArrowRightEndOnRectangleIcon'
+          | 'ArrowRightOnRectangleIcon'
+          | 'ArrowRightStartOnRectangleIcon'
+          | 'ArrowRightIcon'
+          | 'ArrowSmallDownIcon'
+          | 'ArrowSmallLeftIcon'
+          | 'ArrowSmallRightIcon'
+          | 'ArrowSmallUpIcon'
+          | 'ArrowTopRightOnSquareIcon'
+          | 'ArrowTrendingDownIcon'
+          | 'ArrowTrendingUpIcon'
+          | 'ArrowTurnDownLeftIcon'
+          | 'ArrowTurnDownRightIcon'
+          | 'ArrowTurnLeftDownIcon'
+          | 'ArrowTurnLeftUpIcon'
+          | 'ArrowTurnRightDownIcon'
+          | 'ArrowTurnRightUpIcon'
+          | 'ArrowTurnUpLeftIcon'
+          | 'ArrowTurnUpRightIcon'
+          | 'ArrowUpCircleIcon'
+          | 'ArrowUpLeftIcon'
+          | 'ArrowUpOnSquareStackIcon'
+          | 'ArrowUpOnSquareIcon'
+          | 'ArrowUpRightIcon'
+          | 'ArrowUpTrayIcon'
+          | 'ArrowUpIcon'
+          | 'ArrowUturnDownIcon'
+          | 'ArrowUturnLeftIcon'
+          | 'ArrowUturnRightIcon'
+          | 'ArrowUturnUpIcon'
+          | 'ArrowsPointingInIcon'
+          | 'ArrowsPointingOutIcon'
+          | 'ArrowsRightLeftIcon'
+          | 'ArrowsUpDownIcon'
+          | 'AtSymbolIcon'
+          | 'BackspaceIcon'
+          | 'BackwardIcon'
+          | 'BanknotesIcon'
+          | 'Bars2Icon'
+          | 'Bars3BottomLeftIcon'
+          | 'Bars3BottomRightIcon'
+          | 'Bars3CenterLeftIcon'
+          | 'Bars3Icon'
+          | 'Bars4Icon'
+          | 'BarsArrowDownIcon'
+          | 'BarsArrowUpIcon'
+          | 'Battery0Icon'
+          | 'Battery100Icon'
+          | 'Battery50Icon'
+          | 'BeakerIcon'
+          | 'BellAlertIcon'
+          | 'BellSlashIcon'
+          | 'BellSnoozeIcon'
+          | 'BellIcon'
+          | 'BoldIcon'
+          | 'BoltSlashIcon'
+          | 'BoltIcon'
+          | 'BookOpenIcon'
+          | 'BookmarkSlashIcon'
+          | 'BookmarkSquareIcon'
+          | 'BookmarkIcon'
+          | 'BriefcaseIcon'
+          | 'BugAntIcon'
+          | 'BuildingLibraryIcon'
+          | 'BuildingOffice2Icon'
+          | 'BuildingOfficeIcon'
+          | 'BuildingStorefrontIcon'
+          | 'CakeIcon'
+          | 'CalculatorIcon'
+          | 'CalendarDateRangeIcon'
+          | 'CalendarDaysIcon'
+          | 'CalendarIcon'
+          | 'CameraIcon'
+          | 'ChartBarSquareIcon'
+          | 'ChartBarIcon'
+          | 'ChartPieIcon'
+          | 'ChatBubbleBottomCenterTextIcon'
+          | 'ChatBubbleBottomCenterIcon'
+          | 'ChatBubbleLeftEllipsisIcon'
+          | 'ChatBubbleLeftRightIcon'
+          | 'ChatBubbleLeftIcon'
+          | 'ChatBubbleOvalLeftEllipsisIcon'
+          | 'ChatBubbleOvalLeftIcon'
+          | 'CheckBadgeIcon'
+          | 'CheckCircleIcon'
+          | 'CheckIcon'
+          | 'ChevronDoubleDownIcon'
+          | 'ChevronDoubleLeftIcon'
+          | 'ChevronDoubleRightIcon'
+          | 'ChevronDoubleUpIcon'
+          | 'ChevronDownIcon'
+          | 'ChevronLeftIcon'
+          | 'ChevronRightIcon'
+          | 'ChevronUpDownIcon'
+          | 'ChevronUpIcon'
+          | 'CircleStackIcon'
+          | 'ClipboardDocumentCheckIcon'
+          | 'ClipboardDocumentListIcon'
+          | 'ClipboardDocumentIcon'
+          | 'ClipboardIcon'
+          | 'ClockIcon'
+          | 'CloudArrowDownIcon'
+          | 'CloudArrowUpIcon'
+          | 'CloudIcon'
+          | 'CodeBracketSquareIcon'
+          | 'CodeBracketIcon'
+          | 'Cog6ToothIcon'
+          | 'Cog8ToothIcon'
+          | 'CogIcon'
+          | 'CommandLineIcon'
+          | 'ComputerDesktopIcon'
+          | 'CpuChipIcon'
+          | 'CreditCardIcon'
+          | 'CubeTransparentIcon'
+          | 'CubeIcon'
+          | 'CurrencyBangladeshiIcon'
+          | 'CurrencyDollarIcon'
+          | 'CurrencyEuroIcon'
+          | 'CurrencyPoundIcon'
+          | 'CurrencyRupeeIcon'
+          | 'CurrencyYenIcon'
+          | 'CursorArrowRaysIcon'
+          | 'CursorArrowRippleIcon'
+          | 'DevicePhoneMobileIcon'
+          | 'DeviceTabletIcon'
+          | 'DivideIcon'
+          | 'DocumentArrowDownIcon'
+          | 'DocumentArrowUpIcon'
+          | 'DocumentChartBarIcon'
+          | 'DocumentCheckIcon'
+          | 'DocumentCurrencyBangladeshiIcon'
+          | 'DocumentCurrencyDollarIcon'
+          | 'DocumentCurrencyEuroIcon'
+          | 'DocumentCurrencyPoundIcon'
+          | 'DocumentCurrencyRupeeIcon'
+          | 'DocumentCurrencyYenIcon'
+          | 'DocumentDuplicateIcon'
+          | 'DocumentMagnifyingGlassIcon'
+          | 'DocumentMinusIcon'
+          | 'DocumentPlusIcon'
+          | 'DocumentTextIcon'
+          | 'DocumentIcon'
+          | 'EllipsisHorizontalCircleIcon'
+          | 'EllipsisHorizontalIcon'
+          | 'EllipsisVerticalIcon'
+          | 'EnvelopeOpenIcon'
+          | 'EnvelopeIcon'
+          | 'EqualsIcon'
+          | 'ExclamationCircleIcon'
+          | 'ExclamationTriangleIcon'
+          | 'EyeDropperIcon'
+          | 'EyeSlashIcon'
+          | 'EyeIcon'
+          | 'FaceFrownIcon'
+          | 'FaceSmileIcon'
+          | 'FilmIcon'
+          | 'FingerPrintIcon'
+          | 'FireIcon'
+          | 'FlagIcon'
+          | 'FolderArrowDownIcon'
+          | 'FolderMinusIcon'
+          | 'FolderOpenIcon'
+          | 'FolderPlusIcon'
+          | 'FolderIcon'
+          | 'ForwardIcon'
+          | 'FunnelIcon'
+          | 'GifIcon'
+          | 'GiftTopIcon'
+          | 'GiftIcon'
+          | 'GlobeAltIcon'
+          | 'GlobeAmericasIcon'
+          | 'GlobeAsiaAustraliaIcon'
+          | 'GlobeEuropeAfricaIcon'
+          | 'H1Icon'
+          | 'H2Icon'
+          | 'H3Icon'
+          | 'HandRaisedIcon'
+          | 'HandThumbDownIcon'
+          | 'HandThumbUpIcon'
+          | 'HashtagIcon'
+          | 'HeartIcon'
+          | 'HomeModernIcon'
+          | 'HomeIcon'
+          | 'IdentificationIcon'
+          | 'InboxArrowDownIcon'
+          | 'InboxStackIcon'
+          | 'InboxIcon'
+          | 'InformationCircleIcon'
+          | 'ItalicIcon'
+          | 'KeyIcon'
+          | 'LanguageIcon'
+          | 'LifebuoyIcon'
+          | 'LightBulbIcon'
+          | 'LinkSlashIcon'
+          | 'LinkIcon'
+          | 'ListBulletIcon'
+          | 'LockClosedIcon'
+          | 'LockOpenIcon'
+          | 'MagnifyingGlassCircleIcon'
+          | 'MagnifyingGlassMinusIcon'
+          | 'MagnifyingGlassPlusIcon'
+          | 'MagnifyingGlassIcon'
+          | 'MapPinIcon'
+          | 'MapIcon'
+          | 'MegaphoneIcon'
+          | 'MicrophoneIcon'
+          | 'MinusCircleIcon'
+          | 'MinusSmallIcon'
+          | 'MinusIcon'
+          | 'MoonIcon'
+          | 'MusicalNoteIcon'
+          | 'NewspaperIcon'
+          | 'NoSymbolIcon'
+          | 'NumberedListIcon'
+          | 'PaintBrushIcon'
+          | 'PaperAirplaneIcon'
+          | 'PaperClipIcon'
+          | 'PauseCircleIcon'
+          | 'PauseIcon'
+          | 'PencilSquareIcon'
+          | 'PencilIcon'
+          | 'PercentBadgeIcon'
+          | 'PhoneArrowDownLeftIcon'
+          | 'PhoneArrowUpRightIcon'
+          | 'PhoneXMarkIcon'
+          | 'PhoneIcon'
+          | 'PhotoIcon'
+          | 'PlayCircleIcon'
+          | 'PlayPauseIcon'
+          | 'PlayIcon'
+          | 'PlusCircleIcon'
+          | 'PlusSmallIcon'
+          | 'PlusIcon'
+          | 'PowerIcon'
+          | 'PresentationChartBarIcon'
+          | 'PresentationChartLineIcon'
+          | 'PrinterIcon'
+          | 'PuzzlePieceIcon'
+          | 'QrCodeIcon'
+          | 'QuestionMarkCircleIcon'
+          | 'QueueListIcon'
+          | 'RadioIcon'
+          | 'ReceiptPercentIcon'
+          | 'ReceiptRefundIcon'
+          | 'RectangleGroupIcon'
+          | 'RectangleStackIcon'
+          | 'RocketLaunchIcon'
+          | 'RssIcon'
+          | 'ScaleIcon'
+          | 'ScissorsIcon'
+          | 'ServerStackIcon'
+          | 'ServerIcon'
+          | 'ShareIcon'
+          | 'ShieldCheckIcon'
+          | 'ShieldExclamationIcon'
+          | 'ShoppingBagIcon'
+          | 'ShoppingCartIcon'
+          | 'SignalSlashIcon'
+          | 'SignalIcon'
+          | 'SlashIcon'
+          | 'SparklesIcon'
+          | 'SpeakerWaveIcon'
+          | 'SpeakerXMarkIcon'
+          | 'Square2StackIcon'
+          | 'Square3Stack3DIcon'
+          | 'Squares2X2Icon'
+          | 'SquaresPlusIcon'
+          | 'StarIcon'
+          | 'StopCircleIcon'
+          | 'StopIcon'
+          | 'StrikethroughIcon'
+          | 'SunIcon'
+          | 'SwatchIcon'
+          | 'TableCellsIcon'
+          | 'TagIcon'
+          | 'TicketIcon'
+          | 'TrashIcon'
+          | 'TrophyIcon'
+          | 'TruckIcon'
+          | 'TvIcon'
+          | 'UnderlineIcon'
+          | 'UserCircleIcon'
+          | 'UserGroupIcon'
+          | 'UserMinusIcon'
+          | 'UserPlusIcon'
+          | 'UserIcon'
+          | 'UsersIcon'
+          | 'VariableIcon'
+          | 'VideoCameraSlashIcon'
+          | 'VideoCameraIcon'
+          | 'ViewColumnsIcon'
+          | 'ViewfinderCircleIcon'
+          | 'WalletIcon'
+          | 'WifiIcon'
+          | 'WindowIcon'
+          | 'WrenchScrewdriverIcon'
+          | 'WrenchIcon'
+          | 'XCircleIcon'
+          | 'XMarkIcon'
+        )
+      | null;
+    id?: string | null;
+  }[];
+  /**
+   * Automatically advance through quotes
+   */
+  autoplay?: boolean | null;
+  /**
+   * Time in milliseconds between quote changes
+   */
+  autoplayInterval?: number | null;
+  /**
+   * Show dot indicators for quote position
+   */
+  showIndicators?: boolean | null;
+  /**
+   * Call-to-action button displayed below the quotes
+   */
+  ctaLink?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null)
+      | ({
+          relationTo: 'web';
+          value: number | Web;
+        } | null)
+      | ({
+          relationTo: 'content';
+          value: number | Content;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+    /**
+     * Choose how the link should be rendered.
+     */
+    appearance?: ('default' | 'outline' | 'white') | null;
+    /**
+     * Choose the size of the link button.
+     */
+    size?: 'default' | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'bentoCTA';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2280,6 +2686,7 @@ export interface StaticPage {
         | VideoPlayerBlock
         | VideoCardBlock
         | CarouselBlock
+        | BentoCTABlock
         | FormBlock
         | DraggableCardsBlock
         | TechStackCanvasBlock
@@ -2409,6 +2816,23 @@ export interface Search {
     | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-kv".
+ */
+export interface PayloadKv {
+  id: number;
+  key: string;
+  data:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2560,10 +2984,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'search';
         value: number | Search;
-      } | null)
-    | ({
-        relationTo: 'payload-jobs';
-        value: number | PayloadJob;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -2733,6 +3153,7 @@ export interface PagesSelect<T extends boolean = true> {
         formBlock?: T | FormBlockSelect<T>;
         videoCard?: T | VideoCardBlockSelect<T>;
         carousel?: T | CarouselBlockSelect<T>;
+        bentoCTA?: T | BentoCTABlockSelect<T>;
       };
   meta?:
     | T
@@ -2806,6 +3227,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
               formBlock?: T | FormBlockSelect<T>;
               draggableCards?: T | DraggableCardsBlockSelect<T>;
               pricingCard?: T | PricingCardBlockSelect<T>;
+              bentoCTA?: T | BentoCTABlockSelect<T>;
             };
         id?: T;
       };
@@ -3025,6 +3447,7 @@ export interface PricingCardBlockSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         startingPrice?: T;
+        priceDescription?: T;
         includes?: T;
         linkButtonText?: T;
         link?:
@@ -3039,6 +3462,36 @@ export interface PricingCardBlockSelect<T extends boolean = true> {
               size?: T;
             };
         id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BentoCTABlock_select".
+ */
+export interface BentoCTABlockSelect<T extends boolean = true> {
+  mainImage?: T;
+  quotes?:
+    | T
+    | {
+        quote?: T;
+        icon?: T;
+        id?: T;
+      };
+  autoplay?: T;
+  autoplayInterval?: T;
+  showIndicators?: T;
+  ctaLink?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+        appearance?: T;
+        size?: T;
       };
   id?: T;
   blockName?: T;
@@ -3375,6 +3828,7 @@ export interface StaticPagesSelect<T extends boolean = true> {
         videoPlayer?: T | VideoPlayerBlockSelect<T>;
         videoCard?: T | VideoCardBlockSelect<T>;
         carousel?: T | CarouselBlockSelect<T>;
+        bentoCTA?: T | BentoCTABlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
         draggableCards?: T | DraggableCardsBlockSelect<T>;
         techStackCanvas?: T | TechStackCanvasBlockSelect<T>;
@@ -3634,6 +4088,14 @@ export interface SearchSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-kv_select".
+ */
+export interface PayloadKvSelect<T extends boolean = true> {
+  key?: T;
+  data?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

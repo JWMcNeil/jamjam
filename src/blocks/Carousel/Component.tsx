@@ -74,19 +74,12 @@ export const Carousel: React.FC<Props> = (props) => {
             return (
               <div
                 key={index}
-                className={cn(
-                  'absolute inset-0 transition-opacity duration-500',
-                  {
-                    'opacity-100': index === currentSlide,
-                    'opacity-0': index !== currentSlide,
-                  },
-                )}
+                className={cn('absolute inset-0 transition-opacity duration-500', {
+                  'opacity-100': index === currentSlide,
+                  'opacity-0': index !== currentSlide,
+                })}
               >
-                <Media
-                  imgClassName="w-full h-full object-cover"
-                  resource={slide.media}
-                  fill
-                />
+                <Media imgClassName="w-full h-full object-cover" resource={slide.media} fill />
                 {slide.caption && (
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                     <div className="text-white">
@@ -124,13 +117,10 @@ export const Carousel: React.FC<Props> = (props) => {
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={cn(
-                  'w-2 h-2 rounded-full transition-all',
-                  {
-                    'bg-primary w-8': index === currentSlide,
-                    'bg-muted': index !== currentSlide,
-                  },
-                )}
+                className={cn('w-2 h-2 rounded-full transition-all', {
+                  'bg-primary w-8': index === currentSlide,
+                  'bg-muted': index !== currentSlide,
+                })}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
@@ -140,4 +130,3 @@ export const Carousel: React.FC<Props> = (props) => {
     </div>
   )
 }
-

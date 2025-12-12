@@ -3,6 +3,7 @@ import React, { Fragment } from 'react'
 import type { Page, Web, Content } from '@/payload-types'
 
 import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
+import { BentoCTABlock } from '@/blocks/BentoCTA/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { ContentCardBlock } from '@/blocks/ContentCard/Component'
@@ -20,6 +21,7 @@ import { PricingCardBlock } from '@/blocks/PricingCard/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
+  bentoCTA: BentoCTABlock,
   content: ContentBlock,
   contentCard: ContentCardBlock,
   cta: CallToActionBlock,

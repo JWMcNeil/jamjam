@@ -26,6 +26,7 @@ const PricingCardContent: React.FC<CardData> = ({
   title,
   description,
   startingPrice,
+  priceDescription,
   includes,
   link,
   linkButtonText = 'Ask for Quote',
@@ -83,6 +84,9 @@ const PricingCardContent: React.FC<CardData> = ({
           <span className="text-foreground text-sm">Prices start from -</span>
           {startingPrice && (
             <span className="text-primary text-2xl font-semibold">{startingPrice}</span>
+          )}
+          {priceDescription && (
+            <span className="text-sm italic text-muted-foreground">{priceDescription}</span>
           )}
         </div>
 

@@ -326,17 +326,17 @@ type HeroTextProps = {
 
 // Define your blurbs - index 0 is the welcome blurb (default)
 const blurbs = [
-  'Step into jamjam.dev — where web experiences that work beautifully, content that resonates authentically, and thoughtful design that brings it all together.',
-  'Intuitive web experiences that work seamlessly and beautifully — where every interaction feels natural and users want to explore.',
-  'Strategic content that resonates with your audience authentically — meaningful connections, stories with purpose.',
+  'Welcome to jamjam.dev — crafting web experiences that work elegantly, creating content that is authentic and human, and all powered by a lot of coffee ☕',
+  'Clean, functional web experiences that work seamlessly and elegantly — from websites to Ai.',
+  'Content that is authentic and human — photography & video, made for those who value real work.',
 ]
 
 // Define which words to highlight (green) in each blurb
 // Words should match exactly as they appear in the blurb (case-sensitive, including punctuation)
 const highlightedWords: Record<number, string[]> = {
   0: [], // Welcome blurb - no highlights (all white)
-  1: ['web', 'experiences', 'that', 'work', 'beautifully'],
-  2: ['content', 'that', 'resonates', 'authentically'],
+  1: ['web', 'experiences', 'that', 'work', 'elegantly'],
+  2: ['content', 'that', 'is', 'authentic', 'and', 'real'],
 }
 
 const WELCOME_BLURB_INDEX = 0
@@ -363,7 +363,10 @@ const navigationItems = [
   },
 ]
 
-export const HeroText = ({ heroBlock: _heroBlock, cardsBlock: _cardsBlock }: HeroTextProps = {}) => {
+export const HeroText = ({
+  heroBlock: _heroBlock,
+  cardsBlock: _cardsBlock,
+}: HeroTextProps = {}) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const blurb1Ref = useRef<HTMLDivElement>(null)
   const blurb2Ref = useRef<HTMLDivElement>(null)
@@ -824,7 +827,7 @@ export const HeroText = ({ heroBlock: _heroBlock, cardsBlock: _cardsBlock }: Her
     <div className="flex flex-col items-center justify-center h-full px-4 sm:px-6 md:px-8 lg:px-12 py-5 w-full">
       <div
         ref={containerRef}
-        className=" font-black w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl relative h-[50vh] sm:h-[50vh] md:h-[55vh] lg:h-[50vh] xl:h-[50vh] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-foreground mb-8 sm:mb-10 md:mb-12 lg:mb-16 text-center"
+        className=" font-black w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl relative h-[50vh] sm:h-[50vh] md:h-[55vh] lg:h-[50vh] xl:h-[50vh] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-foreground mb-8 sm:mb-10 md:mb-12 lg:mb-16 text-center leading-[1.3] sm:leading-[1.35] md:leading-[1.4] lg:leading-[1.25] xl:leading-[1.25]"
       >
         <div ref={blurb1Ref} className="absolute top-0 left-0 w-full">
           {blurbs[WELCOME_BLURB_INDEX]}

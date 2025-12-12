@@ -1,6 +1,7 @@
 // Centralized block exports for easier import management
 export { Archive } from './ArchiveBlock/config'
 export { Banner } from './Banner/config'
+export { BentoCTA } from './BentoCTA/config'
 export { CallToAction } from './CallToAction/config'
 export { Carousel } from './Carousel/config'
 export { Code } from './Code/config'
@@ -16,4 +17,3 @@ export { TechStackCanvas } from './TechStackCanvas/config'
 export { VideoCard } from './VideoCard/config'
 export { VideoPlayer } from './VideoPlayer/config'
 export { PricingCard } from './PricingCard/config'
-

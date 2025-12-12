@@ -21,6 +21,7 @@ import { Banner } from '@/blocks/Banner/config'
 import { MediaBlock } from '@/blocks/MediaBlock/config'
 import { Code } from '@/blocks/Code/config'
 import { BlocksFeature } from '@payloadcms/richtext-lexical'
+import { BentoCTA } from '@/blocks/BentoCTA/config'
 
 const columnFields: Field[] = [
   {
@@ -89,6 +90,7 @@ const columnFields: Field[] = [
       FormBlock,
       DraggableCards,
       PricingCard,
+      BentoCTA,
     ],
     admin: {
       initCollapsed: true,

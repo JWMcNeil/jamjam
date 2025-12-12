@@ -14,6 +14,7 @@ import {
   TechStackCanvas,
   VideoCard,
   Carousel,
+  BentoCTA,
 } from '../../blocks'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
@@ -90,6 +91,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 FormBlock,
                 VideoCard,
                 Carousel,
+                BentoCTA,
               ],
               required: true,
               admin: {

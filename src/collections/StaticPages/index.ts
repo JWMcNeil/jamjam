@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublic } from '../../access/authenticatedOrPublic'
 import {
+  BentoCTA,
   Carousel,
   Content,
   DraggableCards,
@@ -62,6 +63,7 @@ export const StaticPages: CollectionConfig<'static-pages'> = {
                 VideoPlayer,
                 VideoCard,
                 Carousel,
+                BentoCTA,
                 FormBlock,
                 DraggableCards,
                 TechStackCanvas,
