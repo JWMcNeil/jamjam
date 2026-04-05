@@ -36,4 +36,4 @@ jobs:
 
       - name: Trigger Dokploy webhook
         run: |
-          curl -X GET "http://100.67.109.62:3000/api/deploy/U_PsEAsjRRGvQiS5KHat8"
+          curl -X GET "http://5.78.131.100:3000/api/deploy/U_PsEAsjRRGvQiS5KHat8"
