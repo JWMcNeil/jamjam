@@ -1,0 +1,321 @@
+import type { Field } from 'payload'
+
+import {
+  FixedToolbarFeature,
+  HeadingFeature,
+  InlineToolbarFeature,
+  lexicalEditor,
+} from '@payloadcms/richtext-lexical'
+
+import { linkGroup } from '@/fields/linkGroup'
+import { link } from '@/fields/link'
+
+export const hero: Field = {
+  name: 'hero',
+  type: 'group',
+  fields: [
+    {
+      name: 'type',
+      type: 'select',
+      defaultValue: 'lowImpact',
+      label: 'Type',
+      options: [
+        {
+          label: 'None',
+          value: 'none',
+        },
+        {
+          label: 'High Impact',
+          value: 'highImpact',
+        },
+        {
+          label: 'Medium Impact',
+          value: 'mediumImpact',
+        },
+        {
+          label: 'Low Impact',
+          value: 'lowImpact',
+        },
+        {
+          label: 'Custom',
+          value: 'custom',
+        },
+        {
+          label: 'Animated',
+          value: 'animated',
+        },
+      ],
+      required: true,
+    },
+    {
+      name: 'richText',
+      type: 'richText',
+      editor: lexicalEditor({
+        features: ({ rootFeatures }) => {
+          return [
+            ...rootFeatures,
+            HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+            FixedToolbarFeature(),
+            InlineToolbarFeature(),
+          ]
+        },
+      }),
+      label: false,
+    },
+    linkGroup({
+      appearances: ['default', 'outline', 'secondary', 'miniOutline', 'link', 'white'],
+      overrides: {
+        maxRows: 2,
+      },
+    }),
+    {
+      name: 'media',
+      type: 'upload',
+      admin: {
+        condition: (_, { type } = {}) => ['highImpact', 'mediumImpact'].includes(type),
+      },
+      relationTo: 'media',
+      required: true,
+    },
+    {
+      name: 'dotGrid',
+      type: 'group',
+      label: 'Dot Grid Settings',
+      admin: {
+        condition: (_, { type } = {}) => type === 'animated',
+        description: 'Configure the animated dot grid background.',
+      },
+      fields: [
+        {
+          name: 'dotSize',
+          type: 'number',
+          label: 'Dot Size',
+          defaultValue: 10,
+          admin: {
+            description: 'Size of each dot in pixels',
+          },
+          min: 1,
+          max: 50,
+        },
+        {
+          name: 'gap',
+          type: 'number',
+          label: 'Gap',
+          defaultValue: 15,
+          admin: {
+            description: 'Gap between dots in pixels',
+          },
+          min: 0,
+          max: 100,
+        },
+        {
+          name: 'baseColor',
+          type: 'text',
+          label: 'Base Color',
+          defaultValue: '#5227FF',
+          admin: {
+            description: 'Base color of the dots (hex format)',
+          },
+        },
+        {
+          name: 'activeColor',
+          type: 'text',
+          label: 'Active Color',
+          defaultValue: '#5227FF',
+          admin: {
+            description: 'Active color when mouse is near (hex format)',
+          },
+        },
+        {
+          name: 'proximity',
+          type: 'number',
+          label: 'Proximity',
+          defaultValue: 120,
+          admin: {
+            description: 'Distance in pixels for color change effect',
+          },
+          min: 0,
+          max: 500,
+        },
+        {
+          name: 'shockRadius',
+          type: 'number',
+          label: 'Shock Radius',
+          defaultValue: 250,
+          admin: {
+            description: 'Radius of the click shockwave effect',
+          },
+          min: 0,
+          max: 1000,
+        },
+        {
+          name: 'shockStrength',
+          type: 'number',
+          label: 'Shock Strength',
+          defaultValue: 5,
+          admin: {
+            description: 'Strength of the click shockwave effect',
+          },
+          min: 0,
+          max: 50,
+        },
+        {
+          name: 'resistance',
+          type: 'number',
+          label: 'Resistance',
+          defaultValue: 750,
+          admin: {
+            description: 'Resistance for the animation physics',
+          },
+          min: 0,
+          max: 2000,
+        },
+        {
+          name: 'returnDuration',
+          type: 'number',
+          label: 'Return Duration',
+          defaultValue: 1.5,
+          admin: {
+            description: 'Duration in seconds for dots to return to position',
+            step: 0.1,
+          },
+          min: 0,
+          max: 10,
+        },
+      ],
+    },
+    {
+      name: 'contentCard',
+      type: 'group',
+      label: 'Content Card',
+      admin: {
+        condition: (_, { type } = {}) => type === 'custom',
+        description: 'Add a content card to display on the right side of the hero (desktop only).',
+      },
+      fields: [
+        {
+          name: 'media',
+          type: 'array',
+          label: 'Media Items',
+          required: true,
+          minRows: 1,
+          admin: {
+            description:
+              'Note: For best results, use images with the same dimensions/aspect ratio to prevent layout shifts during transitions. Different sized images will still work but may cause the container to resize smoothly.',
+          },
+          fields: [
+            {
+              name: 'item',
+              type: 'upload',
+              relationTo: 'media',
+              required: true,
+            },
+          ],
+        },
+        {
+          name: 'aspectRatio',
+          type: 'select',
+          label: 'Aspect Ratio',
+          defaultValue: 'auto',
+          options: [
+            {
+              label: 'Auto (Natural)',
+              value: 'auto',
+            },
+            {
+              label: 'Square (1:1)',
+              value: 'square',
+            },
+            {
+              label: 'Landscape (16:9)',
+              value: 'landscape',
+            },
+            {
+              label: 'Portrait (3:4)',
+              value: 'portrait',
+            },
+          ],
+        },
+        {
+          name: 'cycleInterval',
+          type: 'number',
+          label: 'Cycle Interval (seconds)',
+          defaultValue: 3,
+          admin: {
+            description: 'How long each image displays before cycling to the next (in seconds)',
+          },
+          min: 1,
+          max: 60,
+        },
+        {
+          name: 'videoAutoplay',
+          type: 'checkbox',
+          label: 'Enable Video Autoplay',
+          defaultValue: false,
+          admin: {
+            description:
+              'When enabled, videos will autoplay. When disabled, videos show as thumbnails and play on hover.',
+          },
+        },
+        {
+          name: 'enableLink',
+          type: 'checkbox',
+          label: 'Enable Link',
+          defaultValue: false,
+        },
+        link({
+          appearances: false,
+          sizes: false,
+          overrides: {
+            admin: {
+              condition: (_data, siblingData) => {
+                return Boolean(siblingData?.enableLink)
+              },
+            },
+          },
+        }),
+        {
+          name: 'enableFooter',
+          type: 'checkbox',
+          label: 'Enable Footer',
+          defaultValue: false,
+        },
+        {
+          name: 'footerMeta',
+          type: 'array',
+          label: 'Footer Meta Information',
+          admin: {
+            condition: (_data, siblingData) => {
+              return Boolean(siblingData?.enableFooter)
+            },
+            description:
+              'Add meta information for each media item. The order should match your media items.',
+          },
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              label: 'Title',
+            },
+            {
+              name: 'description',
+              type: 'textarea',
+              label: 'Description',
+            },
+            {
+              name: 'location',
+              type: 'text',
+              label: 'Location',
+            },
+            {
+              name: 'customText',
+              type: 'text',
+              label: 'Custom Text',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  label: false,
+}

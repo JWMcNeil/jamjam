@@ -4,39 +4,36 @@ import useClickableCard from '@/utilities/useClickableCard'
 import Link from 'next/link'
 import React, { Fragment } from 'react'
 
-import type { Post, Web, Content } from '@/payload-types'
+import type { Post, Project } from '@/payload-types'
 
 import { Media } from '@/components/Media'
 
-export type CardPostData = Pick<Post, 'slug' | 'categories' | 'meta' | 'title' | 'heroImage'>
-export type CardWebData = Pick<Web, 'slug' | 'categories' | 'meta' | 'title' | 'heroImage'>
-export type CardContentData = Pick<Content, 'slug' | 'categories' | 'meta' | 'title' | 'heroImage'>
-export type CardData = CardPostData | CardWebData | CardContentData
-export type CardDataWithRelation = CardData & { relationTo?: 'posts' | 'web' | 'content' }
+export type CardPostData = Pick<Post, 'slug' | 'tags' | 'meta' | 'title' | 'heroImage'>
+export type CardProjectData = Pick<Project, 'slug' | 'tags' | 'meta' | 'title' | 'heroImage'>
+export type CardData = CardPostData | CardProjectData
+export type CardDataWithRelation = CardData & { relationTo?: 'posts' | 'projects' }
 
 export const Card: React.FC<{
   alignItems?: 'center'
   className?: string
   doc?: CardData
-  relationTo?: 'posts' | 'web' | 'content'
+  relationTo?: 'posts' | 'projects'
   showCategories?: boolean
   title?: string
 }> = (props) => {
   const { card, link } = useClickableCard({})
   const { className, doc, relationTo, showCategories, title: titleFromProps } = props
 
-  const { slug, categories, meta, title, heroImage } = doc || {}
+  const { slug, tags, meta, title, heroImage } = doc || {}
   const { description, image: metaImage } = meta || {}
 
-  // Prefer heroImage over meta.image for card display
-  // heroImage can be a number (ID) or an object (populated Media), so check if it's an object
   const displayImage =
     (heroImage && typeof heroImage === 'object' ? heroImage : null) ||
     (metaImage && typeof metaImage === 'object' ? metaImage : null)
 
-  const hasCategories = categories && Array.isArray(categories) && categories.length > 0
+  const hasTags = tags && Array.isArray(tags) && tags.length > 0
   const titleToUse = titleFromProps || title
-  const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
+  const sanitizedDescription = description?.replace(/\s/g, ' ')
   const href = `/${relationTo}/${slug}`
 
   return (
@@ -54,30 +51,25 @@ export const Card: React.FC<{
         )}
       </div>
       <div className="p-4">
-        {showCategories && hasCategories && (
+        {showCategories && hasTags && (
           <div className="uppercase text-sm mb-4">
-            {showCategories && hasCategories && (
-              <div>
-                {categories?.map((category, index) => {
-                  if (typeof category === 'object') {
-                    const { title: titleFromCategory } = category
+            <div>
+              {tags?.map((tag, index) => {
+                if (typeof tag === 'object') {
+                  const tagLabel = tag.label || 'Untitled tag'
+                  const isLast = index === tags.length - 1
 
-                    const categoryTitle = titleFromCategory || 'Untitled category'
+                  return (
+                    <Fragment key={index}>
+                      {tagLabel}
+                      {!isLast && <Fragment>, &nbsp;</Fragment>}
+                    </Fragment>
+                  )
+                }
 
-                    const isLast = index === categories.length - 1
-
-                    return (
-                      <Fragment key={index}>
-                        {categoryTitle}
-                        {!isLast && <Fragment>, &nbsp;</Fragment>}
-                      </Fragment>
-                    )
-                  }
-
-                  return null
-                })}
-              </div>
-            )}
+                return null
+              })}
+            </div>
           </div>
         )}
         {titleToUse && (

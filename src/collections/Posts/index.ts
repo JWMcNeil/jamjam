@@ -13,10 +13,11 @@ import {
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
-import { Banner, Code, Content, MediaBlock } from '../../blocks'
+import { Banner, Code, Content, MediaBlock } from '../../components/blocks'
 import { generatePreviewPath } from './lib/generatePreviewPath'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
+import { calculateReadTime } from './hooks/calculateReadTime'
 
 import {
   MetaDescriptionField,
@@ -35,20 +36,21 @@ export const Posts: CollectionConfig<'posts'> = {
     read: authenticatedOrPublished,
     update: authenticated,
   },
-  // This config controls what's populated by default when a post is referenced
-  // https://payloadcms.com/docs/queries/select#defaultpopulate-collection-config-property
-  // Type safe if the collection slug generic is passed to `CollectionConfig` - `CollectionConfig<'posts'>
   defaultPopulate: {
     title: true,
     slug: true,
-    categories: true,
+    excerpt: true,
+    readTime: true,
+    tags: true,
+    heroImage: true,
+    publishedAt: true,
     meta: {
       image: true,
       description: true,
     },
   },
   admin: {
-    defaultColumns: ['title', 'slug', 'updatedAt'],
+    defaultColumns: ['title', 'slug', 'publishedAt', 'updatedAt'],
     livePreview: {
       url: ({ data }) =>
         generatePreviewPath({
@@ -68,6 +70,17 @@ export const Posts: CollectionConfig<'posts'> = {
       name: 'title',
       type: 'text',
       required: true,
+      admin: {
+        description: 'Used in the browser tab, OG image, and post cards.',
+      },
+    },
+    {
+      name: 'excerpt',
+      type: 'textarea',
+      maxLength: 150,
+      admin: {
+        description: '150 characters max. Shown on index cards and used as OG description.',
+      },
     },
     {
       type: 'tabs',
@@ -78,6 +91,10 @@ export const Posts: CollectionConfig<'posts'> = {
               name: 'heroImage',
               type: 'upload',
               relationTo: 'media',
+              required: true,
+              admin: {
+                description: 'Main image for the post. Shown at the top of the post and on cards.',
+              },
             },
             {
               name: 'content',
@@ -86,7 +103,7 @@ export const Posts: CollectionConfig<'posts'> = {
                 features: ({ rootFeatures }) => {
                   return [
                     ...rootFeatures,
-                    HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+                    HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
                     BlocksFeature({ blocks: [Banner, Code, Content, MediaBlock] }),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
@@ -109,6 +126,7 @@ export const Posts: CollectionConfig<'posts'> = {
               type: 'relationship',
               admin: {
                 position: 'sidebar',
+                description: 'Up to 2 related posts shown at the bottom.',
               },
               filterOptions: ({ id }) => {
                 return {
@@ -118,16 +136,18 @@ export const Posts: CollectionConfig<'posts'> = {
                 }
               },
               hasMany: true,
+              maxRows: 2,
               relationTo: 'posts',
             },
             {
-              name: 'categories',
+              name: 'tags',
               type: 'relationship',
               admin: {
                 position: 'sidebar',
+                description: 'Select one or more tags for filtering and display.',
               },
               hasMany: true,
-              relationTo: 'categories',
+              relationTo: 'tags',
             },
           ],
           label: 'Meta',
@@ -147,19 +167,27 @@ export const Posts: CollectionConfig<'posts'> = {
             MetaImageField({
               relationTo: 'media',
             }),
-
             MetaDescriptionField({}),
             PreviewField({
-              // if the `generateUrl` function is configured
               hasGenerateFn: true,
-
-              // field paths to match the target field for data
               titlePath: 'meta.title',
               descriptionPath: 'meta.description',
             }),
           ],
         },
       ],
+    },
+    {
+      name: 'readTime',
+      type: 'number',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Auto-calculated from content word count (~200 wpm).',
+      },
+      hooks: {
+        beforeChange: [calculateReadTime],
+      },
     },
     {
       name: 'publishedAt',
@@ -169,6 +197,7 @@ export const Posts: CollectionConfig<'posts'> = {
           pickerAppearance: 'dayAndTime',
         },
         position: 'sidebar',
+        description: 'Auto-set on first publish. Can be overridden.',
       },
       hooks: {
         beforeChange: [
@@ -190,9 +219,6 @@ export const Posts: CollectionConfig<'posts'> = {
       hasMany: true,
       relationTo: 'users',
     },
-    // This field is only used to populate the user data via the `populateAuthors` hook
-    // This is because the `user` collection has access control locked to protect user privacy
-    // GraphQL will also not return mutated user data that differs from the underlying schema
     {
       name: 'populatedAuthors',
       type: 'array',
@@ -224,7 +250,7 @@ export const Posts: CollectionConfig<'posts'> = {
   versions: {
     drafts: {
       autosave: {
-        interval: 100, // We set this interval for optimal live preview
+        interval: 100,
       },
       schedulePublish: true,
     },

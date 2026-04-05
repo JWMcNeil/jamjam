@@ -4,26 +4,30 @@ import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
-import { Field, Plugin } from 'payload'
+import { type Field, type Plugin } from 'payload'
 import { muxVideoPlugin } from '@oversightstudio/mux-video'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
-import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
+import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { searchFields } from '@/search/fieldOverrides'
 import { beforeSyncWithSearch } from '@/search/beforeSync'
 
-import { Page, Post } from '@/payload-types'
+import type { Post, Project } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 import { iconOptions } from '@/utilities/icons'
 
-const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | JamJamDev` : 'JamJamDev'
+const generateTitle: GenerateTitle<Post | Project> = ({ doc }) => {
+  return doc?.title ? `${doc.title} | jamjam.dev` : 'jamjam.dev'
 }
 
-const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
-  const url = getServerSideURL()
+const generateURL: GenerateURL<Post | Project> = ({ doc, collectionSlug }) => {
+  const base = getServerSideURL()
+  if (!doc?.slug) return base
 
-  return doc?.slug ? `${url}/${doc.slug}` : url
+  if (collectionSlug === 'posts') return `${base}/posts/${doc.slug}`
+  if (collectionSlug === 'projects') return `${base}/projects/${doc.slug}`
+
+  return `${base}/${doc.slug}`
 }
 
 export const plugins: Plugin[] = [
@@ -39,7 +43,7 @@ export const plugins: Plugin[] = [
     },
   }),
   redirectsPlugin({
-    collections: ['pages', 'posts'],
+    collections: ['posts', 'projects'],
     overrides: {
       // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
       fields: ({ defaultFields }) => {
@@ -61,7 +65,7 @@ export const plugins: Plugin[] = [
     },
   }),
   nestedDocsPlugin({
-    collections: ['categories'],
+    collections: ['tags'],
     generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
   }),
   seoPlugin({
@@ -92,7 +96,6 @@ export const plugins: Plugin[] = [
           return field
         })
 
-        // Add chips field type as a new block
         const chipsBlock = {
           slug: 'chips',
           labels: {
@@ -141,7 +144,6 @@ export const plugins: Plugin[] = [
           ] as Field[],
         }
 
-        // Find the fields field and add chips to its blocks
         const fieldsField = updatedFields.find(
           (field) => 'name' in field && field.name === 'fields',
         )
@@ -154,7 +156,7 @@ export const plugins: Plugin[] = [
     },
   }),
   searchPlugin({
-    collections: ['web', 'content', 'posts'],
+    collections: ['posts', 'projects'],
     beforeSync: beforeSyncWithSearch,
     searchOverrides: {
       fields: ({ defaultFields }) => {

@@ -4,7 +4,7 @@ import { getIcon } from '@/utilities/icons'
 import Link from 'next/link'
 import React from 'react'
 
-import type { Page, Post, Web, Content } from '@/payload-types'
+import type { Post, Project } from '@/payload-types'
 
 type CMSLinkType = {
   appearance?: 'inline' | ButtonProps['variant']
@@ -14,8 +14,8 @@ type CMSLinkType = {
   label?: string | null
   newTab?: boolean | null
   reference?: {
-    relationTo: 'pages' | 'posts' | 'web' | 'content'
-    value: Page | Post | Web | Content | string | number
+    relationTo: 'posts' | 'projects'
+    value: Post | Project | string | number
   } | null
   size?: ButtonProps['size'] | null
   type?: 'custom' | 'reference' | null
@@ -38,9 +38,7 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
 
   const href =
     type === 'reference' && typeof reference?.value === 'object' && reference.value.slug
-      ? `${reference?.relationTo !== 'pages' ? `/${reference?.relationTo}` : ''}/${
-          reference.value.slug
-        }`
+      ? `/${reference.relationTo}/${reference.value.slug}`
       : url
 
   if (!href) return null
@@ -50,7 +48,6 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
   const isIconOnly = size === 'icon'
   const IconComponent = isIconOnly && icon ? getIcon(icon) : null
 
-  /* Ensure we don't break any styles set by richText */
   if (appearance === 'inline') {
     return (
       <Link className={cn(className)} href={href || url || ''} {...newTabProps}>

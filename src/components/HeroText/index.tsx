@@ -6,7 +6,7 @@ import { gsap } from 'gsap'
 import SplitText from '@benjaminlooi/splittext'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { useIsMobile } from '@/components/DraggableCard/useIsMobile'
+import { useMediaQuery } from '@/hooks/use-media-query'
 import { cn } from '@/utilities/ui'
 
 // SplitText type definition (library doesn't have types)
@@ -377,7 +377,7 @@ export const HeroText = ({
   const [activeButtonIndex, setActiveButtonIndex] = useState<number | null>(null)
   const [hoveredButtonIndex, setHoveredButtonIndex] = useState<number | null>(null)
   const [countdownButtonIndex, setCountdownButtonIndex] = useState<number | null>(null)
-  const isMobile = useIsMobile()
+  const isMobile = useMediaQuery('(max-width: 767px)')
   const strokeAnimationRefs = useRef<Record<number, gsap.core.Tween | null>>({})
   const buttonRefs = useRef<Record<number, HTMLButtonElement | null>>({})
 

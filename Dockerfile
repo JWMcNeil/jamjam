@@ -57,7 +57,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/src ./src
 # Copy root config files
 COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json* ./
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./
-COPY --from=builder --chown=nextjs:nodejs /app/next.config.mjs* ./
+COPY --from=builder --chown=nextjs:nodejs /app/next.config.ts ./
 
 # Copy only production dependencies
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules

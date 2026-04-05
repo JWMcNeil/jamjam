@@ -6,7 +6,8 @@ import { Drawer as DrawerPrimitive } from 'vaul'
 import { cn } from '@/utilities/ui'
 
 const Drawer = ({
-  shouldScaleBackground = true,
+  /** Off by default: scaling the page under the drawer breaks fixed/sticky + touch targeting on iOS. */
+  shouldScaleBackground = false,
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
   <DrawerPrimitive.Root shouldScaleBackground={shouldScaleBackground} {...props} />

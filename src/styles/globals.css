@@ -1,0 +1,209 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@theme {
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Roboto Mono', ui-monospace, 'Courier New', monospace;
+
+  /* Brand accent — green */
+  --color-accent: #629168;
+  --color-accent-hover: #66ccbb;
+  --color-accent-bg: #0f1a14;
+  --color-accent-border: #1a2e1e;
+  --color-accent-active: #1a3a2a;
+  --color-accent-hover-bg: #142014;
+  --color-accent-hover-border: #2a4a3a;
+  --color-accent-dot: #3a9a3a;
+
+  /* Page surfaces */
+  --color-page: #0a0a0a;
+  --color-card: #0c0c0c;
+  --color-card-hover: #0f0f0f;
+  --color-input-bg: #111111;
+  --color-divider: #161616;
+  --color-border-subtle: #1e1e1e;
+
+  /* Greys */
+  --color-grey-100: #222222;
+  --color-grey-150: #2a2a2a;
+  --color-grey-200: #333333;
+  --color-grey-250: #3a3a3a;
+  --color-grey-300: #444444;
+  --color-grey-350: #555555;
+  --color-grey-400: #666666;
+  --color-grey-450: #777777;
+  --color-grey-500: #888888;
+  --color-grey-550: #999999;
+  --color-grey-600: #aaaaaa;
+  --color-grey-650: #bbbbbb;
+  --color-grey-700: #cccccc;
+  --color-grey-750: #dddddd;
+  --color-grey-800: #e8e8e8;
+  --color-grey-850: #f0f0f0;
+  --color-grey-900: #ffffff;
+
+  /* Semantic text colours */
+  --color-text-dim: #333333;
+  --color-text-muted: #444444;
+  --color-text-secondary: #555555;
+  --color-text-body: #666666;
+  --color-text-prompt: #444444;
+  --color-text-nav: #888888;
+  --color-text-hover: #aaaaaa;
+  --color-text-mid: #bbbbbb;
+  --color-text-primary: #cccccc;
+  --color-text-default: #dddddd;
+  --color-text-heading: #f0f0f0;
+
+  /* Tag colours — nextjs */
+  --color-tag-nextjs-bg: #0e0e18;
+  --color-tag-nextjs-text: #8888cc;
+  --color-tag-nextjs-border: #1a1a2c;
+
+  /* Tag colours — webdev */
+  --color-tag-webdev-bg: #0f0f1a;
+  --color-tag-webdev-text: #7777aa;
+  --color-tag-webdev-border: #1a1a2e;
+
+  /* Tag colours — ai */
+  --color-tag-ai-bg: #0f1a14;
+  --color-tag-ai-text: #44aa99;
+  --color-tag-ai-border: #1a2e1e;
+
+  /* Tag colours — webflow */
+  --color-tag-webflow-bg: #0f1518;
+  --color-tag-webflow-text: #4499bb;
+  --color-tag-webflow-border: #1a2530;
+
+  /* Tag colours — js */
+  --color-tag-js-bg: #1a1509;
+  --color-tag-js-text: #bbaa55;
+  --color-tag-js-border: #2e2614;
+
+  /* Tag colours — design */
+  --color-tag-design-bg: #1a0f12;
+  --color-tag-design-text: #cc7788;
+  --color-tag-design-border: #2e1a1e;
+
+  /* Tag colours — opinion */
+  --color-tag-opinion-bg: #1a130f;
+  --color-tag-opinion-text: #aa8877;
+  --color-tag-opinion-border: #2e1e1a;
+
+  /* Tag colours — tools */
+  --color-tag-tools-bg: #1a1a0f;
+  --color-tag-tools-text: #aaaa99;
+  --color-tag-tools-border: #2a2a1a;
+
+  /* Tag colours — experiment */
+  --color-tag-experiment-bg: #1a1a0f;
+  --color-tag-experiment-text: #aaaa99;
+  --color-tag-experiment-border: #2a2a1a;
+
+  /* Tag colours — freelance */
+  --color-tag-freelance-bg: #1a0f1a;
+  --color-tag-freelance-text: #aa77aa;
+  --color-tag-freelance-border: #2e1a2e;
+
+  /* Tag colours — ux */
+  --color-tag-ux-bg: #0f1a1a;
+  --color-tag-ux-text: #44aaaa;
+  --color-tag-ux-border: #1a2e2e;
+
+  /* Tag colours — career */
+  --color-tag-career-bg: #1a1a1a;
+  --color-tag-career-text: #999999;
+  --color-tag-career-border: #2a2a2a;
+
+  /* Tag colours — tutorial */
+  --color-tag-tutorial-bg: #0f1a10;
+  --color-tag-tutorial-text: #55aa66;
+  --color-tag-tutorial-border: #1a2e1c;
+
+  /* Tag colours — wordpress */
+  --color-tag-wordpress-bg: #160f1a;
+  --color-tag-wordpress-text: #aa77cc;
+  --color-tag-wordpress-border: #2a1a2e;
+
+  /* Shadcn-compatible semantic tokens */
+  --color-background: #0a0a0a;
+  --color-foreground: #dddddd;
+  --color-muted: #161616;
+  --color-muted-foreground: #888888;
+  --color-popover: #0c0c0c;
+  --color-popover-foreground: #dddddd;
+  --color-primary: #44aa99;
+  --color-primary-foreground: #0a0a0a;
+  --color-secondary: #1e1e1e;
+  --color-secondary-foreground: #dddddd;
+  --color-destructive: #cc4444;
+  --color-destructive-foreground: #dddddd;
+  --color-border: #1e1e1e;
+  --color-input: #111111;
+  --color-ring: #44aa99;
+  --color-success: #3a9a3a;
+  --color-warning: #bbaa55;
+  --color-error: #cc4444;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+}
+
+/* Keep in @layer base so utility classes (e.g. text-4xl on h1) are not overridden:
+   unlayered rules win over @layer utilities and would force inherit ~16px body size. */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: unset;
+    font-weight: unset;
+  }
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  background-color: var(--color-page);
+  color: var(--color-foreground);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mux Player theme */
+mux-player {
+  accent-color: var(--color-accent);
+  --controls-backdrop-color: color-mix(in srgb, var(--color-page) 60%, transparent);
+}
+
+mux-player::part(button),
+mux-player::part(center play button),
+mux-player::part(display),
+mux-player::part(time),
+mux-player::part(play),
+mux-player::part(mute),
+mux-player::part(captions),
+mux-player::part(fullscreen),
+mux-player::part(pip),
+mux-player::part(cast),
+mux-player::part(airplay),
+mux-player::part(seek-backward),
+mux-player::part(seek-forward),
+mux-player::part(playback-rate),
+mux-player::part(center),
+mux-player::part(layer) {
+  color: var(--color-foreground);
+}
+
+mux-player::part(bottom),
+mux-player::part(top) {
+  background-color: color-mix(in srgb, var(--color-muted) 80%, transparent);
+}

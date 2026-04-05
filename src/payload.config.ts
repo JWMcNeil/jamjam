@@ -1,22 +1,18 @@
-// storage-adapter-import-placeholder
 import { postgresAdapter } from '@payloadcms/db-postgres'
 
-import sharp from 'sharp' // sharp-import
+import sharp from 'sharp'
 import path from 'path'
-import { buildConfig, PayloadRequest } from 'payload'
+import { buildConfig, type PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
-import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
-import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
-import { Web } from './collections/Web'
-import { Content } from './collections/Content'
-import { StaticPages } from './collections/StaticPages'
+import { Projects } from './collections/Projects'
+import { Tags } from './collections/Tags'
 import { Users } from './collections/Users'
-import { Footer } from './Footer/config'
-import { Header } from './Header/config'
-import { Sidebar } from './Sidebar/config'
+import { Footer } from './components/layout/footer/config'
+import { Header } from './components/layout/header/config'
+import { SiteSettings } from './globals/SiteSettings/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -31,11 +27,7 @@ export default buildConfig({
       description: 'jamjam.dev',
     },
     components: {
-      // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
-      // Feel free to delete this at any time. Simply remove the line below.
       beforeLogin: ['@/components/BeforeLogin'],
-      // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
-      // Feel free to delete this at any time. Simply remove the line below.
       beforeDashboard: [],
     },
     importMap: {
@@ -65,20 +57,20 @@ export default buildConfig({
       ],
     },
   },
-  // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
   db: postgresAdapter({
     pool: {
       connectionString:
         process.env.DATABASE_URL || 'postgresql://payload:payload@localhost:5432/jamjam',
     },
+    generateSchemaOutputFile: path.resolve(dirname, 'payload-generated-schema.ts'),
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Web, Content, StaticPages],
+  // Order matters for schema push: tables with FKs (e.g. uploads) must come after their targets.
+  collections: [Users, Media, Tags, Posts, Projects],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer, Sidebar],
+  globals: [Header, Footer, SiteSettings],
   plugins: [
     ...plugins,
-    // storage-adapter-placeholder
   ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
@@ -88,14 +80,8 @@ export default buildConfig({
   jobs: {
     access: {
       run: ({ req }: { req: PayloadRequest }): boolean => {
-        // Allow logged in users to execute this endpoint (default)
         if (req.user) return true
-
-        // If there is no logged in user, then check
-        // for the Vercel Cron secret to be present as an
-        // Authorization header:
-        const authHeader = req.headers.get('authorization')
-        return authHeader === `Bearer ${process.env.CRON_SECRET}`
+        return false
       },
     },
     tasks: [],

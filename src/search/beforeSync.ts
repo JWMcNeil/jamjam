@@ -1,11 +1,11 @@
-import { BeforeSync, DocToSync } from '@payloadcms/plugin-search/types'
+import type { BeforeSync, DocToSync } from '@payloadcms/plugin-search/types'
 
 export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searchDoc }) => {
   const {
     doc: { relationTo: collection },
   } = searchDoc
 
-  const { slug, id, categories, title, meta } = originalDoc
+  const { slug, id, tags, title, meta } = originalDoc
 
   const modifiedDoc: DocToSync = {
     ...searchDoc,
@@ -19,40 +19,38 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
     categories: [],
   }
 
-  if (categories && Array.isArray(categories) && categories.length > 0) {
-    const populatedCategories: { id: string | number; title: string }[] = []
-    for (const category of categories) {
-      if (!category) {
-        continue
-      }
+  if (tags && Array.isArray(tags) && tags.length > 0) {
+    const populatedTags: { id: string | number; label: string }[] = []
+    for (const tag of tags) {
+      if (!tag) continue
 
-      if (typeof category === 'object') {
-        populatedCategories.push(category)
+      if (typeof tag === 'object') {
+        populatedTags.push(tag)
         continue
       }
 
       const doc = await req.payload.findByID({
-        collection: 'categories',
-        id: category,
+        collection: 'tags',
+        id: tag,
         disableErrors: true,
         depth: 0,
-        select: { title: true },
+        select: { label: true },
         req,
       })
 
       if (doc !== null) {
-        populatedCategories.push(doc)
+        populatedTags.push(doc)
       } else {
         console.error(
-          `Failed. Category not found when syncing collection '${collection}' with id: '${id}' to search.`,
+          `Failed. Tag not found when syncing collection '${collection}' with id: '${id}' to search.`,
         )
       }
     }
 
-    modifiedDoc.categories = populatedCategories.map((each) => ({
-      relationTo: 'categories',
+    modifiedDoc.categories = populatedTags.map((each) => ({
+      relationTo: 'tags',
       categoryID: String(each.id),
-      title: each.title,
+      title: each.label,
     }))
   }
 

@@ -1,4 +1,4 @@
-import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import { MediaBlock } from '@/components/blocks/MediaBlock/Component'
 import {
   DefaultNodeTypes,
   SerializedBlockNode,
@@ -11,22 +11,32 @@ import {
   RichText as ConvertRichText,
 } from '@payloadcms/richtext-lexical/react'
 
-import { CodeBlock, CodeBlockProps } from '@/blocks/Code/Component'
+import { CodeBlock, CodeBlockProps } from '@/components/blocks/Code/Component'
 
 import type {
   BannerBlock as BannerBlockProps,
-  CallToActionBlock as CTABlockProps,
   ContentBlock as ContentBlockProps,
   MediaBlock as MediaBlockProps,
 } from '@/payload-types'
-import { BannerBlock } from '@/blocks/Banner/Component'
-import { CallToActionBlock } from '@/blocks/CallToAction/Component'
-import { ContentBlock } from '@/blocks/Content/Component'
+import { BannerBlock } from '@/components/blocks/Banner/Component'
+import { CallToActionBlock } from '@/components/blocks/CallToAction/Component'
+import { ContentBlock } from '@/components/blocks/Content/Component'
 import { cn } from '@/utilities/ui'
 
 type NodeTypes =
   | DefaultNodeTypes
   | SerializedBlockNode<CTABlockProps | MediaBlockProps | BannerBlockProps | CodeBlockProps | ContentBlockProps>
+
+type CTABlockProps = {
+  links?: {
+    link?: {
+      type?: 'reference' | 'custom' | null
+      url?: string | null
+      label?: string | null
+    }
+  }[]
+  richText?: DefaultTypedEditorState
+}
 
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
   const { value, relationTo } = linkNode.fields.doc!
@@ -35,8 +45,7 @@ const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
   }
   const slug = value.slug
   if (relationTo === 'posts') return `/posts/${slug}`
-  if (relationTo === 'web') return `/web/${slug}`
-  if (relationTo === 'content') return `/content/${slug}`
+  if (relationTo === 'projects') return `/projects/${slug}`
   return `/${slug}`
 }
 
@@ -56,7 +65,9 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
       />
     ),
     code: ({ node }) => <CodeBlock className="col-start-2" {...node.fields} />,
-    cta: ({ node }) => <CallToActionBlock {...node.fields} />,
+    cta: ({ node }: { node: SerializedBlockNode<CTABlockProps> }) => (
+      <CallToActionBlock {...node.fields} />
+    ),
     content: ({ node }) => <ContentBlock {...node.fields} />,
   },
 })

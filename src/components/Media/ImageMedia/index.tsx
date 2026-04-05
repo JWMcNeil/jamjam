@@ -63,8 +63,13 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         .map(([, value]) => `(max-width: ${value}px) ${value * 2}w`)
         .join(', ')
 
+  const resolvedPictureClassName = cn(
+    fill && 'absolute inset-0 block h-full w-full',
+    pictureClassName,
+  )
+
   return (
-    <picture className={cn(pictureClassName)}>
+    <picture className={resolvedPictureClassName}>
       <NextImage
         alt={alt || ''}
         className={cn(imgClassName)}
@@ -73,7 +78,6 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         placeholder="blur"
         blurDataURL={placeholderBlur}
         priority={priority}
-        quality={100}
         loading={loading}
         sizes={sizes}
         src={src}

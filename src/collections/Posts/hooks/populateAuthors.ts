@@ -1,13 +1,10 @@
 import type { CollectionAfterReadHook } from 'payload'
-import { User } from 'src/payload-types'
 
-// The `user` collection has access control locked so that users are not publicly accessible
-// This means that we need to populate the authors manually here to protect user privacy
-// GraphQL will not return mutated user data that differs from the underlying schema
-// So we use an alternative `populatedAuthors` field to populate the user data, hidden from the admin UI
+// The `user` collection has access control locked so that users are not publicly accessible.
+// `overrideAccess` + `select: { name }` loads only display-safe fields for `populatedAuthors`.
 export const populateAuthors: CollectionAfterReadHook = async ({ doc, req: { payload } }) => {
   if (doc?.authors && doc?.authors?.length > 0) {
-    const authorDocs: User[] = []
+    const populated: { id: number; name?: string | null }[] = []
 
     for (const author of doc.authors) {
       try {
@@ -15,21 +12,25 @@ export const populateAuthors: CollectionAfterReadHook = async ({ doc, req: { pay
           id: typeof author === 'object' ? author?.id : author,
           collection: 'users',
           depth: 0,
+          overrideAccess: true,
+          select: {
+            name: true,
+          },
         })
 
         if (authorDoc) {
-          authorDocs.push(authorDoc)
-        }
-
-        if (authorDocs.length > 0) {
-          doc.populatedAuthors = authorDocs.map((authorDoc) => ({
+          populated.push({
             id: authorDoc.id,
             name: authorDoc.name,
-          }))
+          })
         }
       } catch {
         // swallow error
       }
+    }
+
+    if (populated.length > 0) {
+      doc.populatedAuthors = populated
     }
   }
 

@@ -1,16 +1,20 @@
-import type { StaticPage } from '@/payload-types'
+type NamedBlock = {
+  blockName?: string | null
+  blockType?: string
+  [key: string]: unknown
+}
 
 /**
  * Creates a map of blocks by their blockName for easy access
  * @param blocks - Array of blocks from StaticPage
  * @returns Map of blockName -> block
  */
-export function getBlocksByName(blocks: StaticPage['blocks'] | null | undefined) {
+export function getBlocksByName<T extends NamedBlock>(blocks: T[] | null | undefined) {
   if (!blocks || !Array.isArray(blocks)) {
-    return new Map<string, NonNullable<StaticPage['blocks']>[number]>()
+    return new Map<string, T>()
   }
 
-  const blocksMap = new Map<string, NonNullable<StaticPage['blocks']>[number]>()
+  const blocksMap = new Map<string, T>()
 
   for (const block of blocks) {
     if (block.blockName) {
@@ -28,8 +32,8 @@ export function getBlocksByName(blocks: StaticPage['blocks'] | null | undefined)
  * @param blockType - Optional block type to filter by
  * @returns The block if found, undefined otherwise
  */
-export function getBlockByName<T = NonNullable<StaticPage['blocks']>[number]>(
-  blocks: StaticPage['blocks'] | null | undefined,
+export function getBlockByName<T extends NamedBlock = NamedBlock>(
+  blocks: T[] | null | undefined,
   blockName: string,
   blockType?: string,
 ): T | undefined {

@@ -1,59 +1,44 @@
 import type { Metadata } from 'next'
 
 import { cn } from '@/utilities/ui'
-import { DM_Mono, DM_Sans } from 'next/font/google'
 import React from 'react'
 
-import { Header } from '@/Header/Component'
-import { Sidebar } from '@/Sidebar/Component'
+import { Footer } from '@/components/layout/footer/Component'
+import { Header } from '@/components/layout/header/Component'
+import { dmSans, robotoMono } from '@/lib/fonts'
 import { Providers } from '@/providers'
-import { InitTheme } from '@/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { draftMode } from 'next/headers'
 
-import './globals.css'
+import '@/styles/globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '700', '800', '900'],
-  variable: '--font-dm-sans',
-  display: 'swap',
-})
-
-const dmMono = DM_Mono({
-  subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  variable: '--font-dm-mono',
-  display: 'swap',
-})
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   await draftMode()
 
   return (
-    <html className={cn(dmSans.variable, dmMono.variable)} lang="en" suppressHydrationWarning>
+    <html
+      className={cn(dmSans.variable, robotoMono.variable)}
+      data-theme="dark"
+      lang="en"
+      suppressHydrationWarning
+    >
       <head>
-        <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        <link
+          href={`${getServerSideURL()}/feed.xml`}
+          rel="alternate"
+          title="jamjam.dev — posts"
+          type="application/rss+xml"
+        />
       </head>
       <body>
         <Providers>
-          {/* <AdminBar
-            adminBarProps={{
-              preview: isEnabled,
-            }}
-          /> */}
-
           <div className="flex flex-col min-h-screen">
-            <div className="mb-[5.5rem]">
-              <Header />
-            </div>
-            <div className="w-[90vw] max-w-[120rem] mx-auto flex flex-1 min-h-0 pt-0">
-              <Sidebar />
-              <main className="md:ml-[3.5rem] flex-1">{children}</main>
-            </div>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
           </div>
         </Providers>
       </body>
@@ -66,6 +51,6 @@ export const metadata: Metadata = {
   openGraph: mergeOpenGraph(),
   twitter: {
     card: 'summary_large_image',
-    creator: '@payloadcms',
+    creator: '@jamjamdev',
   },
 }
