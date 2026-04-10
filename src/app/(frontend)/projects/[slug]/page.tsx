@@ -70,10 +70,10 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
       </Link>
 
       <p className="mb-4 font-mono text-sm text-text-prompt">
-        jamjam~$ cat projects/{project.slug}/readme.md
+        jamjam~$ <span className="text-accent">cat projects/{project.slug}/readme.md</span>
       </p>
 
-      <div className="mb-10 space-y-6">
+      <div className="mb-10 space-y-6 pt-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
             <h1 className="text-3xl font-bold text-text-heading md:text-5xl">{project.title}</h1>
@@ -153,22 +153,22 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
           <section className="space-y-5 text-text-secondary">
             <div>
               <p className="mb-1 text-text-prompt">// type</p>
-              <p className="text-text-heading">{projectTypeHeroLabel[project.type]}</p>
+              <p className="text-foreground">{projectTypeHeroLabel[project.type]}</p>
             </div>
             <div>
               <p className="mb-1 text-text-prompt">// year</p>
-              <p className="text-text-heading tabular-nums">
+              <p className="text-foreground tabular-nums">
                 {project.year != null ? project.year : '—'}
               </p>
             </div>
             <div>
               <p className="mb-1 text-text-prompt">// status</p>
-              <p className="text-text-heading">{projectLifecycleDetailLabel[project.lifecycle]}</p>
+              <p className="text-foreground">{projectLifecycleDetailLabel[project.lifecycle]}</p>
             </div>
             {project.role?.trim() ? (
               <div>
                 <p className="mb-1 text-text-prompt">// role</p>
-                <p className="text-text-heading">{project.role.trim()}</p>
+                <p className="text-foreground">{project.role.trim()}</p>
               </div>
             ) : null}
           </section>

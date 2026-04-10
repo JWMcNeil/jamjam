@@ -36,7 +36,7 @@ export const About: React.FC<AboutProps> = ({
   return (
     <section className="py-10 lg:py-14 mb-6" aria-labelledby="about-heading">
       <p className="mb-8 font-mono text-xs text-text-muted lg:text-sm">{aboutSectionLabel}</p>
-      <div className="overflow-hidden border border-border bg-background">
+      <div className="overflow-hidden border border-border bg-background rounded-sm">
         <div className="flex flex-col md:flex-row md:min-h-[min(28rem,70vh)]">
           <div
             className={cn(

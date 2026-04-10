@@ -87,7 +87,7 @@ export function MobileNavSheet({
             aria-hidden
           >
             <span className="text-text-muted">jamjam:~$ </span>
-            <span className="text-primary">ls nav/</span>
+            <span className="text-accent">ls nav/</span>
           </p>
           <ul className="flex flex-col divide-y divide-border" role="list">
             {items.map(({ link }, i) => {

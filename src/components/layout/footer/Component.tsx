@@ -24,7 +24,7 @@ export async function Footer() {
       <div className="flex justify-center px-4">
         <div className="flex w-fit max-w-full flex-col overflow-hidden rounded-sm border border-border bg-card md:flex-row md:items-stretch md:divide-x md:divide-border">
           <div
-            className={`flex shrink-0 items-center gap-x-0.5 border-b border-border font-mono text-xs lowercase text-text-nav md:border-b-0 ${cell}`}
+            className={`flex shrink-0 items-center gap-x-2 border-b border-border font-mono text-xs lowercase text-text-nav md:border-b-0 ${cell}`}
           >
             <span>{statusText}</span>
             <StatusDot className="ml-0.5 origin-center scale-[0.85]" />

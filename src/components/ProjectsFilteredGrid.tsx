@@ -26,9 +26,9 @@ function deriveTagsFromProjects(projects: ProjectCardProject[]): { id: number; l
 }
 
 const pillBase =
-  'rounded-md border px-3 py-1.5 font-mono text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
-const pillInactive = 'border-border bg-page text-text-heading hover:bg-card'
-const pillActive = 'border-border-subtle bg-grey-150 text-text-heading hover:bg-grey-200'
+  'cursor-pointer rounded-md border px-3 py-1.5 font-mono text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
+const pillInactive = 'border-border bg-page text-text-heading hover:bg-card-hover'
+const pillActive = 'border-border-subtle bg-grey-150 text-text-heading hover:bg-grey-250'
 
 export const ProjectsFilteredGrid: React.FC<{
   projects: ProjectCardProject[]

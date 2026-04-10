@@ -1,16 +1,15 @@
 import type { Metadata } from 'next'
 
-import { RelatedPosts } from '@/components/blocks/RelatedPosts/Component'
+import { PostArticle } from '@/components/templates/PostArticle'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
+import { extractLexicalHeadings } from '@/utilities/extractLexicalHeadings'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
-import RichText from '@/components/RichText'
 
-import type { Post } from '@/payload-types'
+import type { SiteSetting } from '@/payload-types'
 
-import { PostHero } from '@/components/templates/heroes/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
@@ -43,40 +42,31 @@ type Args = {
 export default async function Post({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
-  // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = '/posts/' + decodedSlug
-  const post = await queryPostBySlug({ slug: decodedSlug })
+
+  const [post, siteSettings] = await Promise.all([
+    queryPostBySlug({ slug: decodedSlug }),
+    querySiteSettings(),
+  ])
 
   if (!post) return <PayloadRedirects url={url} />
 
+  const outline = extractLexicalHeadings(post.content)
+
   return (
-    <article className="pt-16 pb-16">
-      {/* Allows redirects for valid pages too */}
+    <article className="pt-16">
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
 
-      <PostHero post={post} />
-
-      <div className="flex flex-col items-center gap-4 pt-8">
-        <div className="container">
-          <RichText className="max-w-[48rem] mx-auto" data={post.content} enableGutter={false} />
-          {post.relatedPosts && post.relatedPosts.length > 0 && (
-            <RelatedPosts
-              className="mt-12 max-w-[52rem] lg:grid lg:grid-cols-subgrid col-start-1 col-span-3 grid-rows-[2fr]"
-              docs={post.relatedPosts.filter((post) => typeof post === 'object')}
-            />
-          )}
-        </div>
-      </div>
+      <PostArticle post={post} siteSettings={siteSettings} outline={outline} />
     </article>
   )
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { slug = '' } = await paramsPromise
-  // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const post = await queryPostBySlug({ slug: decodedSlug })
 
@@ -91,6 +81,7 @@ const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
   const result = await payload.find({
     collection: 'posts',
     draft,
+    depth: 1,
     limit: 1,
     overrideAccess: draft,
     pagination: false,
@@ -102,4 +93,13 @@ const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
   })
 
   return result.docs?.[0] || null
+})
+
+const querySiteSettings = cache(async (): Promise<SiteSetting> => {
+  const payload = await getPayload({ config: configPromise })
+  const doc = await payload.findGlobal({
+    slug: 'site-settings',
+    depth: 1,
+  })
+  return doc as SiteSetting
 })

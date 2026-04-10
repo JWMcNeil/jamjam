@@ -7,8 +7,9 @@ import React, { Fragment } from 'react'
 import type { Post, Project } from '@/payload-types'
 
 import { Media } from '@/components/Media'
+import { formatPostMonthYear } from '@/utilities/formatPostDate'
 
-export type CardPostData = Pick<Post, 'slug' | 'tags' | 'meta' | 'title' | 'heroImage'>
+export type CardPostData = Pick<Post, 'slug' | 'tags' | 'meta' | 'title' | 'heroImage' | 'publishedAt'>
 export type CardProjectData = Pick<Project, 'slug' | 'tags' | 'meta' | 'title' | 'heroImage'>
 export type CardData = CardPostData | CardProjectData
 export type CardDataWithRelation = CardData & { relationTo?: 'posts' | 'projects' }
@@ -20,11 +21,22 @@ export const Card: React.FC<{
   relationTo?: 'posts' | 'projects'
   showCategories?: boolean
   title?: string
+  /** Prefix tag line with `//` (post detail related cards). */
+  terminalCommentTags?: boolean
 }> = (props) => {
   const { card, link } = useClickableCard({})
-  const { className, doc, relationTo, showCategories, title: titleFromProps } = props
+  const {
+    className,
+    doc,
+    relationTo,
+    showCategories,
+    title: titleFromProps,
+    terminalCommentTags,
+  } = props
 
   const { slug, tags, meta, title, heroImage } = doc || {}
+  const publishedAt =
+    doc && relationTo === 'posts' && 'publishedAt' in doc ? doc.publishedAt : undefined
   const { description, image: metaImage } = meta || {}
 
   const displayImage =
@@ -52,7 +64,12 @@ export const Card: React.FC<{
       </div>
       <div className="p-4">
         {showCategories && hasTags && (
-          <div className="uppercase text-sm mb-4">
+          <div
+            className={cn(
+              'mb-4 font-mono text-xs text-text-secondary',
+              !terminalCommentTags && 'uppercase text-sm',
+            )}
+          >
             <div>
               {tags?.map((tag, index) => {
                 if (typeof tag === 'object') {
@@ -61,7 +78,8 @@ export const Card: React.FC<{
 
                   return (
                     <Fragment key={index}>
-                      {tagLabel}
+                      {terminalCommentTags && index === 0 ? '// ' : null}
+                      {terminalCommentTags ? tagLabel : tagLabel.toUpperCase()}
                       {!isLast && <Fragment>, &nbsp;</Fragment>}
                     </Fragment>
                   )
@@ -81,6 +99,11 @@ export const Card: React.FC<{
             </h3>
           </div>
         )}
+        {relationTo === 'posts' && publishedAt ? (
+          <p className="mt-2 font-mono text-xs text-text-muted tabular-nums">
+            {formatPostMonthYear(publishedAt)}
+          </p>
+        ) : null}
         {description && (
           <div className="text-muted-foreground text-sm mt-2">
             {description && <p>{sanitizedDescription}</p>}

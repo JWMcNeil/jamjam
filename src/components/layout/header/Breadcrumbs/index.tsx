@@ -95,7 +95,7 @@ export function BreadcrumbCollapsed() {
     return (
       <Breadcrumb>
         <span
-          className="font-mono text-sm text-muted-foreground md:text-base"
+          className="font-mono text-xs text-muted-foreground md:text-sm"
           aria-current="page"
         >
           ~/home
@@ -106,7 +106,7 @@ export function BreadcrumbCollapsed() {
 
   return (
     <Breadcrumb>
-      <div className="flex min-w-0 items-center font-mono text-sm md:text-base">
+      <div className="flex min-w-0 items-center font-mono text-xs md:text-sm">
         <Link
           href="/"
           className="shrink-0 text-muted-foreground transition-colors hover:text-muted-foreground"

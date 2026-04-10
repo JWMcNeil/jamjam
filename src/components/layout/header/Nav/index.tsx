@@ -83,7 +83,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
             <CMSLink
               key={i}
               {...link}
-              className="bg-background/80 font-mono text-sm text-muted-foreground hover:text-foreground"
+              className="bg-background/80 font-mono text-sm text-foreground hover:text-white duration-300 transition-colors"
             />
           )
         })}

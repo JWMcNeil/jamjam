@@ -1,34 +1,47 @@
+'use client'
+
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 import { RichText as ConvertRichText } from '@payloadcms/richtext-lexical/react'
-import React from 'react'
+import { useMemo } from 'react'
 
 import { createPayloadJsxConverters } from '@/components/RichText/lexicalConverters'
 import { cn } from '@/utilities/ui'
 
-const jsxConverters = createPayloadJsxConverters()
-
 type Props = {
   data: DefaultTypedEditorState
+  headingIds: string[]
+  className?: string
   enableGutter?: boolean
   enableProse?: boolean
-  /** When prose is on: `center` uses mx-auto (default); `flush` aligns to the parent’s start edge. */
   proseLayout?: 'center' | 'flush'
-  /** Forwarded to Payload’s converter; use `true` to ignore alignment from the editor (e.g. centered blocks). */
   disableTextAlign?: boolean | string[]
 } & React.HTMLAttributes<HTMLDivElement>
 
-export default function RichText(props: Props) {
+export function PostBodyRichText(props: Props) {
   const {
+    data,
+    headingIds,
     className,
     enableProse = true,
     enableGutter = true,
-    proseLayout = 'center',
+    proseLayout = 'flush',
     disableTextAlign,
     ...rest
   } = props
+
+  const converters = useMemo(
+    () =>
+      createPayloadJsxConverters({
+        headingIds: headingIds.length ? headingIds : undefined,
+      }),
+    [headingIds],
+  )
+
   return (
     <ConvertRichText
-      converters={jsxConverters}
+      {...rest}
+      converters={converters}
+      data={data}
       disableTextAlign={disableTextAlign}
       className={cn(
         'payload-richtext',
@@ -42,7 +55,6 @@ export default function RichText(props: Props) {
         ],
         className,
       )}
-      {...rest}
     />
   )
 }
