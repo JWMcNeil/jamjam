@@ -3,11 +3,9 @@ import { About } from '@/components/About'
 import { LatestPosts } from '@/components/LatestPosts'
 import { ProjectCard } from '@/components/ProjectCard'
 import { StatusDot } from '@/components/StatusDot'
-import { TerminalButton } from '@/components/ui/terminal-button'
 import type { SiteSetting } from '@/payload-types'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getPayload } from 'payload'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 export default async function HomePage() {
@@ -65,8 +63,8 @@ export default async function HomePage() {
       <section className="py-8 lg:py-12">
         <div className="flex items-center justify-between mb-6">
           <p className="text-text-muted font-mono text-xs lg:text-sm">// featured projects</p>
-          <Button asChild variant="outline" size="default">
-            <Link href="/projects">projects</Link>
+          <Button href="/projects" variant="outline" size="default">
+            projects
           </Button>
         </div>     
         <div className="grid grid-cols-1 gap-8 md:gap-4  md:grid-cols-2 lg:grid-cols-3">
@@ -85,7 +83,6 @@ export default async function HomePage() {
         aboutBio={siteSettings.aboutBio}
         aboutPhoto={siteSettings.aboutPhoto}
         statusText={siteSettings.statusText}
-        statusNote={siteSettings.statusNote}
         email={siteSettings.email}
       />
     </div>

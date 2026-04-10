@@ -207,3 +207,9 @@ mux-player::part(bottom),
 mux-player::part(top) {
   background-color: color-mix(in srgb, var(--color-muted) 80%, transparent);
 }
+
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-background);
+}

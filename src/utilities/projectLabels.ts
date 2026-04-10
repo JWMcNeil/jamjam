@@ -21,3 +21,10 @@ export const projectLifecycleBadgeLabel: Record<Project['lifecycle'], string> = 
   archived: 'archived',
   'in-progress': 'in-progress',
 }
+
+/** Title-case lifecycle for project detail sidebar, e.g. `// status`. */
+export const projectLifecycleDetailLabel: Record<Project['lifecycle'], string> = {
+  live: 'Live',
+  archived: 'Archived',
+  'in-progress': 'In progress',
+}

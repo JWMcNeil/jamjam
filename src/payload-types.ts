@@ -350,7 +350,7 @@ export interface Post {
    */
   relatedPosts?: (number | Post)[] | null;
   /**
-   * Select one or more tags for filtering and display.
+   * Tags for filtering on the posts page.
    */
   tags?: (number | Tag)[] | null;
   meta?: {
@@ -369,6 +369,10 @@ export interface Post {
    * Auto-set on first publish. Can be overridden.
    */
   publishedAt?: string | null;
+  /**
+   * Pinned on /posts in the featured row. Only the two most recent featured posts are shown (by published date).
+   */
+  featured?: boolean | null;
   authors?: (number | User)[] | null;
   populatedAuthors?:
     | {
@@ -463,6 +467,10 @@ export interface Project {
    * URL to the source code. Only shown for demo/experiment projects.
    */
   codeUrl?: string | null;
+  /**
+   * Shown on the project page as // role (e.g. Development & deployment).
+   */
+  role?: string | null;
   meta?: {
     title?: string | null;
     /**
@@ -1469,6 +1477,7 @@ export interface PostsSelect<T extends boolean = true> {
       };
   readTime?: T;
   publishedAt?: T;
+  featured?: T;
   authors?: T;
   populatedAuthors?:
     | T
@@ -1509,6 +1518,7 @@ export interface ProjectsSelect<T extends boolean = true> {
       };
   liveUrl?: T;
   codeUrl?: T;
+  role?: T;
   meta?:
     | T
     | {
@@ -1884,7 +1894,7 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
- * Your public profile, about section, and site-wide contact details.
+ * Name, contact, and status under General; home page about card copy and photo under About.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
@@ -1900,10 +1910,6 @@ export interface SiteSetting {
    */
   statusText: string;
   /**
-   * Optional additional context. e.g. "open to fully remote roles".
-   */
-  statusNote?: string | null;
-  /**
    * Contact email shown on the contact page and footer.
    */
   email: string;
@@ -1911,10 +1917,6 @@ export interface SiteSetting {
    * Your location shown on the contact page and about section.
    */
   location: string;
-  /**
-   * Optional text shown in the footer.
-   */
-  footerNote?: string | null;
   /**
    * Small label shown above the about card (e.g. // about).
    */
@@ -1977,10 +1979,8 @@ export interface FooterSelect<T extends boolean = true> {
 export interface SiteSettingsSelect<T extends boolean = true> {
   name?: T;
   statusText?: T;
-  statusNote?: T;
   email?: T;
   location?: T;
-  footerNote?: T;
   aboutSectionLabel?: T;
   aboutHeadline?: T;
   aboutBio?: T;

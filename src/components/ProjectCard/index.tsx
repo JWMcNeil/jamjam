@@ -40,12 +40,12 @@ export const ProjectCard: React.FC<{
           ) : null}
         </div>
         <div className="flex flex-1 flex-col gap-3 p-4 md:p-5">
-          {/* <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-3">
             <span className="font-mono text-sm text-text-prompt">{projectTypePrompt[type]}</span>
             <span className="shrink-0 rounded-md border border-border px-2 py-0.5 font-mono text-xs text-text-prompt tabular-nums">
               {projectLifecycleBadgeLabel[lifecycle]}
             </span>
-          </div> */}
+          </div>
           <h2 className="text-lg font-semibold leading-snug text-text-heading group-hover:text-text-primary md:text-xl">
             {title}
           </h2>

@@ -13,7 +13,6 @@ export type AboutProps = Pick<
   | 'aboutPhoto'
   | 'statusText'
   | 'email'
-  | 'statusNote'
 >
 
 function resolvePhoto(resource: SiteSetting['aboutPhoto']): Media | null {
@@ -29,7 +28,6 @@ export const About: React.FC<AboutProps> = ({
   aboutPhoto,
   statusText,
   email,
-  statusNote,
 }) => {
   const photo = resolvePhoto(aboutPhoto)
   const displayHandle = `// ${name.trim().toLowerCase()}`
@@ -71,9 +69,6 @@ export const About: React.FC<AboutProps> = ({
             <p className="text-sm leading-relaxed text-text-secondary md:text-base">
               {renderBioWithLineBreaks(aboutBio)}
             </p>
-            {statusNote ? (
-              <p className="text-xs text-text-muted md:text-sm">{statusNote}</p>
-            ) : null}
             <div className="mt-auto flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
               <p className="flex flex-wrap items-center gap-x-1 font-mono text-xs text-accent md:text-sm">
                 <span>{statusText}</span>

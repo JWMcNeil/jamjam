@@ -1,13 +1,14 @@
 import Link from 'next/link'
 import React from 'react'
 
+import { Button } from '@/components/ui/button'
+
 import type { Post } from '@/payload-types'
-import { TerminalButton } from '@/components/ui/terminal-button'
 import { formatPostListDate } from '@/utilities/formatPostListDate'
 import { tagPillClasses } from '@/utilities/tagPillClasses'
 
 import { cn } from '@/utilities/ui'
-import { Button } from '@/components/ui/button'
+
 export type LatestPostsItem = Pick<Post, 'id' | 'slug' | 'title' | 'publishedAt' | 'tags'>
 
 export const LatestPosts: React.FC<{
@@ -20,10 +21,9 @@ export const LatestPosts: React.FC<{
     <section className="py-8 lg:py-12">
       <div className="mb-6 flex items-center justify-between gap-4">
         <p className="font-mono text-xs text-text-muted lg:text-sm">// latest posts</p>
-        {/* <TerminalButton asChild size="md" variant="outline">
-          <Link href="/posts">ls posts/</Link>
-        </TerminalButton> */}
-        <Button asChild variant="outline" size="default"><Link href="/posts">posts</Link></Button>
+        <Button href="/posts" variant="outline" size="default">
+          posts
+        </Button>
       </div>
 
       <div className="overflow-hidden rounded-sm border border-border bg-page">

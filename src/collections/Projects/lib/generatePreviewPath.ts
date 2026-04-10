@@ -8,12 +8,9 @@ export const generatePreviewPath = ({ collection, slug }: Props) => {
     return null
   }
 
-  const encodedSlug = encodeURIComponent(slug)
-
   const encodedParams = new URLSearchParams({
-    slug: encodedSlug,
+    slug,
     collection,
-    path: `/projects/${encodedSlug}`,
     previewSecret: process.env.PREVIEW_SECRET || '',
   })
 

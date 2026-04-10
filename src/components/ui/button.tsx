@@ -1,6 +1,7 @@
 import { cn } from '@/utilities/ui'
 import { Slot } from '@radix-ui/react-slot'
 import { type VariantProps, cva } from 'class-variance-authority'
+import Link from 'next/link'
 import * as React from 'react'
 
 export const terminalStyleShellClass =
@@ -116,33 +117,61 @@ const buttonVariants = cva(terminalStyleShellClass, {
   },
 })
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
-  asChild?: boolean
-  ref?: React.Ref<HTMLButtonElement>
+type NextLinkProps = React.ComponentProps<typeof Link>
+
+type SharedButtonProps = VariantProps<typeof buttonVariants> & {
+  className?: string
   showArrow?: boolean
 }
 
-const Button: React.FC<ButtonProps> = ({
-  asChild = false,
-  children,
-  className,
-  ref,
-  showArrow = false,
-  size,
-  variant,
-  ...props
-}) => {
-  if (asChild) {
+type ButtonNativeProps = SharedButtonProps &
+  Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'> & {
+    href?: undefined
+    asChild?: false
+    ref?: React.Ref<HTMLButtonElement>
+  }
+
+type ButtonSlotProps = SharedButtonProps &
+  Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'> & {
+    href?: undefined
+    asChild: true
+    children: React.ReactElement
+    ref?: React.Ref<HTMLElement>
+  }
+
+type ButtonLinkProps = SharedButtonProps &
+  Omit<NextLinkProps, 'className' | 'children'> & {
+    href: NextLinkProps['href']
+    asChild?: never
+    children?: React.ReactNode
+    ref?: React.Ref<HTMLAnchorElement | null>
+  }
+
+export type ButtonProps = ButtonNativeProps | ButtonSlotProps | ButtonLinkProps
+
+const Button: React.FC<ButtonProps> = (props) => {
+  const { children, className, showArrow = false, size, variant } = props
+
+  if ('asChild' in props && props.asChild) {
     const child = React.Children.only(children) as React.ReactElement<{
       children?: React.ReactNode
       className?: string
     }>
+    const {
+      asChild: _asChild,
+      children: _c,
+      className: _cl,
+      ref,
+      showArrow: _sa,
+      size: _si,
+      variant: _va,
+      ...slotRest
+    } = props as ButtonSlotProps
     return (
       <Slot
         className={cn(buttonVariants({ className, size, variant }))}
         ref={ref as React.Ref<HTMLElement>}
-        {...props}
+        {...slotRest}
       >
         {React.cloneElement(child, {
           children: (
@@ -155,7 +184,32 @@ const Button: React.FC<ButtonProps> = ({
     )
   }
 
-  const { type, ...rest } = props
+  if ('href' in props && props.href != null) {
+    const {
+      href,
+      ref,
+      className: _cn,
+      showArrow: _sa,
+      size: _s,
+      variant: _v,
+      children: _linkChild,
+      ...linkRest
+    } = props as ButtonLinkProps
+    return (
+      <Link
+        ref={ref}
+        href={href}
+        className={cn(buttonVariants({ className, size, variant }))}
+        {...linkRest}
+      >
+        <TerminalStyleContent showArrow={showArrow} showPrompt={false} variant={variant}>
+          {children}
+        </TerminalStyleContent>
+      </Link>
+    )
+  }
+
+  const { type, ref, ...rest } = props as ButtonNativeProps
 
   return (
     <button

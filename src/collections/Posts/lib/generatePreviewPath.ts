@@ -9,13 +9,9 @@ export const generatePreviewPath = ({ collection, slug }: Props) => {
     return null
   }
 
-  // Encode to support slugs with special characters
-  const encodedSlug = encodeURIComponent(slug)
-
   const encodedParams = new URLSearchParams({
-    slug: encodedSlug,
+    slug,
     collection,
-    path: `/posts/${encodedSlug}`,
     previewSecret: process.env.PREVIEW_SECRET || '',
   })
 

@@ -651,6 +651,7 @@ export const posts = pgTable(
     meta_description: varchar('meta_description'),
     readTime: numeric('read_time', { mode: 'number' }),
     publishedAt: timestamp('published_at', { mode: 'string', withTimezone: true, precision: 3 }),
+    featured: boolean('featured').default(false),
     generateSlug: boolean('generate_slug').default(true),
     slug: varchar('slug'),
     updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
@@ -756,6 +757,7 @@ export const _posts_v = pgTable(
       withTimezone: true,
       precision: 3,
     }),
+    version_featured: boolean('version_featured').default(false),
     version_generateSlug: boolean('version_generate_slug').default(true),
     version_slug: varchar('version_slug'),
     version_updatedAt: timestamp('version_updated_at', {
@@ -891,6 +893,7 @@ export const projects = pgTable(
     description: jsonb('description'),
     liveUrl: varchar('live_url'),
     codeUrl: varchar('code_url'),
+    role: varchar('role'),
     meta_title: varchar('meta_title'),
     meta_image: integer('meta_image_id').references(() => media.id, {
       onDelete: 'set null',
@@ -1007,6 +1010,7 @@ export const _projects_v = pgTable(
     version_description: jsonb('version_description'),
     version_liveUrl: varchar('version_live_url'),
     version_codeUrl: varchar('version_code_url'),
+    version_role: varchar('version_role'),
     version_meta_title: varchar('version_meta_title'),
     version_meta_image: integer('version_meta_image_id').references(() => media.id, {
       onDelete: 'set null',
@@ -1974,10 +1978,8 @@ export const site_settings = pgTable(
     id: serial('id').primaryKey(),
     name: varchar('name').notNull().default('Jamie McNeil'),
     statusText: varchar('status_text').notNull().default('available for work'),
-    statusNote: varchar('status_note'),
     email: varchar('email').notNull().default('jamie@jamjam.dev'),
     location: varchar('location').notNull().default('Melbourne, Australia'),
-    footerNote: varchar('footer_note'),
     aboutSectionLabel: varchar('about_section_label').notNull().default('// about'),
     aboutHeadline: varchar('about_headline')
       .notNull()

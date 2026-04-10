@@ -41,6 +41,7 @@ export const Posts: CollectionConfig<'posts'> = {
     slug: true,
     excerpt: true,
     readTime: true,
+    featured: true,
     tags: true,
     heroImage: true,
     publishedAt: true,
@@ -50,7 +51,7 @@ export const Posts: CollectionConfig<'posts'> = {
     },
   },
   admin: {
-    defaultColumns: ['title', 'slug', 'publishedAt', 'updatedAt'],
+    defaultColumns: ['title', 'slug', 'featured', 'publishedAt', 'updatedAt'],
     livePreview: {
       url: ({ data }) =>
         generatePreviewPath({
@@ -144,7 +145,7 @@ export const Posts: CollectionConfig<'posts'> = {
               type: 'relationship',
               admin: {
                 position: 'sidebar',
-                description: 'Select one or more tags for filtering and display.',
+                description: 'Tags for filtering on the posts page.',
               },
               hasMany: true,
               relationTo: 'tags',
@@ -208,6 +209,16 @@ export const Posts: CollectionConfig<'posts'> = {
             return value
           },
         ],
+      },
+    },
+    {
+      name: 'featured',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description:
+          'Pinned on /posts in the featured row. Only the two most recent featured posts are shown (by published date).',
       },
     },
     {

@@ -1,0 +1,53 @@
+import { draftMode } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+const allowedCollections = ['posts', 'projects'] as const
+type PreviewCollection = (typeof allowedCollections)[number]
+
+function isPreviewCollection(value: string): value is PreviewCollection {
+  return (allowedCollections as readonly string[]).includes(value)
+}
+
+function buildPreviewPath(collection: PreviewCollection, slug: string): string {
+  const segment = encodeURIComponent(slug)
+  return collection === 'posts' ? `/posts/${segment}` : `/projects/${segment}`
+}
+
+export async function GET(request: Request): Promise<Response> {
+  const secret = process.env.PREVIEW_SECRET
+  if (!secret?.trim()) {
+    return new Response('Preview not configured', { status: 503 })
+  }
+
+  const { searchParams } = new URL(request.url)
+  if (searchParams.get('previewSecret') !== secret) {
+    return new Response('Invalid token', { status: 401 })
+  }
+
+  const collectionParam = searchParams.get('collection')
+  if (!collectionParam || !isPreviewCollection(collectionParam)) {
+    return new Response('Invalid collection', { status: 400 })
+  }
+  const collection = collectionParam
+
+  const slugParam = searchParams.get('slug')
+  if (slugParam === null || String(slugParam).trim() === '') {
+    return new Response('Invalid slug', { status: 400 })
+  }
+
+  let slug: string
+  try {
+    slug = decodeURIComponent(slugParam)
+  } catch {
+    slug = slugParam
+  }
+
+  if (slug.trim() === '' || slug.includes('/') || slug.includes('\\') || slug.includes('..')) {
+    return new Response('Invalid slug', { status: 400 })
+  }
+
+  const path = buildPreviewPath(collection, slug)
+  ;(await draftMode()).enable()
+
+  return NextResponse.redirect(new URL(path, request.url))
+}

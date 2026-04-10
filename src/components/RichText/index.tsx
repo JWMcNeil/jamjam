@@ -76,20 +76,35 @@ type Props = {
   data: DefaultTypedEditorState
   enableGutter?: boolean
   enableProse?: boolean
+  /** When prose is on: `center` uses mx-auto (default); `flush` aligns to the parent’s start edge. */
+  proseLayout?: 'center' | 'flush'
+  /** Forwarded to Payload’s converter; use `true` to ignore alignment from the editor (e.g. centered blocks). */
+  disableTextAlign?: boolean | string[]
 } & React.HTMLAttributes<HTMLDivElement>
 
 export default function RichText(props: Props) {
-  const { className, enableProse = true, enableGutter = true, ...rest } = props
+  const {
+    className,
+    enableProse = true,
+    enableGutter = true,
+    proseLayout = 'center',
+    disableTextAlign,
+    ...rest
+  } = props
   return (
     <ConvertRichText
       converters={jsxConverters}
+      disableTextAlign={disableTextAlign}
       className={cn(
         'payload-richtext',
         {
           container: enableGutter,
           'max-w-none': !enableGutter,
-          'mx-auto prose md:prose-md dark:prose-invert': enableProse,
         },
+        enableProse && [
+          'prose md:prose-md dark:prose-invert',
+          proseLayout === 'flush' ? 'mx-0 w-full text-left' : 'mx-auto',
+        ],
         className,
       )}
       {...rest}

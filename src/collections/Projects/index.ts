@@ -37,11 +37,13 @@ export const Projects: CollectionConfig<'projects'> = {
     year: true,
     excerpt: true,
     heroImage: true,
+    gallery: true,
     tags: true,
     featured: true,
     order: true,
     liveUrl: true,
     codeUrl: true,
+    role: true,
     meta: {
       image: true,
       description: true,
@@ -232,6 +234,14 @@ export const Projects: CollectionConfig<'projects'> = {
                   return 'Must be a valid URL starting with http:// or https://'
                 }
                 return true
+              },
+            },
+            {
+              name: 'role',
+              type: 'text',
+              admin: {
+                description:
+                  'Shown on the project page as // role (e.g. Development & deployment).',
               },
             },
           ],
