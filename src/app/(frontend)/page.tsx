@@ -2,6 +2,7 @@ import configPromise from '@payload-config'
 import { About } from '@/components/About'
 import { LatestPosts } from '@/components/LatestPosts'
 import { ProjectCard } from '@/components/ProjectCard'
+import RichText from '@/components/RichText'
 import { StatusDot } from '@/components/StatusDot'
 import type { SiteSetting } from '@/payload-types'
 import { getCachedGlobal } from '@/utilities/getGlobals'
@@ -45,7 +46,7 @@ export default async function HomePage() {
       {/* Hero */}
       <section className="py-16 md:py-24">
         <h1 className="text-4xl md:text-6xl lg:text-7xl  font-black text-text-heading leading-tight">
-          Full-stack dev.
+          Creative developer.
           <br />
           <span className="text-text-secondary">Making things with</span>{' '}
           <span className="font-bold text-text-heading">web + AI.</span>
@@ -57,6 +58,17 @@ export default async function HomePage() {
           <span className="text-accent">{siteSettings.statusText}</span>
           <StatusDot />
         </p>
+        {siteSettings.homeIntro && (
+          <div className="mt-10 max-w-full text-pretty">
+            <RichText
+              data={siteSettings.homeIntro}
+              enableGutter={false}
+              proseInvert={false}
+              proseLayout="flush"
+              className="text-lg text-text-muted prose-p:mt-0 prose-p:text-text-secondary prose-strong:text-text-heading prose-a:text-accent prose-a:no-underline hover:prose-a:underline"
+            />
+          </div>
+        )}
       </section>
 
       {/* Featured Projects */}

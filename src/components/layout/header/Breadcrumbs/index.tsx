@@ -95,7 +95,7 @@ export function BreadcrumbCollapsed() {
     return (
       <Breadcrumb>
         <span
-          className="font-mono text-xs text-muted-foreground md:text-sm"
+          className="font-mono text-xs text-text-dim md:text-sm"
           aria-current="page"
         >
           ~/home
@@ -109,13 +109,13 @@ export function BreadcrumbCollapsed() {
       <div className="flex min-w-0 items-center font-mono text-xs md:text-sm">
         <Link
           href="/"
-          className="shrink-0 text-muted-foreground transition-colors hover:text-muted-foreground"
+          className="shrink-0 text-text-dim transition-colors hover:text-foreground"
         >
           ~/home
         </Link>
         {items.length > itemsToDisplay ? (
           <>
-            <span aria-hidden="true" className="shrink-0 text-muted-foreground">
+            <span aria-hidden="true" className="shrink-0 text-text-dim hover:text-muted-foreground">
               /
             </span>
             {isDesktop ? (
@@ -148,7 +148,7 @@ export function BreadcrumbCollapsed() {
                       <Link
                         key={index}
                         href={item.href ?? '/'}
-                        className="py-2 font-mono text-sm transition-colors text-muted-foreground hover:text-foreground"
+                        className="py-2 font-mono text-sm transition-colors text-text-dim hover:text-foreground"
                         onClick={() => setOpen(false)}
                       >
                         {item.label}
@@ -167,18 +167,18 @@ export function BreadcrumbCollapsed() {
         ) : null}
         {visibleItems.map((item, index) => (
           <React.Fragment key={index}>
-            <span aria-hidden="true" className="shrink-0 text-muted-foreground">
+            <span aria-hidden="true" className="shrink-0 text-text-dim">
               /
             </span>
             {item.href ? (
               <Link
                 href={item.href}
-                className="max-w-[120px] truncate text-muted-foreground transition-colors hover:text-foreground sm:max-w-[200px] md:max-w-none"
+                className="max-w-[120px] truncate text-text-dim transition-colors hover:text-foreground sm:max-w-[200px] md:max-w-none"
               >
                 {item.label}
               </Link>
             ) : (
-              <span className="max-w-[120px] truncate font-mono text-muted-foreground sm:max-w-[200px] md:max-w-none">
+              <span className="max-w-[120px] truncate font-mono text-text-dim sm:max-w-[200px] md:max-w-none">
                 {item.label}
               </span>
             )}

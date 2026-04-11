@@ -1,10 +1,17 @@
+import { getHrefForSitePage } from '@/constants/sitePageRoutes'
+
 import type { Header } from '@/payload-types'
 
 type NavLink = NonNullable<NonNullable<Header['navItems']>[number]['link']>
 
 export function getNavItemHref(link: NavLink | null | undefined): string | null {
   if (!link) return null
-  const { type, reference, url } = link
+  const { type, reference, sitePage, url } = link
+
+  if (type === 'sitePage') {
+    return getHrefForSitePage(sitePage)
+  }
+
   if (
     type === 'reference' &&
     typeof reference?.value === 'object' &&

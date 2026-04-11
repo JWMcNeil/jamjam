@@ -102,6 +102,30 @@ function PostAuthorSection({ siteSettings }: { siteSettings: SiteSetting }) {
   )
 }
 
+function buildPostArticleGridTemplates({
+  hasHero,
+  hasChapters,
+}: {
+  hasHero: boolean
+  hasChapters: boolean
+}) {
+  const mobileAreas: string[] = ['back', 'title', 'meta']
+  if (hasHero) mobileAreas.push('hero')
+  if (hasChapters) mobileAreas.push('chapters')
+  mobileAreas.push('body')
+
+  const mobileTemplate = mobileAreas.map((a) => `"${a}"`).join(' ')
+
+  const desktopRows: string[][] = [['back', 'back']]
+  if (hasHero) desktopRows.push(['hero', 'hero'])
+  desktopRows.push(['title', 'aside'])
+  desktopRows.push(['body', 'aside'])
+
+  const desktopTemplate = desktopRows.map((row) => `"${row.join(' ')}"`).join(' ')
+
+  return { mobileTemplate, desktopTemplate }
+}
+
 export function PostArticle({
   post,
   siteSettings,
@@ -112,63 +136,81 @@ export function PostArticle({
   outline: LexicalHeadingOutlineItem[]
 }) {
   const hero = post.heroImage
+  const excerptText = post.excerpt?.trim() ?? ''
+  const hasExcerpt = Boolean(excerptText)
+  const hasHero = Boolean(hero && typeof hero !== 'string')
+  const hasChapters = outline.length > 0
   const headingIds = outline.map((h) => h.id)
   const related = post.relatedPosts?.filter((p): p is Post => typeof p === 'object') ?? []
 
+  const { mobileTemplate, desktopTemplate } = buildPostArticleGridTemplates({
+    hasHero,
+    hasChapters,
+  })
+
   return (
-    <div className="mx-auto w-full max-w-[1100px] px-4 py-16 md:px-10">
-      <Link
-        href="/posts"
-        className="mb-2 inline-block font-mono text-sm text-text-prompt transition-colors hover:text-text-heading"
+    <div className="mx-auto w-full max-w-[1100px] px-4 py-2 md:py-16 md:px-10">
+      <div
+        className="post-article-layout"
+        style={
+          {
+            '--post-mobile-areas': mobileTemplate,
+            '--post-desktop-areas': desktopTemplate,
+          } as React.CSSProperties
+        }
       >
-        ← ls posts/
-      </Link>
-      <p className="mb-10 font-mono text-sm text-text-prompt">
-        jamjam:~$ <span className="text-accent">cat posts/{post.slug}.md</span>
-      </p>
+        <Link
+          href="/posts"
+          className="[grid-area:back] inline-block font-mono text-sm text-text-prompt transition-colors hover:text-text-heading"
+        >
+          ← ls posts/
+        </Link>
 
-      {hero && typeof hero !== 'string' ? (
-        <div className="relative mb-8 aspect-2/1 w-full overflow-hidden border border-border bg-black lg:mb-10">
-          <Media
-            fill
-            priority
-            resource={hero}
-            htmlElement="div"
-            className="absolute inset-0 h-full w-full"
-            imgClassName="object-cover"
-          />
-        </div>
-      ) : null}
-
-      {outline.length > 0 ? (
-        <div className="mb-10 lg:hidden">
-          <PostContentsAside outline={outline} />
-        </div>
-      ) : null}
-
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-12">
-        <div className="min-w-0">
-          <h1 className="mb-8 text-3xl font-bold tracking-tight text-text-heading md:text-4xl lg:text-5xl">
+        <div className="[grid-area:title] min-w-0">
+          <h1 className="text-3xl font-bold tracking-tight text-text-heading md:text-4xl lg:text-5xl">
             {post.title}
           </h1>
-
-          <PostBodyRichText
-            data={post.content}
-            headingIds={headingIds}
-            enableGutter={false}
-            enableProse
-            proseLayout="flush"
-          />
+          {hasExcerpt ? (
+            <p className="mt-2 text-lg leading-relaxed text-text-secondary">{excerptText}</p>
+          ) : null}
         </div>
 
-        <aside className="hidden min-w-0 flex-col gap-6 lg:flex lg:sticky lg:top-24 lg:self-start">
+        <div className="[grid-area:meta] lg:hidden">
+          <PostMetaAside post={post} />
+        </div>
+
+        {hasHero && hero && typeof hero !== 'string' ? (
+          <div className="[grid-area:hero] relative aspect-square w-full overflow-hidden border border-border bg-black md:aspect-2/1">
+            <Media
+              fill
+              priority
+              resource={hero}
+              htmlElement="div"
+              className="absolute inset-0 h-full w-full"
+              imgClassName="object-cover"
+            />
+          </div>
+        ) : null}
+
+        {hasChapters ? (
+          <div className="[grid-area:chapters] lg:hidden">
+            <PostContentsAside outline={outline} />
+          </div>
+        ) : null}
+
+        <PostBodyRichText
+          className="[grid-area:body] min-w-0"
+          data={post.content}
+          headingIds={headingIds}
+          enableGutter={false}
+          enableProse
+          proseLayout="flush"
+        />
+
+        <aside className="[grid-area:aside] hidden min-w-0 flex-col gap-6 lg:flex lg:sticky lg:top-24 lg:self-start">
           <PostMetaAside post={post} />
           <PostContentsAside outline={outline} />
         </aside>
-      </div>
-
-      <div className="mt-10 lg:hidden">
-        <PostMetaAside post={post} />
       </div>
 
       <PostAuthorSection siteSettings={siteSettings} />

@@ -107,7 +107,7 @@ const buttonVariants = cva(terminalStyleShellClass, {
       destructive:
         'border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20',
       ghost: 'border border-transparent bg-transparent text-text-heading hover:bg-card',
-      link: 'h-auto min-h-0 justify-start border border-transparent bg-transparent p-0 text-primary underline-offset-4 hover:underline',
+      link: 'h-auto min-h-0 justify-start  bg-transparent p-0 text-primary underline-offset-4 ',
       outline: 'border border-border bg-page text-text-heading hover:bg-card',
       secondary: 'border border-border-subtle bg-grey-150 text-text-heading hover:bg-grey-200',
       miniOutline:

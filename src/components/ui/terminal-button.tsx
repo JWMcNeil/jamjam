@@ -18,7 +18,7 @@ const terminalButtonVariants = cva(terminalStyleShellClass, {
     variant: {
       'accent-bracket': 'border border-border bg-page text-text-heading hover:bg-card',
       'accent-prompt': 'border border-border bg-page text-text-heading hover:bg-card',
-      inverse: 'border border-border-subtle bg-grey-150 text-text-heading hover:bg-grey-200',
+      inverse: 'border border-border-subtle bg-page text-text-heading hover:bg-card',
       outline: 'border border-border bg-page text-text-heading hover:bg-card',
       solid: 'border border-border bg-grey-100 text-text-heading hover:bg-grey-150',
     },

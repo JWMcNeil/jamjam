@@ -6,12 +6,19 @@ import { usePathname } from 'next/navigation'
 import type { Header as HeaderType } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
+import { cn } from '@/utilities/ui'
 import Link from 'next/link'
 import { SearchIcon, Menu, X } from 'lucide-react'
 
+import { getNavItemHref } from './navSheetPaths'
 import { getResolvedHeaderNavItems } from './resolveNavItems'
 
 const SHOW_HEADER_SEARCH = false
+
+function normalizePath(path: string): string {
+  const stripped = path.split('?')[0]?.replace(/\/+$/, '') || '/'
+  return stripped === '' ? '/' : stripped
+}
 
 interface HeaderNavProps {
   data: HeaderType
@@ -79,11 +86,19 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
         {resolvedNavItems.map(({ link }, i) => {
           if (!link) return null
 
+          const href = getNavItemHref(link)
+          const isActive = href ? normalizePath(pathname) === normalizePath(href) : false
+
           return (
             <CMSLink
               key={i}
               {...link}
-              className="bg-background/80 font-mono text-sm text-foreground hover:text-white duration-300 transition-colors"
+              appearance={link.appearance ?? 'inline'}
+              aria-current={isActive ? 'page' : undefined}
+              className={cn(
+                'bg-background/80 font-mono text-sm text-foreground transition-colors duration-300 hover:text-white',
+                isActive && 'text-white',
+              )}
             />
           )
         })}

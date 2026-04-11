@@ -1,5 +1,6 @@
 import type { Field, GroupField } from 'payload'
 
+import { SITE_PAGE_OPTIONS } from '@/constants/sitePageRoutes'
 import deepMerge from '@/utilities/deepMerge'
 import { iconOptions } from '@/utilities/icons'
 
@@ -35,17 +36,42 @@ type LinkSize = 'clear' | 'default' | 'icon' | 'lg' | 'sm'
 
 type LinkType = (options?: {
   appearances?: LinkAppearances[] | false
+  /** Default selected appearance for new links (header often uses `link`). */
+  appearanceDefault?: LinkAppearances
   disableLabel?: boolean
+  /** Adds “Site page” (home, posts, projects, contact) as an internal link target. */
+  enableSitePages?: boolean
   sizes?: LinkSize[] | false
   overrides?: Partial<GroupField>
 }) => Field
 
 export const link: LinkType = ({
   appearances,
+  appearanceDefault = 'default',
   disableLabel = false,
+  enableSitePages = false,
   sizes,
   overrides = {},
 } = {}) => {
+  const typeRadioOptions = [
+    {
+      label: 'Internal link',
+      value: 'reference',
+    },
+    ...(enableSitePages
+      ? [
+          {
+            label: 'Site page',
+            value: 'sitePage',
+          },
+        ]
+      : []),
+    {
+      label: 'Custom URL',
+      value: 'custom',
+    },
+  ]
+
   const linkResult: GroupField = {
     name: 'link',
     type: 'group',
@@ -64,16 +90,7 @@ export const link: LinkType = ({
               width: '50%',
             },
             defaultValue: 'reference',
-            options: [
-              {
-                label: 'Internal link',
-                value: 'reference',
-              },
-              {
-                label: 'Custom URL',
-                value: 'custom',
-              },
-            ],
+            options: typeRadioOptions,
           },
           {
             name: 'newTab',
@@ -102,6 +119,20 @@ export const link: LinkType = ({
       relationTo: ['posts', 'projects'],
       required: true,
     },
+    ...(enableSitePages
+      ? [
+          {
+            name: 'sitePage',
+            type: 'select',
+            admin: {
+              condition: (_, siblingData) => siblingData?.type === 'sitePage',
+            },
+            label: 'Site page',
+            options: [...SITE_PAGE_OPTIONS],
+            required: true,
+          } as Field,
+        ]
+      : []),
     {
       name: 'url',
       type: 'text',
@@ -114,14 +145,6 @@ export const link: LinkType = ({
   ]
 
   if (!disableLabel) {
-    linkTypes.map((linkType) => ({
-      ...linkType,
-      admin: {
-        ...linkType.admin,
-        width: '50%',
-      },
-    }))
-
     linkResult.fields.push({
       type: 'row',
       fields: [
@@ -155,7 +178,7 @@ export const link: LinkType = ({
       admin: {
         description: 'Choose how the link should be rendered.',
       },
-      defaultValue: 'default',
+      defaultValue: appearanceDefault,
       options: appearanceOptionsToUse,
     })
   }

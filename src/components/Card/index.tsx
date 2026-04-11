@@ -4,7 +4,7 @@ import useClickableCard from '@/utilities/useClickableCard'
 import Link from 'next/link'
 import React, { Fragment } from 'react'
 
-import type { Post, Project } from '@/payload-types'
+import type { Media as MediaType, Post, Project } from '@/payload-types'
 
 import { Media } from '@/components/Media'
 import { formatPostMonthYear } from '@/utilities/formatPostDate'
@@ -51,23 +51,29 @@ export const Card: React.FC<{
   return (
     <article
       className={cn(
-        'border border-border rounded-lg overflow-hidden bg-card hover:cursor-pointer',
+        'overflow-hidden rounded-sm border border-border bg-card transition-colors hover:cursor-pointer hover:bg-card-hover',
         className,
       )}
       ref={card.ref}
     >
-      <div className="relative w-full ">
-        {!displayImage && <div className="">No image</div>}
-        {displayImage && typeof displayImage !== 'string' && (
-          <Media resource={displayImage} size="33vw" />
-        )}
+      <div className="relative aspect-video w-full shrink-0 bg-muted">
+        {displayImage && typeof displayImage !== 'string' ? (
+          <Media
+            htmlElement={null}
+            fill
+            pictureClassName="absolute inset-0 block h-full w-full"
+            imgClassName="object-cover"
+            resource={displayImage as MediaType}
+            size="33vw"
+          />
+        ) : null}
       </div>
-      <div className="p-4">
+      <div className="flex flex-col gap-2 p-4 md:p-5">
         {showCategories && hasTags && (
           <div
             className={cn(
-              'mb-4 font-mono text-xs text-text-secondary',
-              !terminalCommentTags && 'uppercase text-sm',
+              'font-mono text-xs text-text-secondary',
+              !terminalCommentTags && 'text-sm uppercase',
             )}
           >
             <div>
@@ -90,25 +96,25 @@ export const Card: React.FC<{
             </div>
           </div>
         )}
-        {titleToUse && (
-          <div className="prose">
-            <h3>
-              <Link className="not-prose" href={href} ref={link.ref}>
-                {titleToUse}
-              </Link>
-            </h3>
-          </div>
-        )}
+        {titleToUse ? (
+          <h3 className="text-lg font-semibold leading-snug text-text-heading">
+            <Link
+              className="transition-colors hover:text-text-primary focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              href={href}
+              ref={link.ref}
+            >
+              {titleToUse}
+            </Link>
+          </h3>
+        ) : null}
         {relationTo === 'posts' && publishedAt ? (
-          <p className="mt-2 font-mono text-xs text-text-muted tabular-nums">
+          <p className="font-mono text-xs text-text-muted tabular-nums">
             {formatPostMonthYear(publishedAt)}
           </p>
         ) : null}
-        {description && (
-          <div className="text-muted-foreground text-sm mt-2">
-            {description && <p>{sanitizedDescription}</p>}
-          </div>
-        )}
+        {sanitizedDescription ? (
+          <p className="line-clamp-3 text-sm leading-relaxed text-text-secondary">{sanitizedDescription}</p>
+        ) : null}
       </div>
     </article>
   )

@@ -57,21 +57,21 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
   const showcaseMedia = getProjectShowcaseMedia(project)
 
   return (
-    <article className="mx-auto w-full max-w-7xl px-4 py-16 md:px-4 ">
+    <article className="mx-auto w-full max-w-7xl px-4 py-8 md:py-16 md:px-4 ">
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
 
       <Link
         href="/projects"
-        className="mb-6 inline-block font-mono text-sm text-text-prompt transition-colors hover:text-text-heading"
+        className="mb-2 inline-block font-mono text-sm text-text-prompt transition-colors hover:text-text-heading"
       >
         ← ls projects/
       </Link>
 
-      <p className="mb-4 font-mono text-sm text-text-prompt">
+      {/* <p className="mb-4 font-mono text-sm text-text-prompt">
         jamjam~$ <span className="text-accent">cat projects/{project.slug}/readme.md</span>
-      </p>
+      </p> */}
 
       <div className="mb-10 space-y-6 pt-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">

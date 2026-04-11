@@ -1,4 +1,9 @@
 import type { GlobalConfig } from 'payload'
+import {
+  FixedToolbarFeature,
+  InlineToolbarFeature,
+  lexicalEditor,
+} from '@payloadcms/richtext-lexical'
 
 import { revalidateSiteSettings } from './hooks/revalidateSiteSettings'
 
@@ -11,7 +16,7 @@ export const SiteSettings: GlobalConfig = {
   admin: {
     group: 'Site',
     description:
-      'Name, contact, and status under General; home page about card copy and photo under About.',
+      'Name, contact, and status under General; optional home intro under Home; about card under About.',
   },
   hooks: {
     afterChange: [revalidateSiteSettings],
@@ -61,6 +66,66 @@ export const SiteSettings: GlobalConfig = {
               defaultValue: 'Melbourne, Australia',
               admin: {
                 description: 'Your location shown on the contact page and about section.',
+              },
+            },
+          ],
+        },
+        {
+          label: 'Contact',
+          admin: {
+            description: 'Copy for the /contact page hero and meta details.',
+          },
+          fields: [
+            {
+              name: 'contactHeadline',
+              type: 'text',
+              required: true,
+              defaultValue: "Let's work together.",
+              admin: {
+                description: 'Main headline on the contact page.',
+              },
+            },
+            {
+              name: 'contactIntro',
+              type: 'textarea',
+              required: true,
+              defaultValue:
+                "Whether it's a new project, a job opportunity, or just a question — my inbox is open.",
+              admin: {
+                description: 'Supporting paragraph under the headline.',
+              },
+            },
+            {
+              name: 'contactResponseTime',
+              type: 'text',
+              required: true,
+              defaultValue: 'usually within 24hrs',
+              admin: {
+                description: 'Shown next to // response time on the contact page.',
+              },
+            },
+          ],
+        },
+        {
+          label: 'Home',
+          admin: {
+            description: 'Optional copy on the home page below the terminal status line.',
+          },
+          fields: [
+            {
+              name: 'homeIntro',
+              type: 'richText',
+              required: false,
+              editor: lexicalEditor({
+                features: ({ rootFeatures }) => [
+                  ...rootFeatures,
+                  FixedToolbarFeature(),
+                  InlineToolbarFeature(),
+                ],
+              }),
+              admin: {
+                description:
+                  'Optional intro paragraph on the home page, shown below jamjam:~$ and the status.',
               },
             },
           ],

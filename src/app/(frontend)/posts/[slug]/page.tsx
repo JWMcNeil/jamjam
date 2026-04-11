@@ -55,7 +55,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   const outline = extractLexicalHeadings(post.content)
 
   return (
-    <article className="pt-16">
+    <article className="pt-8 md:pt-16">
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
@@ -81,7 +81,8 @@ const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
   const result = await payload.find({
     collection: 'posts',
     draft,
-    depth: 1,
+    // depth 2: relatedPosts are populated at 1, their heroImage/meta.image need another level
+    depth: 2,
     limit: 1,
     overrideAccess: draft,
     pagination: false,

@@ -1848,7 +1848,7 @@ export interface Header {
   navItems?:
     | {
         link?: {
-          type?: ('reference' | 'custom') | null;
+          type?: ('reference' | 'sitePage' | 'custom') | null;
           newTab?: boolean | null;
           reference?:
             | ({
@@ -1859,6 +1859,7 @@ export interface Header {
                 relationTo: 'projects';
                 value: number | Project;
               } | null);
+          sitePage?: ('home' | 'posts' | 'projects' | 'contact') | null;
           url?: string | null;
           label?: string | null;
           /**
@@ -1894,7 +1895,7 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
- * Name, contact, and status under General; home page about card copy and photo under About.
+ * Name, contact, and status under General; optional home intro under Home; about card under About.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
@@ -1917,6 +1918,36 @@ export interface SiteSetting {
    * Your location shown on the contact page and about section.
    */
   location: string;
+  /**
+   * Main headline on the contact page.
+   */
+  contactHeadline: string;
+  /**
+   * Supporting paragraph under the headline.
+   */
+  contactIntro: string;
+  /**
+   * Shown next to // response time on the contact page.
+   */
+  contactResponseTime: string;
+  /**
+   * Optional intro paragraph on the home page, shown below jamjam:~$ and the status.
+   */
+  homeIntro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Small label shown above the about card (e.g. // about).
    */
@@ -1950,6 +1981,7 @@ export interface HeaderSelect<T extends boolean = true> {
               type?: T;
               newTab?: T;
               reference?: T;
+              sitePage?: T;
               url?: T;
               label?: T;
               appearance?: T;
@@ -1981,6 +2013,10 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   statusText?: T;
   email?: T;
   location?: T;
+  contactHeadline?: T;
+  contactIntro?: T;
+  contactResponseTime?: T;
+  homeIntro?: T;
   aboutSectionLabel?: T;
   aboutHeadline?: T;
   aboutBio?: T;

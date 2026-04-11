@@ -3,13 +3,11 @@
 import Link from 'next/link'
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 
-import { TerminalButton } from '@/components/ui/terminal-button'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/utilities/ui'
 
 import type { Header } from '@/payload-types'
 
-import { getNavItemHref, hrefToTildePath, isContactNavLink } from './navSheetPaths'
+import { getNavItemHref } from './navSheetPaths'
 
 type NavItems = NonNullable<Header['navItems']>
 
@@ -94,8 +92,6 @@ export function MobileNavSheet({
               if (!link) return null
               const href = getNavItemHref(link)
               if (!href) return null
-              const tildePath = hrefToTildePath(href)
-              const isContact = isContactNavLink(link)
               const label = link.label?.trim() ?? ''
               const newTabProps = link.newTab
                 ? { rel: 'noopener noreferrer' as const, target: '_blank' as const }
@@ -112,30 +108,15 @@ export function MobileNavSheet({
                     {...newTabProps}
                   >
                     <span className="flex min-w-0 flex-1 items-start gap-2">
-                      {/* <span className="mt-0.5 shrink-0 text-xs text-muted-foreground/45" aria-hidden>
-                        $
-                      </span> */}
                       <span className="min-w-0">
                         <span className="block text-base font-medium leading-tight text-foreground">
                           {label}
                         </span>
-                        {/* <span className="mt-0.5 block truncate text-xs text-muted-foreground/70">
-                          {tildePath}
-                        </span> */}
                       </span>
                     </span>
-                    {isContact ? (
-                      <span className="shrink-0" aria-hidden>
-                        {/* <TerminalButton asChild variant="outline" size="sm">
-                          <span>contact</span>
-                        </TerminalButton> */}
-                        <Button asChild variant="outline" size="default"><span>contact</span></Button>
-                      </span>
-                    ) : (
-                      <span className="shrink-0 text-sm text-muted-foreground/45" aria-hidden>
-                        →
-                      </span>
-                    )}
+                    <span className="shrink-0 text-sm text-muted-foreground/45" aria-hidden>
+                      →
+                    </span>
                   </Link>
                 </li>
               )

@@ -11,6 +11,7 @@ import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { searchFields } from '@/search/fieldOverrides'
 import { beforeSyncWithSearch } from '@/search/beforeSync'
+import { revalidateContactForm } from '@/hooks/revalidateContactForm'
 
 import type { Post, Project } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -77,6 +78,9 @@ export const plugins: Plugin[] = [
       payment: false,
     },
     formOverrides: {
+      hooks: {
+        afterChange: [revalidateContactForm],
+      },
       fields: ({ defaultFields }) => {
         const updatedFields = defaultFields.map((field) => {
           if ('name' in field && field.name === 'confirmationMessage') {

@@ -11,6 +11,8 @@ type Props = {
   data: DefaultTypedEditorState
   enableGutter?: boolean
   enableProse?: boolean
+  /** When `enableProse` is true: apply `dark:prose-invert` (Tailwind Typography inverted palette in dark mode). Set false to style with your own classes instead. */
+  proseInvert?: boolean
   /** When prose is on: `center` uses mx-auto (default); `flush` aligns to the parent’s start edge. */
   proseLayout?: 'center' | 'flush'
   /** Forwarded to Payload’s converter; use `true` to ignore alignment from the editor (e.g. centered blocks). */
@@ -22,6 +24,7 @@ export default function RichText(props: Props) {
     className,
     enableProse = true,
     enableGutter = true,
+    proseInvert = true,
     proseLayout = 'center',
     disableTextAlign,
     ...rest
@@ -37,7 +40,8 @@ export default function RichText(props: Props) {
           'max-w-none': !enableGutter,
         },
         enableProse && [
-          'prose md:prose-md dark:prose-invert',
+          'prose md:prose-md',
+          proseInvert && 'dark:prose-invert',
           proseLayout === 'flush' ? 'mx-0 w-full text-left' : 'mx-auto',
         ],
         className,

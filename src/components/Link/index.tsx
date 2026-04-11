@@ -4,6 +4,8 @@ import { getIcon } from '@/utilities/icons'
 import Link from 'next/link'
 import React from 'react'
 
+import { getHrefForSitePage } from '@/constants/sitePageRoutes'
+
 import type { Post, Project } from '@/payload-types'
 
 type CMSLinkType = {
@@ -17,8 +19,9 @@ type CMSLinkType = {
     relationTo: 'posts' | 'projects'
     value: Post | Project | string | number
   } | null
+  sitePage?: string | null
   size?: ButtonProps['size'] | null
-  type?: 'custom' | 'reference' | null
+  type?: 'custom' | 'reference' | 'sitePage' | null
   url?: string | null
 }
 
@@ -32,14 +35,17 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     label,
     newTab,
     reference,
+    sitePage,
     size: sizeFromProps,
     url,
   } = props
 
   const href =
-    type === 'reference' && typeof reference?.value === 'object' && reference.value.slug
-      ? `/${reference.relationTo}/${reference.value.slug}`
-      : url
+    type === 'sitePage'
+      ? getHrefForSitePage(sitePage)
+      : type === 'reference' && typeof reference?.value === 'object' && reference.value.slug
+        ? `/${reference.relationTo}/${reference.value.slug}`
+        : url
 
   if (!href) return null
 

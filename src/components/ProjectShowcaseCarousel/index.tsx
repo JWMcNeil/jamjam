@@ -66,7 +66,7 @@ export const ProjectShowcaseCarousel: React.FC<Props> = ({ resources, className 
       >
         <button
           type="button"
-          className="shrink-0 px-1 py-1 hover:text-text-heading focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border rounded"
+          className="shrink-0 px-1 py-1 hover:text-text-heading focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border rounded cursor-pointer"
           aria-label="Previous screenshot"
           onClick={() => go(-1)}
         >
@@ -85,7 +85,7 @@ export const ProjectShowcaseCarousel: React.FC<Props> = ({ resources, className 
 
         <button
           type="button"
-          className="shrink-0 px-1 py-1 hover:text-text-heading focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border rounded"
+          className="shrink-0 px-1 py-1 hover:text-text-heading focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border rounded cursor-pointer"
           aria-label="Next screenshot"
           onClick={() => go(1)}
         >
