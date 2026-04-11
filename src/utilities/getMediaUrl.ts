@@ -24,7 +24,28 @@ function sameOriginPathOnly(href: string): string {
 
 function appendCacheTag(url: string, cacheTag: string): string {
   const sep = url.includes('?') ? '&' : '?'
-  return `${url}${sep}v=${encodeURIComponent(cacheTag)}`
+  // ISO timestamps contain ":" which survives encodeURIComponent; next/image then
+  // re-encodes for /_next/image and breaks the URL. Prefer a numeric cache buster.
+  const v = (() => {
+    const parsed = Date.parse(cacheTag)
+    if (!Number.isNaN(parsed)) return String(parsed)
+    return encodeURIComponent(cacheTag)
+  })()
+  return `${url}${sep}v=${v}`
+}
+
+/** True when src is absolute and not served from this app (e.g. R2 on media.*). */
+export function isCrossOriginMediaUrl(href: string): boolean {
+  if (!href.startsWith('http://') && !href.startsWith('https://')) {
+    return false
+  }
+  try {
+    const site = new URL(getServerSideURL())
+    const parsed = new URL(href)
+    return parsed.origin !== site.origin
+  } catch {
+    return false
+  }
 }
 
 /**

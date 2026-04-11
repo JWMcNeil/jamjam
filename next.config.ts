@@ -19,6 +19,19 @@ function parseAllowedDevOrigins(): string[] | undefined {
 
 const allowedDevOrigins = parseAllowedDevOrigins()
 
+/** R2 / public media host (e.g. https://media.jamjam.dev) — used for next/image + CSP. */
+function parseMediaOrigin(): URL | null {
+  const raw = process.env.NEXT_PUBLIC_MEDIA_URL || process.env.R2_PUBLIC_URL
+  if (typeof raw !== 'string' || !raw.trim()) return null
+  try {
+    return new URL(raw.trim())
+  } catch {
+    return null
+  }
+}
+
+const mediaOrigin = parseMediaOrigin()
+
 const nextConfig: NextConfig = {
   ...(allowedDevOrigins ? { allowedDevOrigins } : {}),
   output: 'standalone',
@@ -42,6 +55,16 @@ const nextConfig: NextConfig = {
           pathname: '/**',
         }
       }),
+      ...(mediaOrigin
+        ? [
+            {
+              protocol: mediaOrigin.protocol.replace(':', '') as 'http' | 'https',
+              hostname: mediaOrigin.hostname,
+              ...(mediaOrigin.port ? { port: mediaOrigin.port } : {}),
+              pathname: '/**' as const,
+            },
+          ]
+        : []),
     ],
   },
   reactStrictMode: true,
@@ -49,12 +72,18 @@ const nextConfig: NextConfig = {
     return (await redirects()) as Awaited<ReturnType<NonNullable<NextConfig['redirects']>>>
   },
   async headers() {
+    const imgSrc = [
+      "'self'",
+      'data:',
+      'blob:',
+      ...(mediaOrigin ? [mediaOrigin.origin] : []),
+    ].join(' ')
     const csp = [
       "default-src 'self'",
       // Payload admin relies on eval in some bundled paths; keep inline for Next.js.
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob:",
+      `img-src ${imgSrc}`,
       "font-src 'self'",
       "connect-src 'self' https://api.anthropic.com",
     ].join('; ')

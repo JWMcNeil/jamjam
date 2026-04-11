@@ -9,7 +9,7 @@ import React from 'react'
 import type { Props as MediaProps } from '../types'
 
 import { cssVariables } from '@/cssVariables'
-import { getMediaUrl } from '@/utilities/getMediaUrl'
+import { getMediaUrl, isCrossOriginMediaUrl } from '@/utilities/getMediaUrl'
 
 const { breakpoints } = cssVariables
 
@@ -68,6 +68,10 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     pictureClassName,
   )
 
+  const srcStr = typeof src === 'string' ? src : ''
+  // R2/CDN URLs must skip /_next/image — the optimizer double-encodes ?v= and returns 400.
+  const unoptimized = Boolean(srcStr && isCrossOriginMediaUrl(srcStr))
+
   return (
     <picture className={resolvedPictureClassName}>
       <NextImage
@@ -75,12 +79,13 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         className={cn(imgClassName)}
         fill={fill}
         height={!fill ? height : undefined}
-        placeholder="blur"
-        blurDataURL={placeholderBlur}
+        placeholder={unoptimized ? 'empty' : 'blur'}
+        blurDataURL={unoptimized ? undefined : placeholderBlur}
         priority={priority}
         loading={loading}
         sizes={sizes}
         src={src}
+        unoptimized={unoptimized}
         width={!fill ? width : undefined}
       />
     </picture>
