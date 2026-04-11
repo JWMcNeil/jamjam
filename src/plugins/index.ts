@@ -12,6 +12,7 @@ import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/
 import { searchFields } from '@/search/fieldOverrides'
 import { beforeSyncWithSearch } from '@/search/beforeSync'
 import { revalidateContactForm } from '@/hooks/revalidateContactForm'
+import { r2StoragePlugin } from '@/plugins/r2Storage'
 
 import type { Post, Project } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -32,6 +33,7 @@ const generateURL: GenerateURL<Post | Project> = ({ doc, collectionSlug }) => {
 }
 
 export const plugins: Plugin[] = [
+  r2StoragePlugin,
   muxVideoPlugin({
     enabled: true,
     initSettings: {
