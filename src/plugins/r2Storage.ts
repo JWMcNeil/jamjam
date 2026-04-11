@@ -10,7 +10,9 @@ export const r2StoragePlugin = s3Storage({
   enabled: Boolean(process.env.R2_BUCKET),
   collections: {
     media: {
-      disablePayloadAccessControl: true,
+      // Omit disablePayloadAccessControl (do not set true). If true, no S3 staticHandler
+      // is registered and /api/media/file falls back to disk. generateFileURL still
+      // uses R2_PUBLIC_URL for public URLs.
       generateFileURL: ({ filename, prefix }) => {
         const key = prefix ? `${prefix}/${filename}` : filename
         const base = (process.env.R2_PUBLIC_URL ?? '').replace(/\/$/, '')
