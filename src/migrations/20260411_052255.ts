@@ -1,6 +1,19 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+  const existingEnumCheck = await db.execute(
+    sql`SELECT to_regtype('public.enum_tags_colour') AS enum_tags_colour`,
+  )
+  const existingEnumRows = (
+    existingEnumCheck as unknown as { rows?: Array<{ enum_tags_colour: string | null }> }
+  ).rows
+
+  if (existingEnumRows?.[0]?.enum_tags_colour) {
+    // Baseline migration was generated after schema already existed (dev sync case).
+    // No-op so Payload can mark this migration as applied.
+    return
+  }
+
   await db.execute(sql`
    CREATE TYPE "public"."enum_tags_colour" AS ENUM('nextjs', 'webdev', 'ai', 'webflow', 'js', 'design', 'opinion', 'tools', 'experiment', 'freelance', 'ux', 'career', 'tutorial', 'wordpress');
   CREATE TYPE "public"."enum_posts_status" AS ENUM('draft', 'published');
