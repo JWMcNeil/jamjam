@@ -8,6 +8,10 @@ declare global {
       /** Comma-separated hostnames for next.config.ts allowedDevOrigins (dev / Tailscale). */
       NEXT_DEV_EXTRA_ORIGINS?: string
       ANTHROPIC_API_KEY?: string
+      /** Google AI Studio / Gemini API key for Roast my website. */
+      GEMINI_API_KEY?: string
+      /** Optional Gemini model override for Roast my website. */
+      GEMINI_MODEL?: string
     }
   }
 }

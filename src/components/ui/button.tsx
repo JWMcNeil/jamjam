@@ -29,6 +29,9 @@ function labelClassForVariant(variant: string | null | undefined): string {
   if (v === 'link') {
     return 'inline-flex items-center gap-1'
   }
+  if (v === 'white') {
+    return 'inline-flex items-center gap-1 text-black'
+  }
   return 'inline-flex items-center gap-1 text-text-heading'
 }
 

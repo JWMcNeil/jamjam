@@ -58,75 +58,70 @@
   --color-text-default: #dddddd;
   --color-text-heading: #f0f0f0;
 
-  /* Tag colours — nextjs */
-  --color-tag-nextjs-bg: #0e0e18;
-  --color-tag-nextjs-text: #8888cc;
-  --color-tag-nextjs-border: #1a1a2c;
+  /* Tag colours — indigo */
+  --color-tag-indigo-bg: #0e0e18;
+  --color-tag-indigo-text: #8888cc;
+  --color-tag-indigo-border: #1a1a2c;
 
-  /* Tag colours — webdev */
-  --color-tag-webdev-bg: #0f0f1a;
-  --color-tag-webdev-text: #7777aa;
-  --color-tag-webdev-border: #1a1a2e;
+  /* Tag colours — blueSlate */
+  --color-tag-blueSlate-bg: #0f0f1a;
+  --color-tag-blueSlate-text: #7777aa;
+  --color-tag-blueSlate-border: #1a1a2e;
 
-  /* Tag colours — ai */
-  --color-tag-ai-bg: #0f1a14;
-  --color-tag-ai-text: #44aa99;
-  --color-tag-ai-border: #1a2e1e;
+  /* Tag colours — emerald */
+  --color-tag-emerald-bg: #0f1a14;
+  --color-tag-emerald-text: #44aa99;
+  --color-tag-emerald-border: #1a2e1e;
 
-  /* Tag colours — webflow */
-  --color-tag-webflow-bg: #0f1518;
-  --color-tag-webflow-text: #4499bb;
-  --color-tag-webflow-border: #1a2530;
+  /* Tag colours — teal */
+  --color-tag-teal-bg: #0f1518;
+  --color-tag-teal-text: #4499bb;
+  --color-tag-teal-border: #1a2530;
 
-  /* Tag colours — js */
-  --color-tag-js-bg: #1a1509;
-  --color-tag-js-text: #bbaa55;
-  --color-tag-js-border: #2e2614;
+  /* Tag colours — amber */
+  --color-tag-amber-bg: #1a1509;
+  --color-tag-amber-text: #bbaa55;
+  --color-tag-amber-border: #2e2614;
 
-  /* Tag colours — design */
-  --color-tag-design-bg: #1a0f12;
-  --color-tag-design-text: #cc7788;
-  --color-tag-design-border: #2e1a1e;
+  /* Tag colours — rose */
+  --color-tag-rose-bg: #1a0f12;
+  --color-tag-rose-text: #cc7788;
+  --color-tag-rose-border: #2e1a1e;
 
-  /* Tag colours — opinion */
-  --color-tag-opinion-bg: #1a130f;
-  --color-tag-opinion-text: #aa8877;
-  --color-tag-opinion-border: #2e1e1a;
+  /* Tag colours — brown */
+  --color-tag-brown-bg: #1a130f;
+  --color-tag-brown-text: #aa8877;
+  --color-tag-brown-border: #2e1e1a;
 
-  /* Tag colours — tools */
-  --color-tag-tools-bg: #1a1a0f;
-  --color-tag-tools-text: #aaaa99;
-  --color-tag-tools-border: #2a2a1a;
+  /* Tag colours — olive */
+  --color-tag-olive-bg: #1a1a0f;
+  --color-tag-olive-text: #aaaa99;
+  --color-tag-olive-border: #2a2a1a;
 
-  /* Tag colours — experiment */
-  --color-tag-experiment-bg: #1a1a0f;
-  --color-tag-experiment-text: #aaaa99;
-  --color-tag-experiment-border: #2a2a1a;
+  /* Tag colours — purple */
+  --color-tag-purple-bg: #1a0f1a;
+  --color-tag-purple-text: #aa77aa;
+  --color-tag-purple-border: #2e1a2e;
 
-  /* Tag colours — freelance */
-  --color-tag-freelance-bg: #1a0f1a;
-  --color-tag-freelance-text: #aa77aa;
-  --color-tag-freelance-border: #2e1a2e;
+  /* Tag colours — cyan */
+  --color-tag-cyan-bg: #0f1a1a;
+  --color-tag-cyan-text: #44aaaa;
+  --color-tag-cyan-border: #1a2e2e;
 
-  /* Tag colours — ux */
-  --color-tag-ux-bg: #0f1a1a;
-  --color-tag-ux-text: #44aaaa;
-  --color-tag-ux-border: #1a2e2e;
+  /* Tag colours — grey */
+  --color-tag-grey-bg: #1a1a1a;
+  --color-tag-grey-text: #999999;
+  --color-tag-grey-border: #2a2a2a;
 
-  /* Tag colours — career */
-  --color-tag-career-bg: #1a1a1a;
-  --color-tag-career-text: #999999;
-  --color-tag-career-border: #2a2a2a;
+  /* Tag colours — green */
+  --color-tag-green-bg: #0f1a10;
+  --color-tag-green-text: #55aa66;
+  --color-tag-green-border: #1a2e1c;
 
-  /* Tag colours — tutorial */
-  --color-tag-tutorial-bg: #0f1a10;
-  --color-tag-tutorial-text: #55aa66;
-  --color-tag-tutorial-border: #1a2e1c;
-
-  /* Tag colours — wordpress */
-  --color-tag-wordpress-bg: #160f1a;
-  --color-tag-wordpress-text: #aa77cc;
-  --color-tag-wordpress-border: #2a1a2e;
+  /* Tag colours — violet */
+  --color-tag-violet-bg: #160f1a;
+  --color-tag-violet-text: #aa77cc;
+  --color-tag-violet-border: #2a1a2e;
 
   /* Shadcn-compatible semantic tokens */
   --color-background: #0a0a0a;

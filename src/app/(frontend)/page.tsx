@@ -51,7 +51,7 @@ export default async function HomePage() {
           <span className="text-text-secondary">Making things with</span>{' '}
           <span className="font-bold text-text-heading">web + AI.</span>
         </h1>
-        <p className="mt-4 flex flex-wrap items-center gap-x-1 font-mono text-sm lg:text-base">
+        <p className="mt-4 flex flex-wrap items-center gap-x-1 font-mono text-xs lg:text-sm">
           <span className="text-text-muted">
             jamjam:~$&nbsp;{' '}
           </span>
@@ -78,7 +78,7 @@ export default async function HomePage() {
           <Button href="/projects" variant="outline" size="default">
             projects
           </Button>
-        </div>     
+        </div>
         <div className="grid grid-cols-1 gap-8 md:gap-4  md:grid-cols-2 lg:grid-cols-3">
           {featuredProjects.docs.map((project) => (
             <ProjectCard key={project.id} project={project} />
