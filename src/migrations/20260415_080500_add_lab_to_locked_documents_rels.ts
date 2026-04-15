@@ -6,9 +6,13 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   `)
   await db.execute(sql`
    DO $$ BEGIN
-    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_lab_fk" FOREIGN KEY ("lab_id") REFERENCES "public"."lab"("id") ON DELETE cascade ON UPDATE no action;
-   EXCEPTION
-    WHEN duplicate_object THEN null;
+    IF to_regclass('public.lab') IS NOT NULL THEN
+      BEGIN
+        ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_lab_fk" FOREIGN KEY ("lab_id") REFERENCES "public"."lab"("id") ON DELETE cascade ON UPDATE no action;
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END;
+    END IF;
    END $$;
   `)
   await db.execute(sql`
