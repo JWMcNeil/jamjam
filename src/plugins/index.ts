@@ -14,20 +14,21 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 import { revalidateContactForm } from '@/hooks/revalidateContactForm'
 import { r2StoragePlugin } from '@/plugins/r2Storage'
 
-import type { Post, Project } from '@/payload-types'
+import type { Lab, Post, Project } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 import { iconOptions } from '@/utilities/icons'
 
-const generateTitle: GenerateTitle<Post | Project> = ({ doc }) => {
+const generateTitle: GenerateTitle<Post | Project | Lab> = ({ doc }) => {
   return doc?.title ? `${doc.title} | jamjam.dev` : 'jamjam.dev'
 }
 
-const generateURL: GenerateURL<Post | Project> = ({ doc, collectionSlug }) => {
+const generateURL: GenerateURL<Post | Project | Lab> = ({ doc, collectionSlug }) => {
   const base = getServerSideURL()
   if (!doc?.slug) return base
 
   if (collectionSlug === 'posts') return `${base}/posts/${doc.slug}`
   if (collectionSlug === 'projects') return `${base}/projects/${doc.slug}`
+  if (collectionSlug === 'lab') return `${base}/lab/${doc.slug}`
 
   return `${base}/${doc.slug}`
 }

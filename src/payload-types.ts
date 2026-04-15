@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     tags: Tag;
+    lab: Lab;
     posts: Post;
     projects: Project;
     'mux-video': MuxVideo;
@@ -88,6 +89,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
+    lab: LabSelect<false> | LabSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     'mux-video': MuxVideoSelect<false> | MuxVideoSelect<true>;
@@ -281,20 +283,19 @@ export interface Tag {
    * Colour scheme for the tag. Maps to design token colours.
    */
   colour:
-    | 'nextjs'
-    | 'webdev'
-    | 'ai'
-    | 'webflow'
-    | 'js'
-    | 'design'
-    | 'opinion'
-    | 'tools'
-    | 'experiment'
-    | 'freelance'
-    | 'ux'
-    | 'career'
-    | 'tutorial'
-    | 'wordpress';
+    | 'indigo'
+    | 'blueSlate'
+    | 'emerald'
+    | 'teal'
+    | 'amber'
+    | 'rose'
+    | 'brown'
+    | 'olive'
+    | 'purple'
+    | 'cyan'
+    | 'grey'
+    | 'green'
+    | 'violet';
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -311,6 +312,80 @@ export interface Tag {
     | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Display controls for /lab tools. Tool identity comes from code, route slug from CMS.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lab".
+ */
+export interface Lab {
+  id: number;
+  /**
+   * Stable code key from src/lib/lab/registry.ts used to map this entry.
+   */
+  toolKey: 'memory-card-storage-calc' | 'roast-my-website';
+  enabled?: boolean | null;
+  order?: number | null;
+  kind?: ('tool' | 'app' | 'ai') | null;
+  /**
+   * Optional sidebar section override.
+   */
+  group?: ('ai' | 'apps' | 'tools') | null;
+  /**
+   * Display title shown in the lab sidebar and tool header.
+   */
+  title: string;
+  /**
+   * Badge tag shown in the lab sidebar for this tool.
+   */
+  primaryTag: number | Tag;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Short one-liner shown under the tool title.
+   */
+  description?: string | null;
+  /**
+   * Optional model label shown in tool header.
+   */
+  model?: string | null;
+  /**
+   * Optional expandable write-up shown below the tool.
+   */
+  writeUp?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional URL for a deeper blog post.
+   */
+  blogPostUrl?: string | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1251,6 +1326,10 @@ export interface PayloadLockedDocument {
         value: number | Tag;
       } | null)
     | ({
+        relationTo: 'lab';
+        value: number | Lab;
+      } | null)
+    | ({
         relationTo: 'posts';
         value: number | Post;
       } | null)
@@ -1456,6 +1535,35 @@ export interface TagsSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lab_select".
+ */
+export interface LabSelect<T extends boolean = true> {
+  toolKey?: T;
+  enabled?: T;
+  order?: T;
+  kind?: T;
+  group?: T;
+  title?: T;
+  primaryTag?: T;
+  generateSlug?: T;
+  slug?: T;
+  description?: T;
+  model?: T;
+  writeUp?: T;
+  blogPostUrl?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2044,6 +2152,10 @@ export interface TaskSchedulePublish {
     type?: ('publish' | 'unpublish') | null;
     locale?: string | null;
     doc?:
+      | ({
+          relationTo: 'lab';
+          value: number | Lab;
+        } | null)
       | ({
           relationTo: 'posts';
           value: number | Post;

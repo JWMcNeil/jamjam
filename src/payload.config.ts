@@ -9,6 +9,7 @@ import { Media } from './collections/Media'
 import { Posts } from './collections/Posts'
 import { Projects } from './collections/Projects'
 import { Tags } from './collections/Tags'
+import { Lab } from './collections/Lab'
 import { Users } from './collections/Users'
 import { Footer } from './components/layout/footer/config'
 import { Header } from './components/layout/header/config'
@@ -66,7 +67,7 @@ export default buildConfig({
     generateSchemaOutputFile: path.resolve(dirname, 'payload-generated-schema.ts'),
   }),
   // Order matters for schema push: tables with FKs (e.g. uploads) must come after their targets.
-  collections: [Users, Media, Tags, Posts, Projects],
+  collections: [Users, Media, Tags, Lab, Posts, Projects],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, SiteSettings],
   plugins: [
