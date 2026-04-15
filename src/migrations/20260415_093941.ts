@@ -1,21 +1,16 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
-  const existingEnumCheck = await db.execute(
-    sql`SELECT to_regtype('public.enum_tags_colour') AS enum_tags_colour`,
-  )
-  const existingEnumRows = (
-    existingEnumCheck as unknown as { rows?: Array<{ enum_tags_colour: string | null }> }
-  ).rows
-
-  if (existingEnumRows?.[0]?.enum_tags_colour) {
-    // Baseline migration was generated after schema already existed (dev sync case).
-    // No-op so Payload can mark this migration as applied.
-    return
-  }
-
   await db.execute(sql`
-   CREATE TYPE "public"."enum_tags_colour" AS ENUM('nextjs', 'webdev', 'ai', 'webflow', 'js', 'design', 'opinion', 'tools', 'experiment', 'freelance', 'ux', 'career', 'tutorial', 'wordpress');
+   CREATE TYPE "public"."enum_tags_colour" AS ENUM('indigo', 'blueSlate', 'emerald', 'teal', 'amber', 'rose', 'brown', 'olive', 'purple', 'cyan', 'grey', 'green', 'violet');
+  CREATE TYPE "public"."enum_lab_tool_key" AS ENUM('memory-card-storage-calc', 'roast-my-website');
+  CREATE TYPE "public"."enum_lab_kind" AS ENUM('tool', 'app', 'ai');
+  CREATE TYPE "public"."enum_lab_group" AS ENUM('ai', 'apps', 'tools');
+  CREATE TYPE "public"."enum_lab_status" AS ENUM('draft', 'published');
+  CREATE TYPE "public"."enum__lab_v_version_tool_key" AS ENUM('memory-card-storage-calc', 'roast-my-website');
+  CREATE TYPE "public"."enum__lab_v_version_kind" AS ENUM('tool', 'app', 'ai');
+  CREATE TYPE "public"."enum__lab_v_version_group" AS ENUM('ai', 'apps', 'tools');
+  CREATE TYPE "public"."enum__lab_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_posts_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum__posts_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_projects_type" AS ENUM('demo', 'client', 'experiment', 'personal');
@@ -32,7 +27,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_payload_jobs_log_state" AS ENUM('failed', 'succeeded');
   CREATE TYPE "public"."enum_payload_jobs_task_slug" AS ENUM('inline', 'schedulePublish');
   CREATE TYPE "public"."enum_header_nav_items_link_type" AS ENUM('reference', 'sitePage', 'custom');
-  CREATE TYPE "public"."enum_header_nav_items_link_site_page" AS ENUM('home', 'posts', 'projects', 'contact');
+  CREATE TYPE "public"."enum_header_nav_items_link_site_page" AS ENUM('home', 'posts', 'projects', 'lab', 'contact');
   CREATE TYPE "public"."enum_header_nav_items_link_appearance" AS ENUM('default', 'outline', 'secondary', 'miniOutline', 'link');
   CREATE TYPE "public"."enum_header_nav_items_link_size" AS ENUM('default');
   CREATE TABLE "users_sessions" (
@@ -134,6 +129,57 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"parent_id" integer,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
+  );
+  
+  CREATE TABLE "lab" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"tool_key" "enum_lab_tool_key",
+  	"enabled" boolean DEFAULT true,
+  	"order" numeric DEFAULT 100,
+  	"kind" "enum_lab_kind" DEFAULT 'tool',
+  	"group" "enum_lab_group",
+  	"title" varchar,
+  	"primary_tag_id" integer,
+  	"generate_slug" boolean DEFAULT true,
+  	"slug" varchar,
+  	"description" varchar,
+  	"model" varchar,
+  	"write_up" jsonb,
+  	"blog_post_url" varchar,
+  	"meta_title" varchar,
+  	"meta_image_id" integer,
+  	"meta_description" varchar,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"_status" "enum_lab_status" DEFAULT 'draft'
+  );
+  
+  CREATE TABLE "_lab_v" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"parent_id" integer,
+  	"version_tool_key" "enum__lab_v_version_tool_key",
+  	"version_enabled" boolean DEFAULT true,
+  	"version_order" numeric DEFAULT 100,
+  	"version_kind" "enum__lab_v_version_kind" DEFAULT 'tool',
+  	"version_group" "enum__lab_v_version_group",
+  	"version_title" varchar,
+  	"version_primary_tag_id" integer,
+  	"version_generate_slug" boolean DEFAULT true,
+  	"version_slug" varchar,
+  	"version_description" varchar,
+  	"version_model" varchar,
+  	"version_write_up" jsonb,
+  	"version_blog_post_url" varchar,
+  	"version_meta_title" varchar,
+  	"version_meta_image_id" integer,
+  	"version_meta_description" varchar,
+  	"version_updated_at" timestamp(3) with time zone,
+  	"version_created_at" timestamp(3) with time zone,
+  	"version__status" "enum__lab_v_version_status" DEFAULT 'draft',
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"latest" boolean,
+  	"autosave" boolean
   );
   
   CREATE TABLE "posts_populated_authors" (
@@ -611,6 +657,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"users_id" integer,
   	"media_id" integer,
   	"tags_id" integer,
+  	"lab_id" integer,
   	"posts_id" integer,
   	"projects_id" integer,
   	"mux_video_id" integer,
@@ -702,6 +749,11 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "tags_breadcrumbs" ADD CONSTRAINT "tags_breadcrumbs_doc_id_tags_id_fk" FOREIGN KEY ("doc_id") REFERENCES "public"."tags"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "tags_breadcrumbs" ADD CONSTRAINT "tags_breadcrumbs_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."tags"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "tags" ADD CONSTRAINT "tags_parent_id_tags_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."tags"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "lab" ADD CONSTRAINT "lab_primary_tag_id_tags_id_fk" FOREIGN KEY ("primary_tag_id") REFERENCES "public"."tags"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "lab" ADD CONSTRAINT "lab_meta_image_id_media_id_fk" FOREIGN KEY ("meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_lab_v" ADD CONSTRAINT "_lab_v_parent_id_lab_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."lab"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_lab_v" ADD CONSTRAINT "_lab_v_version_primary_tag_id_tags_id_fk" FOREIGN KEY ("version_primary_tag_id") REFERENCES "public"."tags"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_lab_v" ADD CONSTRAINT "_lab_v_version_meta_image_id_media_id_fk" FOREIGN KEY ("version_meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "posts_populated_authors" ADD CONSTRAINT "posts_populated_authors_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "posts" ADD CONSTRAINT "posts_hero_image_id_media_id_fk" FOREIGN KEY ("hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "posts" ADD CONSTRAINT "posts_meta_image_id_media_id_fk" FOREIGN KEY ("meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
@@ -761,6 +813,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_users_fk" FOREIGN KEY ("users_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_media_fk" FOREIGN KEY ("media_id") REFERENCES "public"."media"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_tags_fk" FOREIGN KEY ("tags_id") REFERENCES "public"."tags"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_lab_fk" FOREIGN KEY ("lab_id") REFERENCES "public"."lab"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_posts_fk" FOREIGN KEY ("posts_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_projects_fk" FOREIGN KEY ("projects_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_mux_video_fk" FOREIGN KEY ("mux_video_id") REFERENCES "public"."mux_video"("id") ON DELETE cascade ON UPDATE no action;
@@ -797,6 +850,25 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "tags_parent_idx" ON "tags" USING btree ("parent_id");
   CREATE INDEX "tags_updated_at_idx" ON "tags" USING btree ("updated_at");
   CREATE INDEX "tags_created_at_idx" ON "tags" USING btree ("created_at");
+  CREATE INDEX "lab_tool_key_idx" ON "lab" USING btree ("tool_key");
+  CREATE INDEX "lab_primary_tag_idx" ON "lab" USING btree ("primary_tag_id");
+  CREATE UNIQUE INDEX "lab_slug_idx" ON "lab" USING btree ("slug");
+  CREATE INDEX "lab_meta_meta_image_idx" ON "lab" USING btree ("meta_image_id");
+  CREATE INDEX "lab_updated_at_idx" ON "lab" USING btree ("updated_at");
+  CREATE INDEX "lab_created_at_idx" ON "lab" USING btree ("created_at");
+  CREATE INDEX "lab__status_idx" ON "lab" USING btree ("_status");
+  CREATE INDEX "_lab_v_parent_idx" ON "_lab_v" USING btree ("parent_id");
+  CREATE INDEX "_lab_v_version_version_tool_key_idx" ON "_lab_v" USING btree ("version_tool_key");
+  CREATE INDEX "_lab_v_version_version_primary_tag_idx" ON "_lab_v" USING btree ("version_primary_tag_id");
+  CREATE INDEX "_lab_v_version_version_slug_idx" ON "_lab_v" USING btree ("version_slug");
+  CREATE INDEX "_lab_v_version_meta_version_meta_image_idx" ON "_lab_v" USING btree ("version_meta_image_id");
+  CREATE INDEX "_lab_v_version_version_updated_at_idx" ON "_lab_v" USING btree ("version_updated_at");
+  CREATE INDEX "_lab_v_version_version_created_at_idx" ON "_lab_v" USING btree ("version_created_at");
+  CREATE INDEX "_lab_v_version_version__status_idx" ON "_lab_v" USING btree ("version__status");
+  CREATE INDEX "_lab_v_created_at_idx" ON "_lab_v" USING btree ("created_at");
+  CREATE INDEX "_lab_v_updated_at_idx" ON "_lab_v" USING btree ("updated_at");
+  CREATE INDEX "_lab_v_latest_idx" ON "_lab_v" USING btree ("latest");
+  CREATE INDEX "_lab_v_autosave_idx" ON "_lab_v" USING btree ("autosave");
   CREATE INDEX "posts_populated_authors_order_idx" ON "posts_populated_authors" USING btree ("_order");
   CREATE INDEX "posts_populated_authors_parent_id_idx" ON "posts_populated_authors" USING btree ("_parent_id");
   CREATE INDEX "posts_hero_image_idx" ON "posts" USING btree ("hero_image_id");
@@ -953,6 +1025,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "payload_locked_documents_rels_users_id_idx" ON "payload_locked_documents_rels" USING btree ("users_id");
   CREATE INDEX "payload_locked_documents_rels_media_id_idx" ON "payload_locked_documents_rels" USING btree ("media_id");
   CREATE INDEX "payload_locked_documents_rels_tags_id_idx" ON "payload_locked_documents_rels" USING btree ("tags_id");
+  CREATE INDEX "payload_locked_documents_rels_lab_id_idx" ON "payload_locked_documents_rels" USING btree ("lab_id");
   CREATE INDEX "payload_locked_documents_rels_posts_id_idx" ON "payload_locked_documents_rels" USING btree ("posts_id");
   CREATE INDEX "payload_locked_documents_rels_projects_id_idx" ON "payload_locked_documents_rels" USING btree ("projects_id");
   CREATE INDEX "payload_locked_documents_rels_mux_video_id_idx" ON "payload_locked_documents_rels" USING btree ("mux_video_id");
@@ -986,6 +1059,8 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "media" CASCADE;
   DROP TABLE "tags_breadcrumbs" CASCADE;
   DROP TABLE "tags" CASCADE;
+  DROP TABLE "lab" CASCADE;
+  DROP TABLE "_lab_v" CASCADE;
   DROP TABLE "posts_populated_authors" CASCADE;
   DROP TABLE "posts" CASCADE;
   DROP TABLE "posts_rels" CASCADE;
@@ -1037,6 +1112,14 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "footer" CASCADE;
   DROP TABLE "site_settings" CASCADE;
   DROP TYPE "public"."enum_tags_colour";
+  DROP TYPE "public"."enum_lab_tool_key";
+  DROP TYPE "public"."enum_lab_kind";
+  DROP TYPE "public"."enum_lab_group";
+  DROP TYPE "public"."enum_lab_status";
+  DROP TYPE "public"."enum__lab_v_version_tool_key";
+  DROP TYPE "public"."enum__lab_v_version_kind";
+  DROP TYPE "public"."enum__lab_v_version_group";
+  DROP TYPE "public"."enum__lab_v_version_status";
   DROP TYPE "public"."enum_posts_status";
   DROP TYPE "public"."enum__posts_v_version_status";
   DROP TYPE "public"."enum_projects_type";

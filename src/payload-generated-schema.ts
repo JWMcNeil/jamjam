@@ -25,20 +25,40 @@ import {
 } from '@payloadcms/db-postgres/drizzle/pg-core'
 import { sql, relations } from '@payloadcms/db-postgres/drizzle'
 export const enum_tags_colour = pgEnum('enum_tags_colour', [
-  'nextjs',
-  'webdev',
+  'indigo',
+  'blueSlate',
+  'emerald',
+  'teal',
+  'amber',
+  'rose',
+  'brown',
+  'olive',
+  'purple',
+  'cyan',
+  'grey',
+  'green',
+  'violet',
+])
+export const enum_lab_tool_key = pgEnum('enum_lab_tool_key', [
+  'memory-card-storage-calc',
+  'roast-my-website',
+])
+export const enum_lab_kind = pgEnum('enum_lab_kind', ['tool', 'app', 'ai'])
+export const enum_lab_group = pgEnum('enum_lab_group', ['ai', 'apps', 'tools'])
+export const enum_lab_status = pgEnum('enum_lab_status', ['draft', 'published'])
+export const enum__lab_v_version_tool_key = pgEnum('enum__lab_v_version_tool_key', [
+  'memory-card-storage-calc',
+  'roast-my-website',
+])
+export const enum__lab_v_version_kind = pgEnum('enum__lab_v_version_kind', ['tool', 'app', 'ai'])
+export const enum__lab_v_version_group = pgEnum('enum__lab_v_version_group', [
   'ai',
-  'webflow',
-  'js',
-  'design',
-  'opinion',
+  'apps',
   'tools',
-  'experiment',
-  'freelance',
-  'ux',
-  'career',
-  'tutorial',
-  'wordpress',
+])
+export const enum__lab_v_version_status = pgEnum('enum__lab_v_version_status', [
+  'draft',
+  'published',
 ])
 export const enum_posts_status = pgEnum('enum_posts_status', ['draft', 'published'])
 export const enum__posts_v_version_status = pgEnum('enum__posts_v_version_status', [
@@ -421,7 +441,15 @@ export const enum_payload_jobs_task_slug = pgEnum('enum_payload_jobs_task_slug',
 ])
 export const enum_header_nav_items_link_type = pgEnum('enum_header_nav_items_link_type', [
   'reference',
+  'sitePage',
   'custom',
+])
+export const enum_header_nav_items_link_site_page = pgEnum('enum_header_nav_items_link_site_page', [
+  'home',
+  'posts',
+  'projects',
+  'lab',
+  'contact',
 ])
 export const enum_header_nav_items_link_appearance = pgEnum(
   'enum_header_nav_items_link_appearance',
@@ -612,6 +640,112 @@ export const tags = pgTable(
     index('tags_parent_idx').on(columns.parent),
     index('tags_updated_at_idx').on(columns.updatedAt),
     index('tags_created_at_idx').on(columns.createdAt),
+  ],
+)
+
+export const lab = pgTable(
+  'lab',
+  {
+    id: serial('id').primaryKey(),
+    toolKey: enum_lab_tool_key('tool_key'),
+    enabled: boolean('enabled').default(true),
+    order: numeric('order', { mode: 'number' }).default(100),
+    kind: enum_lab_kind('kind').default('tool'),
+    group: enum_lab_group('group'),
+    title: varchar('title'),
+    primaryTag: integer('primary_tag_id').references(() => tags.id, {
+      onDelete: 'set null',
+    }),
+    generateSlug: boolean('generate_slug').default(true),
+    slug: varchar('slug'),
+    description: varchar('description'),
+    model: varchar('model'),
+    writeUp: jsonb('write_up'),
+    blogPostUrl: varchar('blog_post_url'),
+    meta_title: varchar('meta_title'),
+    meta_image: integer('meta_image_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+    meta_description: varchar('meta_description'),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    _status: enum_lab_status('_status').default('draft'),
+  },
+  (columns) => [
+    index('lab_tool_key_idx').on(columns.toolKey),
+    index('lab_primary_tag_idx').on(columns.primaryTag),
+    uniqueIndex('lab_slug_idx').on(columns.slug),
+    index('lab_meta_meta_image_idx').on(columns.meta_image),
+    index('lab_updated_at_idx').on(columns.updatedAt),
+    index('lab_created_at_idx').on(columns.createdAt),
+    index('lab__status_idx').on(columns._status),
+  ],
+)
+
+export const _lab_v = pgTable(
+  '_lab_v',
+  {
+    id: serial('id').primaryKey(),
+    parent: integer('parent_id').references(() => lab.id, {
+      onDelete: 'set null',
+    }),
+    version_toolKey: enum__lab_v_version_tool_key('version_tool_key'),
+    version_enabled: boolean('version_enabled').default(true),
+    version_order: numeric('version_order', { mode: 'number' }).default(100),
+    version_kind: enum__lab_v_version_kind('version_kind').default('tool'),
+    version_group: enum__lab_v_version_group('version_group'),
+    version_title: varchar('version_title'),
+    version_primaryTag: integer('version_primary_tag_id').references(() => tags.id, {
+      onDelete: 'set null',
+    }),
+    version_generateSlug: boolean('version_generate_slug').default(true),
+    version_slug: varchar('version_slug'),
+    version_description: varchar('version_description'),
+    version_model: varchar('version_model'),
+    version_writeUp: jsonb('version_write_up'),
+    version_blogPostUrl: varchar('version_blog_post_url'),
+    version_meta_title: varchar('version_meta_title'),
+    version_meta_image: integer('version_meta_image_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+    version_meta_description: varchar('version_meta_description'),
+    version_updatedAt: timestamp('version_updated_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version_createdAt: timestamp('version_created_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version__status: enum__lab_v_version_status('version__status').default('draft'),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    latest: boolean('latest'),
+    autosave: boolean('autosave'),
+  },
+  (columns) => [
+    index('_lab_v_parent_idx').on(columns.parent),
+    index('_lab_v_version_version_tool_key_idx').on(columns.version_toolKey),
+    index('_lab_v_version_version_primary_tag_idx').on(columns.version_primaryTag),
+    index('_lab_v_version_version_slug_idx').on(columns.version_slug),
+    index('_lab_v_version_meta_version_meta_image_idx').on(columns.version_meta_image),
+    index('_lab_v_version_version_updated_at_idx').on(columns.version_updatedAt),
+    index('_lab_v_version_version_created_at_idx').on(columns.version_createdAt),
+    index('_lab_v_version_version__status_idx').on(columns.version__status),
+    index('_lab_v_created_at_idx').on(columns.createdAt),
+    index('_lab_v_updated_at_idx').on(columns.updatedAt),
+    index('_lab_v_latest_idx').on(columns.latest),
+    index('_lab_v_autosave_idx').on(columns.autosave),
   ],
 )
 
@@ -1752,6 +1886,7 @@ export const payload_locked_documents_rels = pgTable(
     usersID: integer('users_id'),
     mediaID: integer('media_id'),
     tagsID: integer('tags_id'),
+    labID: integer('lab_id'),
     postsID: integer('posts_id'),
     projectsID: integer('projects_id'),
     'mux-videoID': integer('mux_video_id'),
@@ -1767,6 +1902,7 @@ export const payload_locked_documents_rels = pgTable(
     index('payload_locked_documents_rels_users_id_idx').on(columns.usersID),
     index('payload_locked_documents_rels_media_id_idx').on(columns.mediaID),
     index('payload_locked_documents_rels_tags_id_idx').on(columns.tagsID),
+    index('payload_locked_documents_rels_lab_id_idx').on(columns.labID),
     index('payload_locked_documents_rels_posts_id_idx').on(columns.postsID),
     index('payload_locked_documents_rels_projects_id_idx').on(columns.projectsID),
     index('payload_locked_documents_rels_mux_video_id_idx').on(columns['mux-videoID']),
@@ -1795,6 +1931,11 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns['tagsID']],
       foreignColumns: [tags.id],
       name: 'payload_locked_documents_rels_tags_fk',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [columns['labID']],
+      foreignColumns: [lab.id],
+      name: 'payload_locked_documents_rels_lab_fk',
     }).onDelete('cascade'),
     foreignKey({
       columns: [columns['postsID']],
@@ -1908,9 +2049,10 @@ export const header_nav_items = pgTable(
     id: varchar('id').primaryKey(),
     link_type: enum_header_nav_items_link_type('link_type').default('reference'),
     link_newTab: boolean('link_new_tab'),
+    link_sitePage: enum_header_nav_items_link_site_page('link_site_page'),
     link_url: varchar('link_url'),
     link_label: varchar('link_label'),
-    link_appearance: enum_header_nav_items_link_appearance('link_appearance').default('default'),
+    link_appearance: enum_header_nav_items_link_appearance('link_appearance').default('link'),
     link_size: enum_header_nav_items_link_size('link_size').default('default'),
   },
   (columns) => [
@@ -1980,6 +2122,14 @@ export const site_settings = pgTable(
     statusText: varchar('status_text').notNull().default('available for work'),
     email: varchar('email').notNull().default('jamie@jamjam.dev'),
     location: varchar('location').notNull().default('Melbourne, Australia'),
+    contactHeadline: varchar('contact_headline').notNull().default("Let's work together."),
+    contactIntro: varchar('contact_intro')
+      .notNull()
+      .default(
+        "Whether it's a new project, a job opportunity, or just a question — my inbox is open.",
+      ),
+    contactResponseTime: varchar('contact_response_time').notNull().default('usually within 24hrs'),
+    homeIntro: jsonb('home_intro'),
     aboutSectionLabel: varchar('about_section_label').notNull().default('// about'),
     aboutHeadline: varchar('about_headline')
       .notNull()
@@ -2033,6 +2183,35 @@ export const relations_tags = relations(tags, ({ one, many }) => ({
   }),
   breadcrumbs: many(tags_breadcrumbs, {
     relationName: 'breadcrumbs',
+  }),
+}))
+export const relations_lab = relations(lab, ({ one }) => ({
+  primaryTag: one(tags, {
+    fields: [lab.primaryTag],
+    references: [tags.id],
+    relationName: 'primaryTag',
+  }),
+  meta_image: one(media, {
+    fields: [lab.meta_image],
+    references: [media.id],
+    relationName: 'meta_image',
+  }),
+}))
+export const relations__lab_v = relations(_lab_v, ({ one }) => ({
+  parent: one(lab, {
+    fields: [_lab_v.parent],
+    references: [lab.id],
+    relationName: 'parent',
+  }),
+  version_primaryTag: one(tags, {
+    fields: [_lab_v.version_primaryTag],
+    references: [tags.id],
+    relationName: 'version_primaryTag',
+  }),
+  version_meta_image: one(media, {
+    fields: [_lab_v.version_meta_image],
+    references: [media.id],
+    relationName: 'version_meta_image',
   }),
 }))
 export const relations_posts_populated_authors = relations(posts_populated_authors, ({ one }) => ({
@@ -2520,6 +2699,11 @@ export const relations_payload_locked_documents_rels = relations(
       references: [tags.id],
       relationName: 'tags',
     }),
+    labID: one(lab, {
+      fields: [payload_locked_documents_rels.labID],
+      references: [lab.id],
+      relationName: 'lab',
+    }),
     postsID: one(posts, {
       fields: [payload_locked_documents_rels.postsID],
       references: [posts.id],
@@ -2629,6 +2813,14 @@ export const relations_site_settings = relations(site_settings, ({ one }) => ({
 
 type DatabaseSchema = {
   enum_tags_colour: typeof enum_tags_colour
+  enum_lab_tool_key: typeof enum_lab_tool_key
+  enum_lab_kind: typeof enum_lab_kind
+  enum_lab_group: typeof enum_lab_group
+  enum_lab_status: typeof enum_lab_status
+  enum__lab_v_version_tool_key: typeof enum__lab_v_version_tool_key
+  enum__lab_v_version_kind: typeof enum__lab_v_version_kind
+  enum__lab_v_version_group: typeof enum__lab_v_version_group
+  enum__lab_v_version_status: typeof enum__lab_v_version_status
   enum_posts_status: typeof enum_posts_status
   enum__posts_v_version_status: typeof enum__posts_v_version_status
   enum_projects_type: typeof enum_projects_type
@@ -2645,6 +2837,7 @@ type DatabaseSchema = {
   enum_payload_jobs_log_state: typeof enum_payload_jobs_log_state
   enum_payload_jobs_task_slug: typeof enum_payload_jobs_task_slug
   enum_header_nav_items_link_type: typeof enum_header_nav_items_link_type
+  enum_header_nav_items_link_site_page: typeof enum_header_nav_items_link_site_page
   enum_header_nav_items_link_appearance: typeof enum_header_nav_items_link_appearance
   enum_header_nav_items_link_size: typeof enum_header_nav_items_link_size
   users_sessions: typeof users_sessions
@@ -2652,6 +2845,8 @@ type DatabaseSchema = {
   media: typeof media
   tags_breadcrumbs: typeof tags_breadcrumbs
   tags: typeof tags
+  lab: typeof lab
+  _lab_v: typeof _lab_v
   posts_populated_authors: typeof posts_populated_authors
   posts: typeof posts
   posts_rels: typeof posts_rels
@@ -2707,6 +2902,8 @@ type DatabaseSchema = {
   relations_media: typeof relations_media
   relations_tags_breadcrumbs: typeof relations_tags_breadcrumbs
   relations_tags: typeof relations_tags
+  relations_lab: typeof relations_lab
+  relations__lab_v: typeof relations__lab_v
   relations_posts_populated_authors: typeof relations_posts_populated_authors
   relations_posts_rels: typeof relations_posts_rels
   relations_posts: typeof relations_posts

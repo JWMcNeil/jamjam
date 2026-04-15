@@ -982,6 +982,678 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.lab": {
+      "name": "lab",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "tool_key": {
+          "name": "tool_key",
+          "type": "enum_lab_tool_key",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "enabled": {
+          "name": "enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "order": {
+          "name": "order",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 100
+        },
+        "kind": {
+          "name": "kind",
+          "type": "enum_lab_kind",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'tool'"
+        },
+        "group": {
+          "name": "group",
+          "type": "enum_lab_group",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "primary_tag_id": {
+          "name": "primary_tag_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "generate_slug": {
+          "name": "generate_slug",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "model": {
+          "name": "model",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "write_up": {
+          "name": "write_up",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "blog_post_url": {
+          "name": "blog_post_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_title": {
+          "name": "meta_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_image_id": {
+          "name": "meta_image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_description": {
+          "name": "meta_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "_status": {
+          "name": "_status",
+          "type": "enum_lab_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'draft'"
+        }
+      },
+      "indexes": {
+        "lab_tool_key_idx": {
+          "name": "lab_tool_key_idx",
+          "columns": [
+            {
+              "expression": "tool_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "lab_primary_tag_idx": {
+          "name": "lab_primary_tag_idx",
+          "columns": [
+            {
+              "expression": "primary_tag_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "lab_slug_idx": {
+          "name": "lab_slug_idx",
+          "columns": [
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "lab_meta_meta_image_idx": {
+          "name": "lab_meta_meta_image_idx",
+          "columns": [
+            {
+              "expression": "meta_image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "lab_updated_at_idx": {
+          "name": "lab_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "lab_created_at_idx": {
+          "name": "lab_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "lab__status_idx": {
+          "name": "lab__status_idx",
+          "columns": [
+            {
+              "expression": "_status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "lab_primary_tag_id_tags_id_fk": {
+          "name": "lab_primary_tag_id_tags_id_fk",
+          "tableFrom": "lab",
+          "tableTo": "tags",
+          "columnsFrom": [
+            "primary_tag_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "lab_meta_image_id_media_id_fk": {
+          "name": "lab_meta_image_id_media_id_fk",
+          "tableFrom": "lab",
+          "tableTo": "media",
+          "columnsFrom": [
+            "meta_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public._lab_v": {
+      "name": "_lab_v",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_tool_key": {
+          "name": "version_tool_key",
+          "type": "enum__lab_v_version_tool_key",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_enabled": {
+          "name": "version_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "version_order": {
+          "name": "version_order",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 100
+        },
+        "version_kind": {
+          "name": "version_kind",
+          "type": "enum__lab_v_version_kind",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'tool'"
+        },
+        "version_group": {
+          "name": "version_group",
+          "type": "enum__lab_v_version_group",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_title": {
+          "name": "version_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_primary_tag_id": {
+          "name": "version_primary_tag_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_generate_slug": {
+          "name": "version_generate_slug",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "version_slug": {
+          "name": "version_slug",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_description": {
+          "name": "version_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_model": {
+          "name": "version_model",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_write_up": {
+          "name": "version_write_up",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_blog_post_url": {
+          "name": "version_blog_post_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_meta_title": {
+          "name": "version_meta_title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_meta_image_id": {
+          "name": "version_meta_image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_meta_description": {
+          "name": "version_meta_description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_updated_at": {
+          "name": "version_updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_created_at": {
+          "name": "version_created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version__status": {
+          "name": "version__status",
+          "type": "enum__lab_v_version_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'draft'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "latest": {
+          "name": "latest",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "autosave": {
+          "name": "autosave",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "_lab_v_parent_idx": {
+          "name": "_lab_v_parent_idx",
+          "columns": [
+            {
+              "expression": "parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_lab_v_version_version_tool_key_idx": {
+          "name": "_lab_v_version_version_tool_key_idx",
+          "columns": [
+            {
+              "expression": "version_tool_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_lab_v_version_version_primary_tag_idx": {
+          "name": "_lab_v_version_version_primary_tag_idx",
+          "columns": [
+            {
+              "expression": "version_primary_tag_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_lab_v_version_version_slug_idx": {
+          "name": "_lab_v_version_version_slug_idx",
+          "columns": [
+            {
+              "expression": "version_slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_lab_v_version_meta_version_meta_image_idx": {
+          "name": "_lab_v_version_meta_version_meta_image_idx",
+          "columns": [
+            {
+              "expression": "version_meta_image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_lab_v_version_version_updated_at_idx": {
+          "name": "_lab_v_version_version_updated_at_idx",
+          "columns": [
+            {
+              "expression": "version_updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_lab_v_version_version_created_at_idx": {
+          "name": "_lab_v_version_version_created_at_idx",
+          "columns": [
+            {
+              "expression": "version_created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_lab_v_version_version__status_idx": {
+          "name": "_lab_v_version_version__status_idx",
+          "columns": [
+            {
+              "expression": "version__status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_lab_v_created_at_idx": {
+          "name": "_lab_v_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_lab_v_updated_at_idx": {
+          "name": "_lab_v_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_lab_v_latest_idx": {
+          "name": "_lab_v_latest_idx",
+          "columns": [
+            {
+              "expression": "latest",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_lab_v_autosave_idx": {
+          "name": "_lab_v_autosave_idx",
+          "columns": [
+            {
+              "expression": "autosave",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "_lab_v_parent_id_lab_id_fk": {
+          "name": "_lab_v_parent_id_lab_id_fk",
+          "tableFrom": "_lab_v",
+          "tableTo": "lab",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_lab_v_version_primary_tag_id_tags_id_fk": {
+          "name": "_lab_v_version_primary_tag_id_tags_id_fk",
+          "tableFrom": "_lab_v",
+          "tableTo": "tags",
+          "columnsFrom": [
+            "version_primary_tag_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_lab_v_version_meta_image_id_media_id_fk": {
+          "name": "_lab_v_version_meta_image_id_media_id_fk",
+          "tableFrom": "_lab_v",
+          "tableTo": "media",
+          "columnsFrom": [
+            "version_meta_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.posts_populated_authors": {
       "name": "posts_populated_authors",
       "schema": "",
@@ -6724,6 +7396,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "lab_id": {
+          "name": "lab_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "posts_id": {
           "name": "posts_id",
           "type": "integer",
@@ -6848,6 +7526,21 @@
           "columns": [
             {
               "expression": "tags_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "payload_locked_documents_rels_lab_id_idx": {
+          "name": "payload_locked_documents_rels_lab_id_idx",
+          "columns": [
+            {
+              "expression": "lab_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -7010,6 +7703,19 @@
           "tableTo": "tags",
           "columnsFrom": [
             "tags_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_lab_fk": {
+          "name": "payload_locked_documents_rels_lab_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "lab",
+          "columnsFrom": [
+            "lab_id"
           ],
           "columnsTo": [
             "id"
@@ -7926,20 +8632,87 @@
       "name": "enum_tags_colour",
       "schema": "public",
       "values": [
-        "nextjs",
-        "webdev",
+        "indigo",
+        "blueSlate",
+        "emerald",
+        "teal",
+        "amber",
+        "rose",
+        "brown",
+        "olive",
+        "purple",
+        "cyan",
+        "grey",
+        "green",
+        "violet"
+      ]
+    },
+    "public.enum_lab_tool_key": {
+      "name": "enum_lab_tool_key",
+      "schema": "public",
+      "values": [
+        "memory-card-storage-calc",
+        "roast-my-website"
+      ]
+    },
+    "public.enum_lab_kind": {
+      "name": "enum_lab_kind",
+      "schema": "public",
+      "values": [
+        "tool",
+        "app",
+        "ai"
+      ]
+    },
+    "public.enum_lab_group": {
+      "name": "enum_lab_group",
+      "schema": "public",
+      "values": [
         "ai",
-        "webflow",
-        "js",
-        "design",
-        "opinion",
-        "tools",
-        "experiment",
-        "freelance",
-        "ux",
-        "career",
-        "tutorial",
-        "wordpress"
+        "apps",
+        "tools"
+      ]
+    },
+    "public.enum_lab_status": {
+      "name": "enum_lab_status",
+      "schema": "public",
+      "values": [
+        "draft",
+        "published"
+      ]
+    },
+    "public.enum__lab_v_version_tool_key": {
+      "name": "enum__lab_v_version_tool_key",
+      "schema": "public",
+      "values": [
+        "memory-card-storage-calc",
+        "roast-my-website"
+      ]
+    },
+    "public.enum__lab_v_version_kind": {
+      "name": "enum__lab_v_version_kind",
+      "schema": "public",
+      "values": [
+        "tool",
+        "app",
+        "ai"
+      ]
+    },
+    "public.enum__lab_v_version_group": {
+      "name": "enum__lab_v_version_group",
+      "schema": "public",
+      "values": [
+        "ai",
+        "apps",
+        "tools"
+      ]
+    },
+    "public.enum__lab_v_version_status": {
+      "name": "enum__lab_v_version_status",
+      "schema": "public",
+      "values": [
+        "draft",
+        "published"
       ]
     },
     "public.enum_posts_status": {
@@ -8406,6 +9179,7 @@
         "home",
         "posts",
         "projects",
+        "lab",
         "contact"
       ]
     },
@@ -8438,6 +9212,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "11c91446-b38f-41bb-a2fe-cca8d717303e",
+  "id": "78cb157c-58ef-4b03-807c-55fd9e839cc3",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

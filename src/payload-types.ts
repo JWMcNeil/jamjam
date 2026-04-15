@@ -1967,7 +1967,7 @@ export interface Header {
                 relationTo: 'projects';
                 value: number | Project;
               } | null);
-          sitePage?: ('home' | 'posts' | 'projects' | 'contact') | null;
+          sitePage?: ('home' | 'posts' | 'projects' | 'lab' | 'contact') | null;
           url?: string | null;
           label?: string | null;
           /**
