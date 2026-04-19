@@ -89,10 +89,15 @@ const nextConfig: NextConfig = {
     const connectSrc = [
       "'self'",
       'https://api.anthropic.com',
-      // @mux/mux-uploader (Payload Mux plugin): resumable PUTs to signed Google Cloud Storage URLs
+      // @mux/mux-uploader: resumable PUTs to signed GCS URLs (direct upload)
       'https://storage.googleapis.com',
+      'https://storage.cloud.google.com',
       'https://*.googleapis.com',
+      'https://www.googleapis.com',
       'https://api.mux.com',
+      'https://*.mux.com',
+      'https://stream.mux.com',
+      'https://image.mux.com',
     ].join(' ')
     const csp = [
       "default-src 'self'",
@@ -105,16 +110,26 @@ const nextConfig: NextConfig = {
       `connect-src ${connectSrc}`,
     ].join('; ')
 
+    const sharedHeaders = [
+      { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+    ]
+
+    /**
+     * In `next dev`, a strict CSP `connect-src` can block Mux Upchunk PUTs to signed
+     * `https://storage.googleapis.com/...` URLs (XHR reports status 0). Omit CSP locally;
+     * production keeps the full policy + expanded connect-src for Mux/GCS.
+     */
+    const isDev = process.env.NODE_ENV === 'development'
+
     return [
       {
         source: '/(.*)',
-        headers: [
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-          { key: 'Content-Security-Policy', value: csp },
-        ],
+        headers: isDev
+          ? sharedHeaders
+          : [...sharedHeaders, { key: 'Content-Security-Policy', value: csp }],
       },
     ]
   },
