@@ -1,3 +1,5 @@
+import { getPreviewSecret } from '@/utilities/previewSecret'
+
 type Props = {
   collection: 'posts'
   slug: string
@@ -12,7 +14,7 @@ export const generatePreviewPath = ({ collection, slug }: Props) => {
   const encodedParams = new URLSearchParams({
     slug,
     collection,
-    previewSecret: process.env.PREVIEW_SECRET || '',
+    previewSecret: getPreviewSecret() ?? '',
   })
 
   const url = `/next/preview?${encodedParams.toString()}`

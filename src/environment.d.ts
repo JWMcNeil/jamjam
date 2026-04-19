@@ -2,6 +2,8 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       PAYLOAD_SECRET: string
+      /** Must match the value used in `/next/preview` and admin live-preview URLs. */
+      PREVIEW_SECRET?: string
       DATABASE_URL: string
       NEXT_PUBLIC_SITE_URL: string
       NEXT_PUBLIC_SERVER_URL: string

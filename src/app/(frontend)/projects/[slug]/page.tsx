@@ -20,6 +20,7 @@ import React, { cache } from 'react'
 import type { Project } from '@/payload-types'
 import type { ProjectShowcaseSlide } from '@/types/projectShowcase'
 import { generateMeta } from '@/utilities/generateMeta'
+import { populateProjectGalleryMuxVideos } from '@/utilities/populateProjectGalleryMux'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -258,5 +259,6 @@ const queryProjectBySlug = cache(async ({ slug }: { slug: string }) => {
     },
   })
 
-  return (result.docs?.[0] as Project) || null
+  const doc = (result.docs?.[0] as Project) || null
+  return populateProjectGalleryMuxVideos(doc, payload, draft)
 })

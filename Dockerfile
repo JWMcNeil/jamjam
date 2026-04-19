@@ -19,6 +19,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Optional: same value as runtime `PREVIEW_SECRET` if your host only injects secrets
+# at container start — Next may otherwise bake an empty preview token into the admin
+# bundle. Prefer runtime-only injection via `src/utilities/previewSecret.ts` instead.
+ARG PREVIEW_SECRET
+ENV PREVIEW_SECRET=${PREVIEW_SECRET}
+
 # Disable telemetry during build
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_ENV production

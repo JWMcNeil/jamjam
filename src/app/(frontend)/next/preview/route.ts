@@ -1,6 +1,8 @@
 import { draftMode } from 'next/headers'
 import { NextResponse } from 'next/server'
 
+import { getPreviewSecret } from '@/utilities/previewSecret'
+
 const allowedCollections = ['posts', 'projects'] as const
 type PreviewCollection = (typeof allowedCollections)[number]
 
@@ -14,13 +16,14 @@ function buildPreviewPath(collection: PreviewCollection, slug: string): string {
 }
 
 export async function GET(request: Request): Promise<Response> {
-  const secret = process.env.PREVIEW_SECRET
-  if (!secret?.trim()) {
+  const secret = getPreviewSecret()
+  if (!secret) {
     return new Response('Preview not configured', { status: 503 })
   }
 
   const { searchParams } = new URL(request.url)
-  if (searchParams.get('previewSecret') !== secret) {
+  const token = searchParams.get('previewSecret')?.trim()
+  if (token !== secret) {
     return new Response('Invalid token', { status: 401 })
   }
 

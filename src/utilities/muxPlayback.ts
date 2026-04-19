@@ -8,9 +8,14 @@ export function getMuxPlayback(video: MuxVideo | null | undefined): {
     return { playbackId: null, posterUrl: undefined }
   }
 
-  const first = video.playbackOptions?.[0]
+  const options = video.playbackOptions
+  if (!options?.length) {
+    return { playbackId: null, posterUrl: undefined }
+  }
+
+  const best = options.find((o) => o?.playbackId)
   return {
-    playbackId: first?.playbackId ?? null,
-    posterUrl: first?.posterUrl ?? undefined,
+    playbackId: best?.playbackId ?? null,
+    posterUrl: best?.posterUrl ?? undefined,
   }
 }
