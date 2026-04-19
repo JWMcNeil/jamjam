@@ -6,6 +6,7 @@ import Link from 'next/link'
 import React, { useMemo } from 'react'
 import MuxPlayer from '@mux/mux-player-react'
 import type { MuxVideo } from '@/payload-types'
+import { getMuxPlayback } from '@/utilities/muxPlayback'
 
 export type FooterMeta = {
   title?: string | null
@@ -51,25 +52,7 @@ export const VideoCard: React.FC<VideoCardProps> = (props) => {
     newTab: linkNewTab,
   })
 
-  // Extract playback options from mux-video
-  const playbackOptions = useMemo(() => {
-    if (!video || typeof video !== 'object') {
-      return null
-    }
-
-    if (
-      'playbackOptions' in video &&
-      Array.isArray(video.playbackOptions) &&
-      video.playbackOptions.length > 0
-    ) {
-      return video.playbackOptions[0]
-    }
-
-    return null
-  }, [video])
-
-  const playbackId = playbackOptions?.playbackId || null
-  const posterUrl = playbackOptions?.posterUrl ?? undefined
+  const { playbackId, posterUrl } = getMuxPlayback(video)
 
   // Calculate aspect ratio from video dimensions when 'auto'
   const dynamicAspectRatio = useMemo(() => {

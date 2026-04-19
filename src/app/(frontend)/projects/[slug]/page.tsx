@@ -17,7 +17,8 @@ import { draftMode } from 'next/headers'
 import Link from 'next/link'
 import React, { cache } from 'react'
 
-import type { Media, Project } from '@/payload-types'
+import type { Project } from '@/payload-types'
+import type { ProjectShowcaseSlide } from '@/types/projectShowcase'
 import { generateMeta } from '@/utilities/generateMeta'
 
 export async function generateStaticParams() {
@@ -54,7 +55,7 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
 
   if (!project) return <PayloadRedirects url={url} />
 
-  const showcaseMedia = getProjectShowcaseMedia(project)
+  const showcaseSlides = getProjectShowcaseSlides(project)
 
   return (
     <article className="mx-auto w-full max-w-7xl px-4 py-8 md:py-16 md:px-4 ">
@@ -125,8 +126,8 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(240px,320px)] lg:items-start">
         <div className="min-w-0">
-          {showcaseMedia.length > 0 ? (
-            <ProjectShowcaseCarousel className="mb-0" resources={showcaseMedia} />
+          {showcaseSlides.length > 0 ? (
+            <ProjectShowcaseCarousel className="mb-0" slides={showcaseSlides} />
           ) : null}
         </div>
 
@@ -219,15 +220,20 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   return generateMeta({ doc: project })
 }
 
-function getProjectShowcaseMedia(project: Project): Media[] {
-  const slides: Media[] = []
+function getProjectShowcaseSlides(project: Project): ProjectShowcaseSlide[] {
+  const slides: ProjectShowcaseSlide[] = []
   if (project.heroImage && typeof project.heroImage === 'object') {
-    slides.push(project.heroImage)
+    slides.push({ kind: 'media', media: project.heroImage })
   }
   if (project.gallery?.length) {
     for (const row of project.gallery) {
-      if (row.image && typeof row.image === 'object') {
-        slides.push(row.image)
+      if (!row) continue
+      if (row.slideType === 'mux') {
+        if (row.muxVideo && typeof row.muxVideo === 'object') {
+          slides.push({ kind: 'mux', video: row.muxVideo })
+        }
+      } else if (row.image && typeof row.image === 'object') {
+        slides.push({ kind: 'media', media: row.image })
       }
     }
   }

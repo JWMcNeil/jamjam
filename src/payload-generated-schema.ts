@@ -65,6 +65,10 @@ export const enum__posts_v_version_status = pgEnum('enum__posts_v_version_status
   'draft',
   'published',
 ])
+export const enum_projects_gallery_slide_type = pgEnum('enum_projects_gallery_slide_type', [
+  'media',
+  'mux',
+])
 export const enum_projects_type = pgEnum('enum_projects_type', [
   'demo',
   'client',
@@ -77,6 +81,10 @@ export const enum_projects_lifecycle = pgEnum('enum_projects_lifecycle', [
   'archived',
 ])
 export const enum_projects_status = pgEnum('enum_projects_status', ['draft', 'published'])
+export const enum__projects_v_version_gallery_slide_type = pgEnum(
+  'enum__projects_v_version_gallery_slide_type',
+  ['media', 'mux'],
+)
 export const enum__projects_v_version_type = pgEnum('enum__projects_v_version_type', [
   'demo',
   'client',
@@ -976,7 +984,11 @@ export const projects_gallery = pgTable(
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     id: varchar('id').primaryKey(),
+    slideType: enum_projects_gallery_slide_type('slide_type').default('media'),
     image: integer('image_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+    muxVideo: integer('mux_video_id').references(() => mux_video.id, {
       onDelete: 'set null',
     }),
   },
@@ -984,6 +996,7 @@ export const projects_gallery = pgTable(
     index('projects_gallery_order_idx').on(columns._order),
     index('projects_gallery_parent_id_idx').on(columns._parentID),
     index('projects_gallery_image_idx').on(columns.image),
+    index('projects_gallery_mux_video_idx').on(columns.muxVideo),
     foreignKey({
       columns: [columns['_parentID']],
       foreignColumns: [projects.id],
@@ -1088,7 +1101,11 @@ export const _projects_v_version_gallery = pgTable(
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     id: serial('id').primaryKey(),
+    slideType: enum__projects_v_version_gallery_slide_type('slide_type').default('media'),
     image: integer('image_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+    muxVideo: integer('mux_video_id').references(() => mux_video.id, {
       onDelete: 'set null',
     }),
     _uuid: varchar('_uuid'),
@@ -1097,6 +1114,7 @@ export const _projects_v_version_gallery = pgTable(
     index('_projects_v_version_gallery_order_idx').on(columns._order),
     index('_projects_v_version_gallery_parent_id_idx').on(columns._parentID),
     index('_projects_v_version_gallery_image_idx').on(columns.image),
+    index('_projects_v_version_gallery_mux_video_idx').on(columns.muxVideo),
     foreignKey({
       columns: [columns['_parentID']],
       foreignColumns: [_projects_v.id],
@@ -2327,6 +2345,11 @@ export const relations_projects_gallery = relations(projects_gallery, ({ one }) 
     references: [media.id],
     relationName: 'image',
   }),
+  muxVideo: one(mux_video, {
+    fields: [projects_gallery.muxVideo],
+    references: [mux_video.id],
+    relationName: 'muxVideo',
+  }),
 }))
 export const relations_projects_tech_stack = relations(projects_tech_stack, ({ one }) => ({
   _parentID: one(projects, {
@@ -2380,6 +2403,11 @@ export const relations__projects_v_version_gallery = relations(
       fields: [_projects_v_version_gallery.image],
       references: [media.id],
       relationName: 'image',
+    }),
+    muxVideo: one(mux_video, {
+      fields: [_projects_v_version_gallery.muxVideo],
+      references: [mux_video.id],
+      relationName: 'muxVideo',
     }),
   }),
 )
@@ -2823,9 +2851,11 @@ type DatabaseSchema = {
   enum__lab_v_version_status: typeof enum__lab_v_version_status
   enum_posts_status: typeof enum_posts_status
   enum__posts_v_version_status: typeof enum__posts_v_version_status
+  enum_projects_gallery_slide_type: typeof enum_projects_gallery_slide_type
   enum_projects_type: typeof enum_projects_type
   enum_projects_lifecycle: typeof enum_projects_lifecycle
   enum_projects_status: typeof enum_projects_status
+  enum__projects_v_version_gallery_slide_type: typeof enum__projects_v_version_gallery_slide_type
   enum__projects_v_version_type: typeof enum__projects_v_version_type
   enum__projects_v_version_lifecycle: typeof enum__projects_v_version_lifecycle
   enum__projects_v_version_status: typeof enum__projects_v_version_status

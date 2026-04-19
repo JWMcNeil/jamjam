@@ -495,11 +495,16 @@ export interface Project {
    */
   heroImage: number | Media;
   /**
-   * Additional screenshots. Drag to reorder.
+   * Additional slides: images, GIFs (Media), or Mux-hosted video. Drag to reorder.
    */
   gallery?:
     | {
-        image: number | Media;
+        /**
+         * Use Media for screenshots and GIFs; use Mux for hosted video.
+         */
+        slideType: 'media' | 'mux';
+        image?: (number | null) | Media;
+        muxVideo?: (number | null) | MuxVideo;
         id?: string | null;
       }[]
     | null;
@@ -1613,7 +1618,9 @@ export interface ProjectsSelect<T extends boolean = true> {
   gallery?:
     | T
     | {
+        slideType?: T;
         image?: T;
+        muxVideo?: T;
         id?: T;
       };
   description?: T;

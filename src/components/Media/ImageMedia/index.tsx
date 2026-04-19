@@ -69,8 +69,15 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   )
 
   const srcStr = typeof src === 'string' ? src : ''
+  const isGif =
+    resource &&
+    typeof resource === 'object' &&
+    (resource.mimeType === 'image/gif' ||
+      (typeof resource.filename === 'string' && /\.gif$/i.test(resource.filename)))
   // R2/CDN URLs must skip /_next/image — the optimizer double-encodes ?v= and returns 400.
-  const unoptimized = Boolean(srcStr && isCrossOriginMediaUrl(srcStr))
+  // GIFs skip optimization so animation is preserved.
+  const unoptimized =
+    Boolean(srcStr && isCrossOriginMediaUrl(srcStr)) || Boolean(isGif)
 
   return (
     <picture className={resolvedPictureClassName}>

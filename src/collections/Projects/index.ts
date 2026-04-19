@@ -144,14 +144,58 @@ export const Projects: CollectionConfig<'projects'> = {
               name: 'gallery',
               type: 'array',
               admin: {
-                description: 'Additional screenshots. Drag to reorder.',
+                description:
+                  'Additional slides: images, GIFs (Media), or Mux-hosted video. Drag to reorder.',
+              },
+              validate: (rows) => {
+                if (!rows || !Array.isArray(rows)) return true
+                for (const row of rows) {
+                  if (!row || typeof row !== 'object') continue
+                  const r = row as {
+                    slideType?: string
+                    image?: unknown
+                    muxVideo?: unknown
+                  }
+                  const slideType = r.slideType === 'mux' ? 'mux' : 'media'
+                  if (slideType === 'media') {
+                    if (!r.image) {
+                      return 'Each image or GIF slide must have a Media upload.'
+                    }
+                  } else if (!r.muxVideo) {
+                    return 'Each Mux video slide must have a Mux video selected.'
+                  }
+                }
+                return true
               },
               fields: [
+                {
+                  name: 'slideType',
+                  type: 'select',
+                  required: true,
+                  defaultValue: 'media',
+                  options: [
+                    { label: 'Image / GIF (Media)', value: 'media' },
+                    { label: 'Video (Mux)', value: 'mux' },
+                  ],
+                  admin: {
+                    description: 'Use Media for screenshots and GIFs; use Mux for hosted video.',
+                  },
+                },
                 {
                   name: 'image',
                   type: 'upload',
                   relationTo: 'media',
-                  required: true,
+                  admin: {
+                    condition: (_, siblingData) => siblingData?.slideType !== 'mux',
+                  },
+                },
+                {
+                  name: 'muxVideo',
+                  type: 'relationship',
+                  relationTo: 'mux-video',
+                  admin: {
+                    condition: (_, siblingData) => siblingData?.slideType === 'mux',
+                  },
                 },
               ],
             },
