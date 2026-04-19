@@ -38,6 +38,47 @@ function parseMediaOriginWithFallback(): URL | null {
 
 const mediaOrigin = parseMediaOriginWithFallback()
 
+/**
+ * CSP `frame-ancestors` for Payload live preview: the admin iframes the frontend. If users
+ * hit `www` while `NEXT_PUBLIC_SITE_URL` is apex (or the reverse), `X-Frame-Options: SAMEORIGIN`
+ * alone blocks the iframe. Listing both origins here allows same-site framing across that split.
+ */
+function buildFrameAncestors(): string {
+  const origins = new Set<string>(["'self'"])
+  const site = process.env.NEXT_PUBLIC_SITE_URL?.trim()
+  if (site) {
+    try {
+      const u = new URL(site)
+      origins.add(u.origin)
+      const host = u.hostname
+      const isLocal =
+        host === 'localhost' || host === '127.0.0.1' || host.endsWith('.localhost')
+      const isIp = /^\d{1,3}(\.\d{1,3}){3}$/.test(host)
+      if (!isLocal && !isIp) {
+        if (host.startsWith('www.')) {
+          origins.add(`${u.protocol}//${host.slice(4)}`)
+        } else {
+          origins.add(`${u.protocol}//www.${host}`)
+        }
+      }
+    } catch {
+      /* ignore invalid NEXT_PUBLIC_SITE_URL */
+    }
+  }
+  const extra =
+    process.env.FRAME_ANCESTORS?.split(',')
+      .map((s) => s.trim())
+      .filter(Boolean) ?? []
+  for (const e of extra) {
+    try {
+      origins.add(new URL(e).origin)
+    } catch {
+      /* ignore */
+    }
+  }
+  return [...origins].join(' ')
+}
+
 const nextConfig: NextConfig = {
   ...(allowedDevOrigins ? { allowedDevOrigins } : {}),
   output: 'standalone',
@@ -99,6 +140,25 @@ const nextConfig: NextConfig = {
       'https://stream.mux.com',
       'https://image.mux.com',
     ].join(' ')
+    // Without explicit media-src / worker-src, default-src 'self' blocks Mux HLS (stream.mux.com)
+    // and blob workers used by @mux/mux-player-react in production (dev omits CSP).
+    const mediaSrc = [
+      "'self'",
+      'blob:',
+      'data:',
+      ...(media ? [media.origin] : []),
+      'https://stream.mux.com',
+      'https://image.mux.com',
+      'https://*.mux.com',
+    ].join(' ')
+    const workerSrc = ["'self'", 'blob:'].join(' ')
+    const frameSrc = [
+      "'self'",
+      'https://www.youtube.com',
+      'https://www.youtube-nocookie.com',
+      'https://player.vimeo.com',
+    ].join(' ')
+    const frameAncestors = buildFrameAncestors()
     const csp = [
       "default-src 'self'",
       // Payload admin relies on eval in some bundled paths; keep inline for Next.js.
@@ -107,11 +167,14 @@ const nextConfig: NextConfig = {
       "style-src 'self' 'unsafe-inline'",
       `img-src ${imgSrc}`,
       "font-src 'self'",
+      `media-src ${mediaSrc}`,
+      `worker-src ${workerSrc}`,
+      `frame-src ${frameSrc}`,
       `connect-src ${connectSrc}`,
+      `frame-ancestors ${frameAncestors}`,
     ].join('; ')
 
     const sharedHeaders = [
-      { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
       { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
@@ -120,7 +183,7 @@ const nextConfig: NextConfig = {
     /**
      * In `next dev`, a strict CSP `connect-src` can block Mux Upchunk PUTs to signed
      * `https://storage.googleapis.com/...` URLs (XHR reports status 0). Omit CSP locally;
-     * production keeps the full policy + expanded connect-src for Mux/GCS.
+     * production keeps the full policy + connect-src / media-src / worker-src for Mux/GCS.
      */
     const isDev = process.env.NODE_ENV === 'development'
 
@@ -128,8 +191,17 @@ const nextConfig: NextConfig = {
       {
         source: '/(.*)',
         headers: isDev
-          ? sharedHeaders
-          : [...sharedHeaders, { key: 'Content-Security-Policy', value: csp }],
+          ? [
+              ...sharedHeaders,
+              // Dev: no CSP; keep classic framing guard (admin + iframe are usually same origin).
+              { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+            ]
+          : [
+              ...sharedHeaders,
+              // Prod: CSP `frame-ancestors` replaces X-Frame-Options so www/apex can both frame
+              // the app (Payload live preview). Browsers prefer CSP when both are present.
+              { key: 'Content-Security-Policy', value: csp },
+            ],
       },
     ]
   },
