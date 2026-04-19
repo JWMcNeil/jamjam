@@ -86,6 +86,14 @@ const nextConfig: NextConfig = {
       'blob:',
       ...(media ? [media.origin] : []),
     ].join(' ')
+    const connectSrc = [
+      "'self'",
+      'https://api.anthropic.com',
+      // @mux/mux-uploader (Payload Mux plugin): resumable PUTs to signed Google Cloud Storage URLs
+      'https://storage.googleapis.com',
+      'https://*.googleapis.com',
+      'https://api.mux.com',
+    ].join(' ')
     const csp = [
       "default-src 'self'",
       // Payload admin relies on eval in some bundled paths; keep inline for Next.js.
@@ -94,7 +102,7 @@ const nextConfig: NextConfig = {
       "style-src 'self' 'unsafe-inline'",
       `img-src ${imgSrc}`,
       "font-src 'self'",
-      "connect-src 'self' https://api.anthropic.com",
+      `connect-src ${connectSrc}`,
     ].join('; ')
 
     return [
