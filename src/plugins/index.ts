@@ -15,7 +15,7 @@ import { revalidateContactForm } from '@/hooks/revalidateContactForm'
 import { r2StoragePlugin } from '@/plugins/r2Storage'
 
 import type { Lab, Post, Project } from '@/payload-types'
-import { getServerSideURL } from '@/utilities/getURL'
+import { getMuxCorsOrigin, getServerSideURL } from '@/utilities/getURL'
 import { iconOptions } from '@/utilities/icons'
 
 const generateTitle: GenerateTitle<Post | Project | Lab> = ({ doc }) => {
@@ -43,7 +43,7 @@ export const plugins: Plugin[] = [
       webhookSecret: process.env.MUX_WEBHOOK_SIGNING_SECRET || '',
     },
     uploadSettings: {
-      cors_origin: getServerSideURL() || 'http://localhost:3000',
+      cors_origin: getMuxCorsOrigin(),
     },
   }),
   redirectsPlugin({

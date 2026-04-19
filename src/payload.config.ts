@@ -18,6 +18,19 @@ import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 
+function getPayloadCorsOrigins(): string[] {
+  const primary = getServerSideURL()
+  const extraFromEnv =
+    process.env.PAYLOAD_CORS_ORIGINS?.split(',')
+      .map((s) => s.trim())
+      .filter(Boolean) ?? []
+  const devLocalOrigins =
+    process.env.NODE_ENV === 'development'
+      ? ['http://localhost:3000', 'http://127.0.0.1:3000']
+      : []
+  return [...new Set([primary, ...extraFromEnv, ...devLocalOrigins].filter(Boolean))]
+}
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -68,7 +81,7 @@ export default buildConfig({
   }),
   // Order matters for schema push: tables with FKs (e.g. uploads) must come after their targets.
   collections: [Users, Media, Tags, Lab, Posts, Projects],
-  cors: [getServerSideURL()].filter(Boolean),
+  cors: getPayloadCorsOrigins(),
   globals: [Header, Footer, SiteSettings],
   plugins: [
     ...plugins,
