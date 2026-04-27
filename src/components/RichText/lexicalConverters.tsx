@@ -13,6 +13,7 @@ import {
 } from '@payloadcms/richtext-lexical/react'
 
 import { CodeBlock, CodeBlockProps } from '@/components/blocks/Code/Component'
+import { EmbedBlock, EmbedBlockProps } from '@/components/blocks/Embed/Component'
 
 import type {
   BannerBlock as BannerBlockProps,
@@ -27,7 +28,7 @@ import React from 'react'
 export type RichTextNodeTypes =
   | DefaultNodeTypes
   | SerializedBlockNode<
-      CTABlockProps | MediaBlockProps | BannerBlockProps | CodeBlockProps | ContentBlockProps
+      CTABlockProps | MediaBlockProps | BannerBlockProps | CodeBlockProps | EmbedBlockProps | ContentBlockProps
     >
 
 type CTABlockProps = {
@@ -69,6 +70,7 @@ export function createPayloadJsxConverters(
       banner: JSXConverter<SerializedBlockNode<BannerBlockProps>>
       mediaBlock: JSXConverter<SerializedBlockNode<MediaBlockProps>>
       code: JSXConverter<SerializedBlockNode<CodeBlockProps>>
+      embed: JSXConverter<SerializedBlockNode<EmbedBlockProps>>
       cta: JSXConverter<SerializedBlockNode<CTABlockProps>>
       content: JSXConverter<SerializedBlockNode<ContentBlockProps>>
     } = {
@@ -84,6 +86,7 @@ export function createPayloadJsxConverters(
         />
       ),
       code: ({ node }) => <CodeBlock className="col-start-2" {...node.fields} />,
+      embed: ({ node }) => <EmbedBlock className="col-start-2" {...node.fields} />,
       cta: ({ node }) => <CallToActionBlock {...node.fields} />,
       content: ({ node }) => <ContentBlock {...node.fields} />,
     }

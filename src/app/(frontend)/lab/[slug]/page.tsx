@@ -26,13 +26,13 @@ export default async function ToolPage({ params }: ToolPageProps) {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between gap-3 border-b border-border-subtle px-6 py-4 lg:h-[4.75rem] lg:py-0">
+      <header className="flex flex-col gap-3 border-b border-border-subtle px-4 py-4 sm:px-6 lg:h-[4.75rem] lg:flex-row lg:items-center lg:justify-between lg:py-0">
         <div className="min-w-0">
           <h1 className="text-base font-semibold text-text-heading">{tool.name}</h1>
-          <p className="truncate text-xs text-text-secondary">{tool.description}</p>
+          <p className="text-xs leading-relaxed text-text-secondary sm:truncate">{tool.description}</p>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <div className="font-mono text-[10px] text-text-muted">
+        <div className="flex w-full items-center justify-between gap-2 lg:w-auto lg:shrink-0 lg:justify-end">
+          <div className="min-w-0 truncate font-mono text-[10px] text-text-muted">
             {tool.model ? `${tool.model} · streaming` : 'client only'}
           </div>
           <ResetToolButton toolSlug={tool.toolKey} />

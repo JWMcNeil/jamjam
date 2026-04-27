@@ -46,7 +46,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
             )}
           >
             <Link
-              className="flex items-center gap-2 md:gap-3 px-4 md:px-8 border-r border-border shrink-0"
+              className="flex items-center gap-2 md:gap-6 px-4 md:px-8 border-r border-border shrink-0"
               href="/"
             >
               <MotoGuy />

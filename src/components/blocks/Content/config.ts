@@ -18,6 +18,7 @@ import { PricingCard } from '@/components/blocks/PricingCard/config'
 import { Banner } from '@/components/blocks/Banner/config'
 import { MediaBlock } from '@/components/blocks/MediaBlock/config'
 import { Code } from '@/components/blocks/Code/config'
+import { Embed } from '@/components/blocks/Embed/config'
 import { BlocksFeature } from '@payloadcms/richtext-lexical'
 import { BentoCTA } from '@/components/blocks/BentoCTA/config'
 
@@ -53,7 +54,7 @@ const columnFields: Field[] = [
         return [
           ...rootFeatures,
           HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-          BlocksFeature({ blocks: [Banner, Code, MediaBlock] }),
+          BlocksFeature({ blocks: [Banner, Code, Embed, MediaBlock] }),
           FixedToolbarFeature(),
           InlineToolbarFeature(),
           UnorderedListFeature(),

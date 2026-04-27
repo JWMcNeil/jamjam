@@ -152,11 +152,14 @@ const nextConfig: NextConfig = {
       'https://*.mux.com',
     ].join(' ')
     const workerSrc = ["'self'", 'blob:'].join(' ')
+    // Rich-text Embed block: match embed URLs in `src/components/blocks/Embed/Component.tsx`
     const frameSrc = [
       "'self'",
       'https://www.youtube.com',
       'https://www.youtube-nocookie.com',
       'https://player.vimeo.com',
+      'https://codepen.io',
+      'https://www.figma.com',
     ].join(' ')
     const frameAncestors = buildFrameAncestors()
     const csp = [

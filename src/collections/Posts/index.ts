@@ -13,7 +13,7 @@ import {
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
-import { Banner, Code, Content, MediaBlock } from '../../components/blocks'
+import { Banner, Code, Content, Embed, MediaBlock } from '../../components/blocks'
 import { generatePreviewPath } from './lib/generatePreviewPath'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
@@ -105,7 +105,7 @@ export const Posts: CollectionConfig<'posts'> = {
                   return [
                     ...rootFeatures,
                     HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
-                    BlocksFeature({ blocks: [Banner, Code, Content, MediaBlock] }),
+                    BlocksFeature({ blocks: [Banner, Code, Content, Embed, MediaBlock] }),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
                     HorizontalRuleFeature(),

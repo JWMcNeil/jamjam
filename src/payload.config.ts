@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 
 import sharp from 'sharp'
 import path from 'path'
@@ -29,6 +30,37 @@ function getPayloadCorsOrigins(): string[] {
       ? ['http://localhost:3000', 'http://127.0.0.1:3000']
       : []
   return [...new Set([primary, ...extraFromEnv, ...devLocalOrigins].filter(Boolean))]
+}
+
+/**
+ * Form builder and other features use `payload.sendEmail`; Payload needs a transport.
+ *
+ * With `SMTP_USER` + `SMTP_PASS` set (e.g. Gmail app password), mail is sent via SMTP.
+ * Defaults match Gmail: host smtp.gmail.com, port 587. Optional: `SMTP_HOST`, `SMTP_PORT`,
+ * `SMTP_SECURE` (true for 465), `SMTP_FROM_ADDRESS`, `SMTP_FROM_NAME`.
+ * If credentials are omitted, the Nodemailer adapter uses Ethereal (dev-only test inbox; see server logs).
+ */
+function getEmailAdapter() {
+  const user = process.env.SMTP_USER
+  const pass = process.env.SMTP_PASS
+
+  if (user && pass) {
+    const port = Number(process.env.SMTP_PORT) || 587
+    const secure = process.env.SMTP_SECURE === 'true' || port === 465
+
+    return nodemailerAdapter({
+      defaultFromAddress: process.env.SMTP_FROM_ADDRESS ?? user,
+      defaultFromName: process.env.SMTP_FROM_NAME ?? 'jamjam.dev',
+      transportOptions: {
+        host: process.env.SMTP_HOST ?? 'smtp.gmail.com',
+        port,
+        secure,
+        auth: { user, pass },
+      },
+    })
+  }
+
+  return nodemailerAdapter()
 }
 
 const filename = fileURLToPath(import.meta.url)
@@ -86,6 +118,7 @@ export default buildConfig({
   plugins: [
     ...plugins,
   ],
+  email: getEmailAdapter(),
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {

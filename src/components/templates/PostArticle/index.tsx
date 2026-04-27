@@ -171,7 +171,9 @@ export function PostArticle({
             {post.title}
           </h1>
           {hasExcerpt ? (
-            <p className="mt-2 text-lg leading-relaxed text-text-secondary">{excerptText}</p>
+            <p className="mt-4 max-w-3xl border-l-2 border-border pl-4 text-base leading-relaxed text-text-mid md:text-lg">
+              {excerptText}
+            </p>
           ) : null}
         </div>
 
