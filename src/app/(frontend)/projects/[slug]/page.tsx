@@ -3,8 +3,9 @@ import type { Metadata } from 'next'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { ProjectShowcaseCarousel } from '@/components/ProjectShowcaseCarousel'
-import RichText from '@/components/RichText'
+import { PostBodyRichText } from '@/components/RichText/PostBodyRichText'
 import configPromise from '@payload-config'
+import { extractLexicalHeadings } from '@/utilities/extractLexicalHeadings'
 import { getNextPublishedProject } from '@/utilities/getNextPublishedProject'
 import {
   projectLifecycleDetailLabel,
@@ -57,9 +58,11 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
   if (!project) return <PayloadRedirects url={url} />
 
   const showcaseSlides = getProjectShowcaseSlides(project)
+  const outline = extractLexicalHeadings(project.description)
+  const headingIds = outline.map((h) => h.id)
 
   return (
-    <article className="mx-auto w-full max-w-7xl px-4 py-8 md:py-16 md:px-4 ">
+    <article className="mx-auto w-full max-w-[1100px] px-4 py-6 md:px-10 md:py-14">
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
@@ -71,16 +74,16 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
         ← ls projects/
       </Link>
 
-      {/* <p className="mb-4 font-mono text-sm text-text-prompt">
-        jamjam~$ <span className="text-accent">cat projects/{project.slug}/readme.md</span>
-      </p> */}
-
-      <div className="mb-10 space-y-6 pt-8">
+      <header className="mb-10 space-y-6 pt-4 md:pt-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
-            <h1 className="text-3xl font-bold text-text-heading md:text-5xl">{project.title}</h1>
+            <h1 className="text-balance text-2xl font-bold tracking-tight text-text-heading md:text-3xl lg:text-[2.125rem] lg:leading-[1.2]">
+              {project.title}
+            </h1>
             {project.excerpt ? (
-              <p className="mt-4 max-w-2xl text-text-secondary">{project.excerpt}</p>
+              <p className="mt-5 max-w-2xl text-pretty text-lg leading-[1.75] text-text-secondary md:text-[1.125rem]">
+                {project.excerpt}
+              </p>
             ) : null}
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
@@ -123,79 +126,96 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
             })}
           </div>
         ) : null}
-      </div>
+      </header>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(240px,320px)] lg:items-start">
-        <div className="min-w-0">
+        <div className="flex min-w-0 flex-col gap-10 md:gap-12">
           {showcaseSlides.length > 0 ? (
             <ProjectShowcaseCarousel className="mb-0" slides={showcaseSlides} />
           ) : null}
+
+          {project.description ? (
+            <PostBodyRichText
+              className="pt-1"
+              data={project.description}
+              headingIds={headingIds}
+              enableGutter={false}
+              proseLayout="flush"
+            />
+          ) : null}
         </div>
 
-        <aside className="space-y-8 self-start font-mono text-sm lg:sticky lg:top-24">
+        <aside className="space-y-5 self-start font-mono text-sm lg:sticky lg:top-24">
           {project.techStack && project.techStack.length > 0 ? (
-            <section>
-              <p className="mb-2 text-text-prompt">// tech stack</p>
-              <div className="overflow-hidden rounded-sm border border-border bg-card">
+            <section className="border border-border bg-card p-4">
+              <p className="mb-3 text-xs text-text-muted">// tech stack</p>
+              <div className="overflow-hidden rounded-sm border border-border">
                 {project.techStack.map((item, index) => (
                   <div
                     key={item.id || index}
-                    className={`flex items-center justify-between gap-3 px-3 py-2.5 ${
+                    className={`flex items-baseline justify-between gap-4 bg-page px-3 py-2.5 ${
                       index > 0 ? 'border-t border-border' : ''
                     }`}
                   >
-                    <span className="min-w-0 text-text-heading">{item.name}</span>
-                    <span className="shrink-0 text-text-secondary lowercase">{item.role}</span>
+                    <span className="shrink-0 text-xs lowercase text-text-dim">{item.role}</span>
+                    <span className="min-w-0 text-right font-medium text-text-heading">{item.name}</span>
                   </div>
                 ))}
               </div>
             </section>
           ) : null}
 
-          <section className="space-y-5 text-text-secondary">
+          <section className="space-y-5 border border-border bg-card p-4">
             <div>
-              <p className="mb-1 text-text-prompt">// type</p>
-              <p className="text-foreground">{projectTypeHeroLabel[project.type]}</p>
+              <p className="mb-1 text-xs text-text-muted">// type</p>
+              <p className="text-text-primary">{projectTypeHeroLabel[project.type]}</p>
             </div>
             <div>
-              <p className="mb-1 text-text-prompt">// year</p>
-              <p className="text-foreground tabular-nums">
+              <p className="mb-1 text-xs text-text-muted">// year</p>
+              <p className="tabular-nums text-text-primary">
                 {project.year != null ? project.year : '—'}
               </p>
             </div>
             <div>
-              <p className="mb-1 text-text-prompt">// status</p>
-              <p className="text-foreground">{projectLifecycleDetailLabel[project.lifecycle]}</p>
+              <p className="mb-1 text-xs text-text-muted">// status</p>
+              <p className="text-text-primary">{projectLifecycleDetailLabel[project.lifecycle]}</p>
             </div>
             {project.role?.trim() ? (
               <div>
-                <p className="mb-1 text-text-prompt">// role</p>
-                <p className="text-foreground">{project.role.trim()}</p>
+                <p className="mb-1 text-xs text-text-muted">// role</p>
+                <p className="text-text-primary">{project.role.trim()}</p>
               </div>
             ) : null}
           </section>
+
+          {outline.length > 0 ? (
+            <nav aria-label="Table of contents" className="border border-border bg-card p-4">
+              <p className="mb-3 text-xs text-text-muted">// contents</p>
+              <ul className="space-y-2.5 p-0 text-sm leading-snug">
+                {outline.map((item) => (
+                  <li key={item.id}>
+                    <a
+                      href={`#${item.id}`}
+                      className="text-text-secondary transition-colors hover:text-text-heading"
+                    >
+                      {item.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
         </aside>
       </div>
-
-      {project.description ? (
-        <div className="mt-10">
-          <RichText
-            className="max-w-3xl"
-            data={project.description}
-            enableGutter={false}
-            proseLayout="flush"
-          />
-        </div>
-      ) : null}
 
       <div className="mt-16 flex flex-col gap-6 border-t border-border pt-10 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 flex-1">
           {nextProject ? (
             <>
-              <p className="mb-2 font-mono text-sm text-text-prompt">// next project</p>
+              <p className="mb-2 font-mono text-xs text-text-muted">// next project</p>
               <Link
                 href={`/projects/${nextProject.slug}`}
-                className="font-medium text-text-heading transition-colors hover:text-text-primary"
+                className="font-medium text-text-heading transition-colors hover:text-accent"
               >
                 {nextProject.title} →
               </Link>
