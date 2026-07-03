@@ -1,13 +1,35 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
 import configPromise from '@payload-config'
 import { About } from '@/components/About'
 import { LatestPosts } from '@/components/LatestPosts'
 import { ProjectCard } from '@/components/ProjectCard'
 import RichText from '@/components/RichText'
 import { StatusDot } from '@/components/StatusDot'
+import { BracketLink } from '@/components/ui/bracket-link'
+import { Button } from '@/components/ui/button'
 import type { SiteSetting } from '@/payload-types'
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { getPayload } from 'payload'
-import { Button } from '@/components/ui/button'
+
+export const revalidate = 600
+
+export async function generateMetadata(): Promise<Metadata> {
+  const siteSettings = (await getCachedGlobal('site-settings', 0)()) as SiteSetting
+  const description =
+    siteSettings.aboutBio?.trim() ||
+    'Creative developer building websites, web apps, and AI-powered tools in Melbourne.'
+
+  return {
+    title: 'jamjam.dev',
+    description,
+    openGraph: mergeOpenGraph({
+      title: 'jamjam.dev',
+      description,
+    }),
+  }
+}
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
@@ -45,19 +67,20 @@ export default async function HomePage() {
     <div className="w-full max-w-7xl mx-auto px-4">
       {/* Hero */}
       <section className="py-16 md:py-24">
-        <h1 className="text-4xl md:text-6xl lg:text-7xl  font-black text-text-heading leading-tight">
+        <h1 className="text-display font-black text-text-heading motion-safe:animate-subtle-fade">
           Creative developer.
           <br />
           <span className="text-text-secondary">Making things with</span>{' '}
           <span className="font-bold text-text-heading">web + AI.</span>
         </h1>
-        <p className="mt-4 flex flex-wrap items-center gap-x-1 font-mono text-xs lg:text-sm">
-          <span className="text-text-muted">
-            jamjam:~$&nbsp;{' '}
-          </span>
-          <span className="text-accent">{siteSettings.statusText}</span>
-          <StatusDot />
-        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <p className="flex flex-wrap items-center gap-x-1 font-mono text-xs lg:text-sm">
+            <span className="text-text-muted">jamjam:~$&nbsp;</span>
+            <span className="text-accent">{siteSettings.statusText}</span>
+            <StatusDot />
+          </p>
+          <BracketLink href="/contact">say hello</BracketLink>
+        </div>
         {siteSettings.homeIntro && (
           <div className="mt-10 max-w-full text-pretty">
             <RichText
@@ -79,11 +102,23 @@ export default async function HomePage() {
             projects
           </Button>
         </div>
-        <div className="grid grid-cols-1 gap-8 md:gap-4  md:grid-cols-2 lg:grid-cols-3">
-          {featuredProjects.docs.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
+        {featuredProjects.docs.length === 0 ? (
+          <p className="rounded-sm border border-border bg-page p-4 font-mono text-sm text-text-muted">
+            No featured projects yet.{' '}
+            <Link
+              href="/projects"
+              className="text-accent underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              Browse all projects
+            </Link>
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-8 md:gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {featuredProjects.docs.map((project) => (
+              <ProjectCard key={project.id} project={project} subduedImage />
+            ))}
+          </div>
+        )}
       </section>
 
       <LatestPosts posts={latestPosts.docs} totalDocs={latestPosts.totalDocs} />

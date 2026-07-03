@@ -55,7 +55,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   const outline = extractLexicalHeadings(post.content)
 
   return (
-    <article className="pt-8 md:pt-16">
+    <article className="pt-4 md:pt-10">
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}

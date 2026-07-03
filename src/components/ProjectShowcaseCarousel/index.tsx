@@ -246,7 +246,7 @@ function ShowcaseLightbox({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[200] flex flex-col bg-black/90"
+      className="fixed inset-0 z-modal flex flex-col bg-black/90"
       role="dialog"
       aria-modal="true"
       aria-label="Enlarged image"
@@ -254,7 +254,7 @@ function ShowcaseLightbox({
       <button
         ref={closeBtnRef}
         type="button"
-        className="absolute right-4 top-4 z-[2] rounded border border-white/20 bg-black/50 px-3 py-1.5 font-mono text-sm text-white hover:bg-black/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+        className="absolute right-4 top-4 z-overlay rounded border border-white/20 bg-black/50 px-3 py-1.5 font-mono text-sm text-white hover:bg-black/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
         onClick={onClose}
       >
         close

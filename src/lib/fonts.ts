@@ -1,15 +1,15 @@
-import { DM_Sans, Roboto_Mono } from 'next/font/google'
+import { JetBrains_Mono, Schibsted_Grotesk } from 'next/font/google'
 
-export const dmSans = DM_Sans({
+export const schibstedGrotesk = Schibsted_Grotesk({
   subsets: ['latin'],
-  weight: ['400', '500', '700', '800', '900'],
+  weight: ['400', '500', '600', '700', '800', '900'],
   variable: '--font-sans',
   display: 'swap',
 })
 
-export const robotoMono = Roboto_Mono({
+export const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '700'],
+  weight: ['400', '500', '700'],
   variable: '--font-mono',
   display: 'swap',
 })

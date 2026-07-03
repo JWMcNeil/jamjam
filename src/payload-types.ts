@@ -2042,7 +2042,7 @@ export interface SiteSetting {
    */
   contactIntro: string;
   /**
-   * Shown next to // response time on the contact page.
+   * Shown next to // typical reply on the contact page.
    */
   contactResponseTime: string;
   /**

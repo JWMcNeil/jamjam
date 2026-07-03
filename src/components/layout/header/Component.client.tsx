@@ -22,7 +22,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
   const resolvedNavItems = getResolvedHeaderNavItems(data)
 
   return (
-    <header className="sticky top-0 z-[150] bg-background">
+    <header className="sticky top-0 z-header bg-background">
       {isMobileMenuOpen ? (
         <div
           className="fixed inset-0 z-40 bg-background/80 animate-fade-in md:hidden"
