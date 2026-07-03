@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-03T03:55:00.000Z",
+  "title": "Design System: jamjam.dev",
+  "extensions": {
+    "colorMeta": {
+      "page": {
+        "role": "neutral",
+        "displayName": "Void Black",
+        "canonical": "oklch(14.5% 0 0)",
+        "tonalRamp": ["#0a0a0a", "#0c0c0c", "#0f0f0f", "#111111", "#161616", "#1e1e1e", "#222222", "#444444"]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Studio Green",
+        "canonical": "oklch(58% 0.08 145)",
+        "tonalRamp": ["#0f1a14", "#1a2e1e", "#1a3a2a", "#2a4a3a", "#629168", "#66ccbb", "#3a9a3a", "#44aa99"]
+      },
+      "primary-teal": {
+        "role": "primary",
+        "displayName": "Terminal Teal",
+        "canonical": "oklch(65% 0.1 175)",
+        "tonalRamp": ["#0f1518", "#1a2530", "#1a2e2e", "#4499bb", "#44aa99", "#66ccbb", "#888888", "#dddddd"]
+      },
+      "text-heading": {
+        "role": "neutral",
+        "displayName": "Heading White",
+        "canonical": "oklch(95% 0 0)",
+        "tonalRamp": ["#0a0a0a", "#333333", "#555555", "#888888", "#aaaaaa", "#cccccc", "#dddddd", "#f0f0f0"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headlines and page-defining statements. DM Sans black weight."
+      },
+      "label": {
+        "displayName": "Terminal Label",
+        "purpose": "Mono section labels, badges, tag pills, shell prompts."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "ease-out-standard",
+        "value": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        "purpose": "Default 200ms transitions on buttons and link arrows."
+      },
+      {
+        "name": "gsap-hero",
+        "value": "power3.out, duration 1s, y 20→0, opacity 0→1",
+        "purpose": "Animated hero rich text entrance."
+      },
+      {
+        "name": "status-ping",
+        "value": "animate-ping 3s on accent-dot",
+        "purpose": "Home hero status dot pulse; disabled with motion-reduce."
+      }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Default CTA style for section links (projects, posts). Terminal mono shell.",
+      "html": "<button class=\"ds-btn-outline\"><span class=\"ds-btn-label\">projects</span><span class=\"ds-btn-arrow\" aria-hidden> -&gt;</span></button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem; min-height: 2.25rem; padding: 0.5rem 0.75rem; font-family: 'Roboto Mono', ui-monospace, monospace; font-size: 0.875rem; color: #f0f0f0; background: #0a0a0a; border: 1px solid #1e1e1e; border-radius: 0.25rem; cursor: pointer; transition: background-color 0.2s ease-out, color 0.2s ease-out; } .ds-btn-outline:hover { background: #0c0c0c; } .ds-btn-outline:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a0a0a, 0 0 0 4px #629168; } .ds-btn-arrow { transition: transform 0.2s ease-out; } .ds-btn-outline:hover .ds-btn-arrow { transform: translateX(2px); }"
+    },
+    {
+      "name": "Default Button",
+      "kind": "button",
+      "refersTo": "button-default",
+      "description": "Filled grey button for secondary actions.",
+      "html": "<button class=\"ds-btn-default\"><span class=\"ds-btn-label\">submit</span></button>",
+      "css": ".ds-btn-default { display: inline-flex; align-items: center; min-height: 2.25rem; padding: 0.5rem 0.75rem; font-family: 'Roboto Mono', ui-monospace, monospace; font-size: 0.875rem; color: #f0f0f0; background: #222222; border: 1px solid #1e1e1e; border-radius: 0.25rem; cursor: pointer; transition: background-color 0.2s ease-out; } .ds-btn-default:hover { background: #2a2a2a; } .ds-btn-default:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a0a0a, 0 0 0 4px #629168; }"
+    },
+    {
+      "name": "Tag Pill",
+      "kind": "chip",
+      "refersTo": "tag-pill",
+      "description": "Hash-prefixed mono tag for posts and projects.",
+      "html": "<span class=\"ds-tag ds-tag-emerald\">#ai</span>",
+      "css": ".ds-tag { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; font-family: 'Roboto Mono', ui-monospace, monospace; font-size: 0.75rem; border-radius: 0.25rem; border: 1px solid; } .ds-tag-emerald { color: #44aa99; background: #0f1a14; border-color: #1a2e1e; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Contact form and search fields.",
+      "html": "<input class=\"ds-input\" type=\"email\" placeholder=\"you@example.com\" />",
+      "css": ".ds-input { display: flex; width: 100%; height: 2.75rem; padding: 0.625rem 1rem; font-family: 'DM Sans', ui-sans-serif, sans-serif; font-size: 0.875rem; color: #dddddd; background: rgba(12, 12, 12, 0.5); border: 1px solid #1e1e1e; border-radius: 0.5rem; transition: border-color 0.2s, box-shadow 0.2s; } .ds-input::placeholder { color: #888888; } .ds-input:focus-visible { outline: none; border-color: rgba(98, 145, 104, 0.5); box-shadow: 0 0 0 2px #0a0a0a, 0 0 0 4px #629168; }"
+    },
+    {
+      "name": "Project Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Featured project link card with media, mono metadata, title, tags.",
+      "html": "<article class=\"ds-project-card\"><div class=\"ds-project-media\"></div><div class=\"ds-project-body\"><span class=\"ds-project-type\">npm run build</span><h2 class=\"ds-project-title\">Project Name</h2><p class=\"ds-project-excerpt\">Short description of the work.</p><span class=\"ds-tag ds-tag-emerald\">#nextjs</span></div></article>",
+      "css": ".ds-project-card { display: flex; flex-direction: column; overflow: hidden; background: #0c0c0c; border: 1px solid #1e1e1e; border-radius: 0.25rem; transition: background-color 0.2s ease-out; } .ds-project-card:hover { background: #0f0f0f; } .ds-project-media { aspect-ratio: 16/9; background: #161616; } .ds-project-body { display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem 1.25rem; } .ds-project-type { font-family: 'Roboto Mono', monospace; font-size: 0.875rem; color: #444444; } .ds-project-title { font-family: 'DM Sans', sans-serif; font-size: 1.25rem; font-weight: 600; color: #f0f0f0; line-height: 1.375; margin: 0; } .ds-project-excerpt { font-size: 0.875rem; color: #555555; line-height: 1.625; margin: 0; }"
+    },
+    {
+      "name": "Status Line",
+      "kind": "custom",
+      "refersTo": "status-dot",
+      "description": "Home hero terminal status with pulsing dot.",
+      "html": "<p class=\"ds-status\"><span class=\"ds-status-prompt\">jamjam:~$ </span><span class=\"ds-status-text\">building something new</span><span class=\"ds-status-dot\" aria-hidden></span></p>",
+      "css": ".ds-status { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem; font-family: 'Roboto Mono', monospace; font-size: 0.875rem; margin: 0; } .ds-status-prompt { color: #444444; } .ds-status-text { color: #629168; } .ds-status-dot { position: relative; display: inline-flex; width: 0.625rem; height: 0.625rem; margin-left: 0.25rem; border-radius: 9999px; background: #3a9a3a; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Late-Night Terminal",
+    "overview": "jamjam.dev reads like a developer's workspace after hours: dark surfaces, green accent glow, mono prompts that wink without cosplay. The system is brand-register work where personality is the product. Density is moderate: generous hero type, tight mono labels, bordered containers instead of floating card shadows.",
+    "keyCharacteristics": [
+      "Dark-first tonal layering instead of shadows",
+      "DM Sans + Roboto Mono pairing",
+      "Green accent as rare signal",
+      "Subtle borders define structure",
+      "GSAP hero reveals; 200ms micro-interactions",
+      "prefers-reduced-motion respected"
+    ],
+    "rules": [
+      {
+        "name": "The One Glow Rule",
+        "body": "Green accent appears on ≤10% of any screen. Its rarity is the point.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Cream Rule",
+        "body": "Never introduce warm near-white body backgrounds.",
+        "section": "colors"
+      },
+      {
+        "name": "The Terminal Earned Rule",
+        "body": "Mono labels belong on section headers, status lines, and metadata. Do not put jamjam:~$ on every heading.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Surfaces are flat at rest. Hover is a tonal nudge, never a lifted shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The No Glass Rule",
+        "body": "No glassmorphism or frosted panels unless a Lab experiment calls for it.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the page background at Void Black (#0a0a0a) and build hierarchy through borders and tonal shifts.",
+      "Do use Terminal Teal (#44aa99) for links and Studio Green (#629168) for focus, selection, and status.",
+      "Do write section labels in mono with // or shell-style prompts where they add personality.",
+      "Do use GSAP power3.out for hero reveals and respect prefers-reduced-motion.",
+      "Do show real project imagery and writing; design frames the work."
+    ],
+    "donts": [
+      "Don't build generic SaaS landing pages: no cream backgrounds, hero metrics, identical feature card grids, or buzzword copy.",
+      "Don't ship template portfolio patterns: no Inter/default sans swaps, purple gradients, or endless same-sized icon + heading + blurb cards.",
+      "Don't slide into corporate brochure tone: no stock photography fillers or synergy language.",
+      "Don't use border-left or border-right accent stripes on cards or callouts.",
+      "Don't apply gradient text for emphasis.",
+      "Don't add glassmorphism by default.",
+      "Don't put a tiny uppercase tracked eyebrow above every section.",
+      "Don't nest cards inside cards."
+    ]
+  }
+}

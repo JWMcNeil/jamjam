@@ -34,11 +34,12 @@ export default async function ContactPage() {
   }
 
   const contactHeadline =
-    siteSettings.contactHeadline ?? "Let's work together."
+    siteSettings.contactHeadline ?? 'Reach out about a project or role.'
   const contactIntro =
     siteSettings.contactIntro ??
-    "Whether it's a new project, a job opportunity, or just a question — my inbox is open."
-  const contactResponseTime = siteSettings.contactResponseTime ?? 'usually within 24hrs'
+    'Freelance builds, full-time roles, and one-off questions all start here. Use the form or email me directly; I read every message.'
+  const contactResponseTime =
+    siteSettings.contactResponseTime ?? 'Usually within one business day'
   const { email, location, statusText } = siteSettings
 
   return (
@@ -56,39 +57,44 @@ export default async function ContactPage() {
 
           <dl className="mt-10 space-y-4 font-mono text-sm">
             <div>
-              <dt className="text-text-dim">// direct email</dt>
+              <dt className="text-text-dim">// email</dt>
               <dd>
-                <a className="text-foreground underline-offset-4 hover:underline" href={`mailto:${email}`}>
+                <a
+                  className="text-foreground underline-offset-4 hover:underline"
+                  href={`mailto:${email}`}
+                >
                   {email}
                 </a>
               </dd>
             </div>
             <div>
-              <dt className="text-text-dim">// based in</dt>
+              <dt className="text-text-dim">// location</dt>
               <dd className="text-foreground">{location}</dd>
             </div>
             <div>
-              <dt className="text-text-dim">// status</dt>
+              <dt className="text-text-dim">// availability</dt>
               <dd className="flex items-center gap-2 text-foreground">
                 {statusText}
                 <StatusDot />
               </dd>
             </div>
             <div>
-              <dt className="text-text-dim">// response time</dt>
+              <dt className="text-text-dim">// typical reply</dt>
               <dd className="text-foreground">{contactResponseTime}</dd>
             </div>
           </dl>
         </div>
 
         <div className="border-t border-border p-6 md:border-t-0 md:p-10">
-          <p className="mb-6 font-mono text-sm text-text-dim">// send a message</p>
+          <p className="mb-6 font-mono text-sm text-text-dim">// message form</p>
           <FormBlock
             enableIntro={false}
             form={contactForm as unknown as FormType}
             variant="contact"
           />
-          <p className="mt-6 font-mono text-xs text-muted-foreground">no spam, ever.</p>
+          <p className="mt-6 font-mono text-xs text-muted-foreground">
+            No mailing lists. I reply personally, not with auto-responders.
+          </p>
         </div>
       </div>
     </div>
@@ -98,6 +104,7 @@ export default async function ContactPage() {
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Contact — jamjam.dev',
-    description: 'Get in touch for projects, opportunities, or questions.',
+    description:
+      'Contact Jamie for freelance web development, full-time roles, or questions about web and AI work.',
   }
 }

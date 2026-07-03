@@ -80,7 +80,7 @@ export const SiteSettings: GlobalConfig = {
               name: 'contactHeadline',
               type: 'text',
               required: true,
-              defaultValue: "Let's work together.",
+              defaultValue: 'Reach out about a project or role.',
               admin: {
                 description: 'Main headline on the contact page.',
               },
@@ -90,7 +90,7 @@ export const SiteSettings: GlobalConfig = {
               type: 'textarea',
               required: true,
               defaultValue:
-                "Whether it's a new project, a job opportunity, or just a question — my inbox is open.",
+                'Freelance builds, full-time roles, and one-off questions all start here. Use the form or email me directly; I read every message.',
               admin: {
                 description: 'Supporting paragraph under the headline.',
               },
@@ -99,9 +99,9 @@ export const SiteSettings: GlobalConfig = {
               name: 'contactResponseTime',
               type: 'text',
               required: true,
-              defaultValue: 'usually within 24hrs',
+              defaultValue: 'Usually within one business day',
               admin: {
-                description: 'Shown next to // response time on the contact page.',
+                description: 'Shown next to // typical reply on the contact page.',
               },
             },
           ],

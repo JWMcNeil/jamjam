@@ -9,6 +9,7 @@ import {
   projectTypePrompt,
 } from '@/utilities/projectLabels'
 import { tagPillClasses } from '@/utilities/tagPillClasses'
+import { cn } from '@/utilities/ui'
 
 export type ProjectCardProject = Pick<
   Project,
@@ -17,7 +18,8 @@ export type ProjectCardProject = Pick<
 
 export const ProjectCard: React.FC<{
   project: ProjectCardProject
-}> = ({ project }) => {
+  subduedImage?: boolean
+}> = ({ project, subduedImage = false }) => {
   const { slug, title, excerpt, type, lifecycle, heroImage, tags } = project
   const hero =
     heroImage && typeof heroImage === 'object' && 'url' in heroImage ? heroImage : null
@@ -33,7 +35,11 @@ export const ProjectCard: React.FC<{
             <Media
               fill
               pictureClassName="absolute inset-0 block h-full w-full"
-              imgClassName="object-cover"
+              imgClassName={cn(
+                'object-cover',
+                subduedImage &&
+                  'grayscale motion-safe:transition-[filter] motion-safe:duration-300 group-hover:grayscale-0 group-focus-within:grayscale-0',
+              )}
               resource={hero as MediaType}
               size="33vw"
             />

@@ -5,7 +5,7 @@ import React from 'react'
 
 import { Footer } from '@/components/layout/footer/Component'
 import { Header } from '@/components/layout/header/Component'
-import { dmSans, robotoMono } from '@/lib/fonts'
+import { jetbrainsMono, schibstedGrotesk } from '@/lib/fonts'
 import { Providers } from '@/providers'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { draftMode } from 'next/headers'
@@ -18,7 +18,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html
-      className={cn(dmSans.variable, robotoMono.variable)}
+      className={cn(schibstedGrotesk.variable, jetbrainsMono.variable)}
       data-theme="dark"
       lang="en"
       suppressHydrationWarning

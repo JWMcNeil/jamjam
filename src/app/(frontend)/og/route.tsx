@@ -19,8 +19,8 @@ export async function GET(request: Request): Promise<ImageResponse> {
     (
       <div
         style={{
-          background: '#0a0a0a',
-          color: '#f0f0f0',
+          background: 'oklch(17% 0 0)',
+          color: 'oklch(90% 0 0)',
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
@@ -58,7 +58,7 @@ export async function GET(request: Request): Promise<ImageResponse> {
           </div>
           <div
             style={{
-              color: '#777777',
+              color: 'oklch(60% 0 0)',
               fontFamily:
                 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
               fontSize: 24,

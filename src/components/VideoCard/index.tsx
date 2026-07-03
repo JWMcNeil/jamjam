@@ -131,7 +131,7 @@ export const VideoCard: React.FC<VideoCardProps> = (props) => {
 
       {enableLink && href && (
         <Link
-          className="absolute inset-0 z-[1] pointer-events-auto text-transparent outline-none"
+          className="absolute inset-0 z-overlay pointer-events-auto text-transparent outline-none"
           href={href}
           ref={link.ref}
           aria-label="View video"

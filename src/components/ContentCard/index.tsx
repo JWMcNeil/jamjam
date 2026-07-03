@@ -306,17 +306,23 @@ export const ContentCard: React.FC<ContentCardProps> = (props) => {
               return (
                 <button
                   key={index}
-                  className={cn(
-                    'h-1.5 rounded-full transition-all',
-                    index === currentIndex ? 'w-6 bg-foreground' : 'w-1.5 bg-foreground/40',
-                  )}
+                  aria-label={`Show image ${index + 1} of ${validMedia.length}`}
+                  aria-current={index === currentIndex ? 'true' : undefined}
+                  className="flex h-11 w-11 items-center justify-center"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
                     setCurrentIndex(index)
                   }}
                   type="button"
-                />
+                >
+                  <span
+                    className={cn(
+                      'block h-1.5 rounded-full transition-all',
+                      index === currentIndex ? 'w-6 bg-foreground' : 'w-1.5 bg-foreground/40',
+                    )}
+                  />
+                </button>
               )
             })}
           </div>
@@ -344,7 +350,7 @@ export const ContentCard: React.FC<ContentCardProps> = (props) => {
 
       {enableLink && href && (
         <Link
-          className="absolute inset-0 z-[1] pointer-events-auto text-transparent outline-none"
+          className="absolute inset-0 z-overlay pointer-events-auto text-transparent outline-none"
           href={href}
           ref={link.ref}
           aria-label="View content"

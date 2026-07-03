@@ -7,7 +7,7 @@ const bracketLinkArrowMotionClass =
   'inline-block transition-transform duration-200 ease-out motion-safe:group-hover:translate-x-0.5'
 
 const bracketLinkClassName =
-  'group inline-flex items-baseline gap-x-1 font-mono text-sm text-text-prompt transition-colors hover:text-text-heading focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
+  'group inline-flex items-baseline gap-x-1 font-mono text-sm text-text-nav transition-colors hover:text-text-heading focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
 export type BracketLinkProps = React.ComponentProps<typeof Link> & {
   asChild?: boolean
@@ -17,14 +17,14 @@ export type BracketLinkProps = React.ComponentProps<typeof Link> & {
 function BracketLinkInner({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <span aria-hidden className="text-text-prompt">
+      <span aria-hidden className="text-text-muted">
         [
       </span>
       <span>{children}</span>
-      <span aria-hidden className="text-text-prompt">
+      <span aria-hidden className="text-text-muted">
         ]
       </span>
-      <span aria-hidden className={cn('text-text-prompt', bracketLinkArrowMotionClass)}>
+      <span aria-hidden className={cn('text-text-muted', bracketLinkArrowMotionClass)}>
         {' '}
         -&gt;
       </span>
