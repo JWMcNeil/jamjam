@@ -4,6 +4,7 @@ import {
   SerializedBlockNode,
   SerializedHeadingNode,
   SerializedLinkNode,
+  SerializedTextNode,
   type DefaultTypedEditorState,
 } from '@payloadcms/richtext-lexical'
 import {
@@ -91,9 +92,24 @@ export function createPayloadJsxConverters(
       content: ({ node }) => <ContentBlock {...node.fields} />,
     }
 
+    // Paste from design tools / Mac Option+Space often inserts U+00A0,
+    // which prevents line wrapping. Normalize to regular spaces on render.
+    const defaultText = defaultConverters.text
+    const text: JSXConverter<SerializedTextNode> = (args) => {
+      const { node } = args
+      if (!node.text.includes('\u00A0') || typeof defaultText !== 'function') {
+        return typeof defaultText === 'function' ? defaultText(args) : node.text
+      }
+      return defaultText({
+        ...args,
+        node: { ...node, text: node.text.replace(/\u00A0/g, ' ') },
+      })
+    }
+
     const base = {
       ...defaultConverters,
       ...LinkJSXConverter({ internalDocToHref }),
+      text,
       blocks,
     }
 

@@ -68,10 +68,11 @@ export default async function HomePage() {
       {/* Hero */}
       <section className="py-16 md:py-24">
         <h1 className="text-display font-black text-text-heading motion-safe:animate-subtle-fade">
-          Creative developer.
+          Runs on curiosity, mostly.
           <br />
-          <span className="text-text-secondary">Making things with</span>{' '}
-          <span className="font-bold text-text-heading">web + AI.</span>
+          <span>Making</span>{' '}
+          <span className="text-text-secondary">web & Ai</span>{' '}
+          <span>things out of it.</span>
         </h1>
         <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
           <p className="flex flex-wrap items-center gap-x-1 font-mono text-xs lg:text-sm">
@@ -82,20 +83,20 @@ export default async function HomePage() {
           <BracketLink href="/contact">say hello</BracketLink>
         </div>
         {siteSettings.homeIntro && (
-          <div className="mt-10 max-w-full text-pretty">
+          <div className="mt-10 min-w-0 max-w-2xl text-pretty">
             <RichText
               data={siteSettings.homeIntro}
               enableGutter={false}
               proseInvert={false}
               proseLayout="flush"
-              className="text-lg text-text-muted prose-p:mt-0 prose-p:text-text-secondary prose-strong:text-text-heading prose-a:text-accent prose-a:no-underline hover:prose-a:underline"
+              className="min-w-0 text-lg text-text-muted prose-p:mt-0 prose-p:text-text-secondary prose-strong:text-text-heading prose-a:text-accent prose-a:no-underline hover:prose-a:underline max-w-none text-pretty"
             />
           </div>
         )}
       </section>
 
       {/* Featured Projects */}
-      <section className="py-8 lg:py-12">
+      <section className="py-2 lg:py-8">
         <div className="flex items-center justify-between mb-6">
           <p className="text-text-muted font-mono text-xs lg:text-sm">// featured projects</p>
           <Button href="/projects" variant="outline" size="default">
