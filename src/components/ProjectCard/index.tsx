@@ -19,7 +19,9 @@ export type ProjectCardProject = Pick<
 export const ProjectCard: React.FC<{
   project: ProjectCardProject
   subduedImage?: boolean
-}> = ({ project, subduedImage = false }) => {
+  /** Eager-load / preload hero — use for the first above-the-fold card (LCP). */
+  priority?: boolean
+}> = ({ project, subduedImage = false, priority = false }) => {
   const { slug, title, excerpt, type, lifecycle, heroImage, tags } = project
   const hero =
     heroImage && typeof heroImage === 'object' && 'url' in heroImage ? heroImage : null
@@ -40,6 +42,7 @@ export const ProjectCard: React.FC<{
                 subduedImage &&
                   'grayscale motion-safe:transition-[filter] motion-safe:duration-300 group-hover:grayscale-0 group-focus-within:grayscale-0',
               )}
+              priority={priority}
               resource={hero as MediaType}
               size="33vw"
             />

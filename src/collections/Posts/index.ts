@@ -51,6 +51,8 @@ export const Posts: CollectionConfig<'posts'> = {
     },
   },
   admin: {
+    group: 'Content',
+    description: 'Blog posts shown on /posts.',
     defaultColumns: ['title', 'slug', 'featured', 'publishedAt', 'updatedAt'],
     livePreview: {
       url: ({ data }) =>

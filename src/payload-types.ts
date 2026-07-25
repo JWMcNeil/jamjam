@@ -152,6 +152,8 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Admin accounts with access to this dashboard.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -178,6 +180,8 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Images and files used across Posts, Projects, and Lab.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -270,6 +274,8 @@ export interface Media {
   };
 }
 /**
+ * Shared tags for filtering Posts and Projects on the frontend.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "tags".
  */
@@ -388,6 +394,8 @@ export interface Lab {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Blog posts shown on /posts.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts".
  */
@@ -465,6 +473,8 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Portfolio projects shown on /projects.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "projects".
  */
@@ -1092,9 +1102,6 @@ export interface Form {
       )[]
     | null;
   submitButtonLabel?: string | null;
-  /**
-   * Choose whether to display an on-page message or redirect to a different page after they submit the form.
-   */
   confirmationType?: ('message' | 'redirect') | null;
   confirmationMessage?: {
     root: {
@@ -1114,9 +1121,6 @@ export interface Form {
   redirect?: {
     url: string;
   };
-  /**
-   * Send custom emails when the form submits. Use comma separated lists to send the same email to multiple recipients. To reference a value from this form, wrap that field's name with double curly brackets, i.e. {{firstName}}. You can use a wildcard {{*}} to output all data and {{*:table}} to format it as an HTML table in the email.
-   */
   emails?:
     | {
         emailTo?: string | null;
@@ -1125,9 +1129,6 @@ export interface Form {
         replyTo?: string | null;
         emailFrom?: string | null;
         subject: string;
-        /**
-         * Enter the message that should be sent in this email.
-         */
         message?: {
           root: {
             type: string;
@@ -1955,6 +1956,8 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Primary navigation links shown in the site header.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
  */
@@ -1993,6 +1996,8 @@ export interface Header {
   createdAt?: string | null;
 }
 /**
+ * Social links shown in the site footer.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "footer".
  */

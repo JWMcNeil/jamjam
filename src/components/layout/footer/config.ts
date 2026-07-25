@@ -7,6 +7,10 @@ export const Footer: GlobalConfig = {
   access: {
     read: () => true,
   },
+  admin: {
+    group: 'Site',
+    description: 'Social links shown in the site footer.',
+  },
   fields: [
     {
       name: 'githubUrl',

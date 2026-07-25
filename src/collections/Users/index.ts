@@ -12,6 +12,7 @@ export const Users: CollectionConfig<'users'> = {
     update: authenticated,
   },
   admin: {
+    description: 'Admin accounts with access to this dashboard.',
     defaultColumns: ['name', 'email'],
     useAsTitle: 'name',
   },

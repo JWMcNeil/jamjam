@@ -22,6 +22,11 @@ export const Media: CollectionConfig<'media'> = {
     read: anyone,
     update: authenticated,
   },
+  admin: {
+    group: 'Organise',
+    description: 'Images and files used across Posts, Projects, and Lab.',
+    defaultColumns: ['filename', 'alt', 'filesize', 'updatedAt'],
+  },
   fields: [
     {
       name: 'alt',

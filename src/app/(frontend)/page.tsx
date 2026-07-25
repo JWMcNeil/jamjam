@@ -114,8 +114,13 @@ export default async function HomePage() {
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-8 md:gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {featuredProjects.docs.map((project) => (
-              <ProjectCard key={project.id} project={project} subduedImage />
+            {featuredProjects.docs.map((project, index) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                subduedImage
+                priority={index === 0}
+              />
             ))}
           </div>
         )}

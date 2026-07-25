@@ -96,6 +96,7 @@ export const Lab: CollectionConfig = {
     update: authenticated,
   },
   admin: {
+    group: 'Content',
     defaultColumns: ['slug', 'toolKey', 'title', 'kind', 'group', 'enabled', 'order', 'updatedAt'],
     useAsTitle: 'title',
     description: 'Display controls for /lab tools. Tool identity comes from code, route slug from CMS.',

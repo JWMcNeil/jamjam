@@ -8,6 +8,10 @@ export const Header: GlobalConfig = {
   access: {
     read: () => true,
   },
+  admin: {
+    group: 'Site',
+    description: 'Primary navigation links shown in the site header.',
+  },
   fields: [
     {
       name: 'navItems',

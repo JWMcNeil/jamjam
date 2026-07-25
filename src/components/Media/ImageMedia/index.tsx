@@ -54,7 +54,8 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     return null
   }
 
-  const loading = loadingFromProps || (!priority ? 'lazy' : undefined)
+  // priority implies eager; Next.js LCP warning expects an explicit eager when above-the-fold
+  const loading = loadingFromProps ?? (priority ? 'eager' : 'lazy')
 
   // NOTE: this is used by the browser to determine which image to download at different screen sizes
   const sizes = sizeFromProps

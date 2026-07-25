@@ -13,6 +13,8 @@ export const Tags: CollectionConfig<'tags'> = {
     update: authenticated,
   },
   admin: {
+    group: 'Organise',
+    description: 'Shared tags for filtering Posts and Projects on the frontend.',
     useAsTitle: 'label',
     defaultColumns: ['label', 'slug', 'colour'],
   },

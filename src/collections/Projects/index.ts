@@ -50,6 +50,8 @@ export const Projects: CollectionConfig<'projects'> = {
     },
   },
   admin: {
+    group: 'Content',
+    description: 'Portfolio projects shown on /projects.',
     defaultColumns: ['title', 'type', 'lifecycle', 'featured', 'order', 'updatedAt'],
     livePreview: {
       url: ({ data }) =>
