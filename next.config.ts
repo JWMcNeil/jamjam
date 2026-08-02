@@ -6,7 +6,7 @@ import redirects from './redirects.js'
 const NEXT_PUBLIC_SERVER_URL =
   process.env.NEXT_PUBLIC_SITE_URL || process.env.__NEXT_PRIVATE_ORIGIN || 'http://localhost:3000'
 
-/** Fallback when env is missing at build time (e.g. Docker build without R2_*). Forks should set R2_PUBLIC_URL. */
+/** Fallback when env is missing at build time. Prefer setting R2_PUBLIC_URL / NEXT_PUBLIC_MEDIA_URL. */
 const DEFAULT_MEDIA_PUBLIC_URL = 'https://media.jamjam.dev'
 
 /** Hostnames only (no scheme/port). Lets phone/Tailscale load `/_next` dev assets. */
@@ -23,8 +23,8 @@ function parseAllowedDevOrigins(): string[] | undefined {
 const allowedDevOrigins = parseAllowedDevOrigins()
 
 /**
- * Public media origin (R2 custom domain). Must read env when called — do not rely only on
- * module-load time for CSP: Dokploy often injects R2_PUBLIC_URL at runtime, not at `next build`.
+ * Public media origin (R2 custom domain). Read env when called so CSP picks up runtime
+ * values, not only what was present at `next build`.
  */
 function parseMediaOriginWithFallback(): URL | null {
   const raw =
@@ -81,7 +81,6 @@ function buildFrameAncestors(): string {
 
 const nextConfig: NextConfig = {
   ...(allowedDevOrigins ? { allowedDevOrigins } : {}),
-  output: 'standalone',
   images: {
     /**
      * Next 16 defaults omitted `localPatterns` to `[{ pathname: '**', search: '' }]`,
@@ -119,7 +118,7 @@ const nextConfig: NextConfig = {
     return (await redirects()) as Awaited<ReturnType<NonNullable<NextConfig['redirects']>>>
   },
   async headers() {
-    // Re-read env at header generation so runtime-injected R2_PUBLIC_URL applies (Dokploy, etc.).
+    // Re-read env at header generation so R2_PUBLIC_URL from the runtime env applies.
     const media = parseMediaOriginWithFallback()
     const imgSrc = [
       "'self'",

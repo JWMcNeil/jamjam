@@ -1,7 +1,7 @@
 import { s3Storage } from '@payloadcms/storage-s3'
 
 /**
- * Cloudflare R2 via S3-compatible API. Set R2_* env vars in production (e.g. Dokploy).
+ * Cloudflare R2 via S3-compatible API. Set R2_* env vars in production (e.g. Vercel).
  * Omit R2_BUCKET locally to keep uploads in public/media.
  *
  * @see https://payloadcms.com/docs/upload/storage-adapters#using-with-cloudflare-r2-via-s3-api
