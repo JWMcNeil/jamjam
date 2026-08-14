@@ -61,6 +61,7 @@ export function MobileNavSheet({
 
   return (
     <div
+      id="mobile-nav"
       className={cn(
         /* z-10 vs chrome bar z-20. Collapse with 0fr/1fr — `hidden` breaks grid-template-rows transitions. */
         'md:hidden fixed z-10 grid overflow-hidden transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none motion-reduce:duration-0',
@@ -74,6 +75,7 @@ export function MobileNavSheet({
             : undefined
       }
       aria-hidden={!open}
+      {...(!open ? { inert: true } : {})}
     >
       <div className="min-h-0">
         <nav
@@ -101,6 +103,7 @@ export function MobileNavSheet({
                 <li key={i}>
                   <Link
                     href={href}
+                    tabIndex={open ? undefined : -1}
                     className={cn(
                       'flex w-full items-center justify-between gap-3 px-4 py-4 font-mono transition-colors',
                       'hover:bg-black/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',

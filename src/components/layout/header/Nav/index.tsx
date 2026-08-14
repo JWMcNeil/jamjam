@@ -117,6 +117,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
         className="relative flex h-14 w-14 shrink-0 touch-manipulation items-center justify-center px-4 text-muted-foreground hover:text-foreground md:hidden"
         aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isMobileMenuOpen}
+        aria-controls="mobile-nav"
       >
         {isMobileMenuOpen ? (
           <X className="h-5 w-5" aria-hidden />
