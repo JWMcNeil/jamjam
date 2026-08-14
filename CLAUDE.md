@@ -10,3 +10,17 @@ Strategic and visual design specs live at the project root. Read these before UI
 - **[DESIGN.md](./DESIGN.md)** — colors, typography, components, do's and don'ts (Stitch-format tokens in frontmatter)
 
 Live variant mode config: `.impeccable/live/config.json`
+
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs live in GitHub Issues. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the default five triage labels. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This is a single-context repo using root `CONTEXT.md` and `docs/adr/`. See `docs/agents/domain.md`.
