@@ -9,7 +9,7 @@ import React from 'react'
 import type { Props as MediaProps } from '../types'
 
 import { cssVariables } from '@/cssVariables'
-import { getMediaUrl, isCrossOriginMediaUrl } from '@/utilities/getMediaUrl'
+import { getMediaUrl, pickDisplayMedia } from '@/utilities/getMediaUrl'
 
 const { breakpoints } = cssVariables
 
@@ -36,16 +36,28 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   let src: StaticImageData | string | null = srcFromProps || null
 
   if (!src && resource && typeof resource === 'object') {
-    const { alt: altFromResource, height: fullHeight, url, width: fullWidth } = resource
+    const isGif =
+      resource.mimeType === 'image/gif' ||
+      (typeof resource.filename === 'string' && /\.gif$/i.test(resource.filename)) ||
+      Boolean(resource.url?.toLowerCase().endsWith('.gif'))
 
-    width = fullWidth!
-    height = fullHeight!
-    alt = altFromResource || ''
+    const minWidth = fill
+      ? 1400
+      : Math.min(Math.max((props.width ?? resource.width ?? 1400) * 2, 600), 1920)
 
-    const cacheTag = resource.updatedAt
+    const picked = isGif
+      ? {
+          url: resource.url || '',
+          width: resource.width ?? undefined,
+          height: resource.height ?? undefined,
+        }
+      : pickDisplayMedia(resource, minWidth)
 
-    const mediaUrl = getMediaUrl(url, cacheTag)
-    // Only set src if we have a valid non-empty URL
+    width = picked.width ?? resource.width!
+    height = picked.height ?? resource.height!
+    alt = resource.alt || altFromProps || ''
+
+    const mediaUrl = getMediaUrl(picked.url, resource.updatedAt)
     src = mediaUrl && mediaUrl.trim() !== '' ? mediaUrl : null
   }
 
@@ -69,16 +81,15 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     pictureClassName,
   )
 
-  const srcStr = typeof src === 'string' ? src : ''
   const isGif =
     resource &&
     typeof resource === 'object' &&
     (resource.mimeType === 'image/gif' ||
-      (typeof resource.filename === 'string' && /\.gif$/i.test(resource.filename)))
-  // R2/CDN URLs must skip /_next/image — the optimizer double-encodes ?v= and returns 400.
-  // GIFs skip optimization so animation is preserved.
-  const unoptimized =
-    Boolean(srcStr && isCrossOriginMediaUrl(srcStr)) || Boolean(isGif)
+      (typeof resource.filename === 'string' && /\.gif$/i.test(resource.filename)) ||
+      Boolean(resource.url?.toLowerCase().endsWith('.gif')))
+  // GIFs skip optimization so animation is preserved. Cross-origin R2 URLs go through
+  // /_next/image now that cache-bust `v=` is numeric (ISO `:` used to 400).
+  const unoptimized = Boolean(isGif)
 
   return (
     <picture className={resolvedPictureClassName}>

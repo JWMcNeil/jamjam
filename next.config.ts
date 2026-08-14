@@ -107,6 +107,7 @@ const nextConfig: NextConfig = {
               protocol: mediaOrigin.protocol.replace(':', '') as 'http' | 'https',
               hostname: mediaOrigin.hostname,
               ...(mediaOrigin.port ? { port: mediaOrigin.port } : {}),
+              // Omit `search` so `?v=` cache-busting is allowed (same as local media files).
               pathname: '/**' as const,
             },
           ]

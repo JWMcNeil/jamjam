@@ -12,8 +12,9 @@ export const MotoGuy: React.FC<Props> = ({ className }) => {
     <NextImage
       src="/motoguy.png"
       alt="jamjam.dev logo"
-      width={712}
-      height={712}
+      width={72}
+      height={72}
+      sizes="36px"
       priority
       className={cn('h-8 w-auto object-contain md:h-9', className)}
     />

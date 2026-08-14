@@ -25,7 +25,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <head>
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
-        <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        {process.env.NEXT_PUBLIC_MEDIA_URL ? (
+          <link rel="preconnect" href={new URL(process.env.NEXT_PUBLIC_MEDIA_URL).origin} />
+        ) : null}
         <link
           href={`${getServerSideURL()}/feed.xml`}
           rel="alternate"

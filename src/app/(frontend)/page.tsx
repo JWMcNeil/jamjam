@@ -120,7 +120,7 @@ export default async function HomePage() {
                 key={project.id}
                 project={project}
                 subduedImage
-                priority={index === 0}
+                priority={index < 3}
               />
             ))}
           </div>

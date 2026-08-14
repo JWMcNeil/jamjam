@@ -6,7 +6,6 @@ export const schibstedGrotesk = localFont({
     { path: '../fonts/schibsted-grotesk-500.woff2', weight: '500', style: 'normal' },
     { path: '../fonts/schibsted-grotesk-600.woff2', weight: '600', style: 'normal' },
     { path: '../fonts/schibsted-grotesk-700.woff2', weight: '700', style: 'normal' },
-    { path: '../fonts/schibsted-grotesk-800.woff2', weight: '800', style: 'normal' },
     { path: '../fonts/schibsted-grotesk-900.woff2', weight: '900', style: 'normal' },
   ],
   variable: '--font-sans',
@@ -15,6 +14,7 @@ export const schibstedGrotesk = localFont({
 })
 
 export const jetbrainsMono = localFont({
+  preload: false,
   src: [
     { path: '../fonts/jetbrains-mono-400.woff2', weight: '400', style: 'normal' },
     { path: '../fonts/jetbrains-mono-500.woff2', weight: '500', style: 'normal' },

@@ -34,17 +34,49 @@ function appendCacheTag(url: string, cacheTag: string): string {
   return `${url}${sep}v=${v}`
 }
 
-/** True when src is absolute and not served from this app (e.g. R2 on media.*). */
-export function isCrossOriginMediaUrl(href: string): boolean {
-  if (!href.startsWith('http://') && !href.startsWith('https://')) {
-    return false
+type DisplaySizeKey = 'small' | 'medium' | 'large' | 'xlarge'
+
+const SIZE_ORDER: DisplaySizeKey[] = ['small', 'medium', 'large', 'xlarge']
+
+type MediaSize = {
+  url?: string | null
+  width?: number | null
+  height?: number | null
+}
+
+type MediaLike = {
+  url?: string | null
+  width?: number | null
+  height?: number | null
+  sizes?: Partial<Record<DisplaySizeKey, MediaSize | null>> | null
+}
+
+/**
+ * Prefer a Payload-generated size so next/image does not download a multi-MB original.
+ * Picks the smallest size whose width is at least `minWidth`.
+ */
+export function pickDisplayMedia(
+  resource: MediaLike,
+  minWidth: number,
+): { url: string; width?: number; height?: number } {
+  const sizes = resource.sizes
+  const generated = SIZE_ORDER.map((key) => sizes?.[key])
+    .filter((size): size is MediaSize => Boolean(size?.url))
+    .sort((a, b) => (a.width ?? 0) - (b.width ?? 0))
+
+  const fit = generated.find((size) => (size.width ?? 0) >= minWidth) ?? generated.at(-1)
+  if (fit?.url) {
+    return {
+      url: fit.url,
+      width: fit.width ?? undefined,
+      height: fit.height ?? undefined,
+    }
   }
-  try {
-    const site = new URL(getServerSideURL())
-    const parsed = new URL(href)
-    return parsed.origin !== site.origin
-  } catch {
-    return false
+
+  return {
+    url: resource.url || '',
+    width: resource.width ?? undefined,
+    height: resource.height ?? undefined,
   }
 }
 
