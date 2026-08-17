@@ -2,6 +2,10 @@ import type { NextRequest } from 'next/server'
 
 import { resolveLabToolBySlug } from '@/lib/lab/resolveTools'
 
+/** Keep the roast tool in Sydney next to Neon; streaming Gemini can exceed the default. */
+export const preferredRegion = 'syd1'
+export const maxDuration = 30
+
 type RouteContext = {
   params: Promise<{
     slug: string

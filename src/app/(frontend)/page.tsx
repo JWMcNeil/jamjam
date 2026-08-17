@@ -66,7 +66,7 @@ export default async function HomePage() {
   return (
     <div className="w-full max-w-7xl mx-auto px-4">
       {/* Hero */}
-      <section className="py-16 md:py-24">
+      <section className="py-16 md:py-16">
         <h1 className="text-display font-black text-text-heading motion-safe:animate-subtle-fade">
           Runs on curiosity, mostly.
           <br />
@@ -94,6 +94,8 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+
+      <LatestPosts posts={latestPosts.docs} totalDocs={latestPosts.totalDocs} />
 
       {/* Featured Projects */}
       <section className="py-2 lg:py-8">
@@ -127,7 +129,7 @@ export default async function HomePage() {
         )}
       </section>
 
-      <LatestPosts posts={latestPosts.docs} totalDocs={latestPosts.totalDocs} />
+
 
       <About
         name={siteSettings.name}

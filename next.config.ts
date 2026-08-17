@@ -139,6 +139,9 @@ const nextConfig: NextConfig = {
       'https://*.mux.com',
       'https://stream.mux.com',
       'https://image.mux.com',
+      // Vercel Web Analytics + Speed Insights (prod uses /_vercel/* on this origin)
+      'https://va.vercel-scripts.com',
+      'https://vitals.vercel-insights.com',
     ].join(' ')
     // Without explicit media-src / worker-src, default-src 'self' blocks Mux HLS (stream.mux.com)
     // and blob workers used by @mux/mux-player-react in production (dev omits CSP).
@@ -165,8 +168,9 @@ const nextConfig: NextConfig = {
     const csp = [
       "default-src 'self'",
       // Payload admin relies on eval in some bundled paths; keep inline for Next.js.
-      // Cloudflare Web Analytics loads from static.cloudflareinsights.com
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com",
+      // Cloudflare Web Analytics: static.cloudflareinsights.com
+      // Vercel Analytics/Speed Insights debug scripts: va.vercel-scripts.com (prod uses /_vercel/*)
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://va.vercel-scripts.com",
       "style-src 'self' 'unsafe-inline'",
       `img-src ${imgSrc}`,
       "font-src 'self'",

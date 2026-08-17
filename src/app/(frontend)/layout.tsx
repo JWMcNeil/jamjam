@@ -3,6 +3,9 @@ import type { Metadata } from 'next'
 import { cn } from '@/utilities/ui'
 import React from 'react'
 
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+
 import { Footer } from '@/components/layout/footer/Component'
 import { Header } from '@/components/layout/header/Component'
 import { jetbrainsMono, schibstedGrotesk } from '@/lib/fonts'
@@ -43,6 +46,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Footer />
           </div>
         </Providers>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
