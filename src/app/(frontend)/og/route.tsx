@@ -3,6 +3,8 @@ import { ImageResponse } from 'next/og'
 export const runtime = 'nodejs'
 
 function terminalPath(type: string | undefined, slug: string | undefined): string {
+  if (type === 'contact') return '~/contact'
+  if (type === 'lab' && slug) return `~/lab/${slug}`
   if (type === 'project' && slug) return `~/projects/${slug}`
   if (slug) return `~/posts/${slug}`
   return '~/jamjam.dev'

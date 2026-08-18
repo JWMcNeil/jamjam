@@ -238,7 +238,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const decodedSlug = decodeURIComponent(slug)
   const project = await queryProjectBySlug({ slug: decodedSlug })
 
-  return generateMeta({ doc: project })
+  return generateMeta({ doc: project, kind: 'project' })
 }
 
 function getProjectShowcaseSlides(project: Project): ProjectShowcaseSlide[] {

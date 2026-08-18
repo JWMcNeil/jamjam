@@ -16,7 +16,9 @@ import { StatusDot } from '@/components/StatusDot'
 import React from 'react'
 
 import { getCachedContactForm } from '@/utilities/getContactForm'
+import { generatedOgImageUrl } from '@/utilities/generateMeta'
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
 export const dynamic = 'force-static'
 export const revalidate = 600
@@ -102,9 +104,16 @@ export default async function ContactPage() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
+  const description =
+    'Contact Jamie for freelance web development, full-time roles, or questions about web and AI work.'
+
   return {
     title: 'Contact — jamjam.dev',
-    description:
-      'Contact Jamie for freelance web development, full-time roles, or questions about web and AI work.',
+    description,
+    openGraph: mergeOpenGraph({
+      title: 'Contact — jamjam.dev',
+      description,
+      images: [{ url: generatedOgImageUrl({ title: 'Contact', type: 'contact' }) }],
+    }),
   }
 }

@@ -10,6 +10,7 @@ import { BracketLink } from '@/components/ui/bracket-link'
 import { Button } from '@/components/ui/button'
 import type { SiteSetting } from '@/payload-types'
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { generatedOgImageUrl } from '@/utilities/generateMeta'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { getPayload } from 'payload'
 
@@ -27,6 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: mergeOpenGraph({
       title: 'jamjam.dev',
       description,
+      images: [{ url: generatedOgImageUrl({ title: 'jamjam.dev' }) }],
     }),
   }
 }

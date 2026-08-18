@@ -1,46 +1,91 @@
 import type { Metadata } from 'next'
 
-import type { Config, Lab, Media, Post, Project } from '../payload-types'
+import type { Lab, Media, Post, Project } from '../payload-types'
 
 import { mergeOpenGraph } from './mergeOpenGraph'
 import { getServerSideURL } from './getURL'
 
-const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
-  const serverUrl = getServerSideURL()
+export type MetaDocKind = 'post' | 'project' | 'lab'
 
-  let url = serverUrl + '/website-template-OG.webp'
+type MetaDoc = Partial<Post> | Partial<Project> | Partial<Lab> | null
 
-  if (image && typeof image === 'object' && 'url' in image) {
-    const ogUrl = image.sizes?.og?.url
+const toAbsoluteUrl = (url: string): string => {
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  const path = url.startsWith('/') ? url : `/${url}`
+  return `${getServerSideURL()}${path}`
+}
 
-    url = ogUrl ? serverUrl + ogUrl : serverUrl + image.url
+export const generatedOgImageUrl = (args: {
+  title: string
+  type?: string
+  slug?: string
+}): string => {
+  const params = new URLSearchParams()
+  params.set('title', args.title)
+  if (args.type) params.set('type', args.type)
+  if (args.slug) params.set('slug', args.slug)
+  return `${getServerSideURL()}/og?${params.toString()}`
+}
+
+const canonicalPath = (kind: MetaDocKind, slug: string | undefined): string => {
+  if (!slug) return '/'
+  if (kind === 'post') return `/posts/${slug}`
+  if (kind === 'project') return `/projects/${slug}`
+  return `/lab/${slug}`
+}
+
+const heroOgImageUrl = (doc: MetaDoc): string | null => {
+  if (!doc || !('heroImage' in doc)) return null
+  const image = doc.heroImage
+  if (!image || typeof image !== 'object' || !('url' in image)) return null
+
+  const media = image as Media
+  const raw = media.sizes?.og?.url || media.url
+  if (!raw) return null
+  return toAbsoluteUrl(raw)
+}
+
+const cardTitle = (doc: MetaDoc): string => {
+  if (doc?.meta?.title?.trim()) return doc.meta.title.trim()
+  if (doc && 'title' in doc && typeof doc.title === 'string' && doc.title.trim()) {
+    return doc.title.trim()
   }
+  return 'jamjam.dev'
+}
 
-  return url
+const inferKind = (doc: MetaDoc): MetaDocKind => {
+  if (doc && 'toolKey' in doc) return 'lab'
+  if (doc && 'lifecycle' in doc) return 'project'
+  return 'post'
 }
 
 export const generateMeta = async (args: {
-  doc: Partial<Post> | Partial<Project> | Partial<Lab> | null
+  doc: MetaDoc
+  kind?: MetaDocKind
 }): Promise<Metadata> => {
   const { doc } = args
-
-  const ogImage = getImageURL(doc?.meta?.image)
-
-  const title = doc?.meta?.title ? doc?.meta?.title + ' | jamjam.dev' : 'jamjam.dev'
+  const kind = args.kind ?? inferKind(doc)
+  const slug = typeof doc?.slug === 'string' ? doc.slug : undefined
+  const title = doc?.meta?.title ? `${doc.meta.title} | jamjam.dev` : 'jamjam.dev'
+  const ogImage =
+    heroOgImageUrl(doc) ??
+    generatedOgImageUrl({
+      title: cardTitle(doc),
+      type: kind,
+      slug,
+    })
 
   return {
     description: doc?.meta?.description,
     openGraph: mergeOpenGraph({
       description: doc?.meta?.description || '',
-      images: ogImage
-        ? [
-            {
-              url: ogImage,
-            },
-          ]
-        : undefined,
+      images: [
+        {
+          url: ogImage,
+        },
+      ],
       title,
-      url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
+      url: canonicalPath(kind, slug),
     }),
     title,
   }
