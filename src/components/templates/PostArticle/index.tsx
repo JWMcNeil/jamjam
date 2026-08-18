@@ -2,6 +2,7 @@ import { RelatedPosts } from '@/components/blocks/RelatedPosts/Component'
 import { ImageMedia } from '@/components/Media/ImageMedia'
 import { Media } from '@/components/Media'
 import { PostBodyRichText } from '@/components/RichText/PostBodyRichText'
+import { PostContentsAside, PostContentsMobile } from '@/components/templates/PostArticle/PostContents'
 import { PostHeartShare } from '@/components/templates/PostArticle/PostHeartShare'
 import type { LexicalHeadingOutlineItem } from '@/utilities/extractLexicalHeadings'
 import { formatPostDateLong } from '@/utilities/formatPostDate'
@@ -60,57 +61,6 @@ function PostTagsAside({ post }: { post: Post }) {
         })}
       </div>
     </div>
-  )
-}
-
-function PostContentsAside({ outline }: { outline: LexicalHeadingOutlineItem[] }) {
-  if (outline.length === 0) return null
-
-  return (
-    <nav aria-label="Table of contents" className="border border-border bg-card p-4">
-      <p className="mb-3 font-mono text-xs text-text-muted">// contents</p>
-      <ul className="space-y-2.5 p-0 text-sm leading-snug">
-        {outline.map((item) => (
-          <li key={item.id}>
-            <a
-              href={`#${item.id}`}
-              className="text-text-secondary transition-colors hover:text-text-heading"
-            >
-              {item.text}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  )
-}
-
-function PostContentsMobile({ outline }: { outline: LexicalHeadingOutlineItem[] }) {
-  if (outline.length === 0) return null
-
-  return (
-    <details className="group border border-border bg-card lg:hidden">
-      <summary className="cursor-pointer list-none px-4 py-3 font-mono text-sm text-text-muted marker:content-none [&::-webkit-details-marker]:hidden">
-        <span className="text-text-secondary transition-colors group-open:text-text-heading">
-          // contents
-        </span>
-        <span className="ml-2 text-text-dim">({outline.length})</span>
-      </summary>
-      <nav aria-label="Table of contents" className="border-t border-border px-4 pb-4 pt-3">
-        <ul className="space-y-2.5 text-sm leading-snug">
-          {outline.map((item) => (
-            <li key={item.id}>
-              <a
-                href={`#${item.id}`}
-                className="text-text-secondary transition-colors hover:text-text-heading"
-              >
-                {item.text}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </details>
   )
 }
 
