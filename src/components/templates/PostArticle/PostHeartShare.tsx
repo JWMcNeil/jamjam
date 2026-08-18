@@ -160,7 +160,7 @@ export function PostHeartShare({
         disabled={pending}
         aria-pressed={hearted}
         aria-label={hearted ? 'Remove heart' : 'Heart this post'}
-        className="inline-flex items-center gap-2 font-mono text-sm tabular-nums text-text-muted transition-colors hover:text-text-heading disabled:opacity-60"
+        className="inline-flex items-center gap-2 font-mono text-sm tabular-nums text-text-muted transition-colors hover:text-text-heading disabled:opacity-60 cursor-pointer"
       >
         <PixelHeart filled={hearted} />
         <span>{count}</span>
@@ -168,7 +168,7 @@ export function PostHeartShare({
       <button
         type="button"
         onClick={() => void share()}
-        className="font-mono text-sm text-text-muted transition-colors hover:text-text-heading"
+        className="font-mono text-sm text-text-muted transition-colors hover:text-text-heading cursor-pointer"
       >
         {shareLabel}
       </button>
