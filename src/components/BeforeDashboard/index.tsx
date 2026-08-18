@@ -1,74 +1,99 @@
-import { Banner } from '@payloadcms/ui/elements/Banner'
-import React from 'react'
+'use client'
 
-import { SeedButton } from './SeedButton'
+import React, { useEffect, useState } from 'react'
+
+import { getHeartCount, parseHeartCounts } from '@/lib/hearts'
+
 import './index.scss'
 
 const baseClass = 'before-dashboard'
 
-const BeforeDashboard: React.FC = () => {
+type HeartRow = {
+  id: number
+  title: string
+  count: number
+}
+
+export default function BeforeDashboard() {
+  const [rows, setRows] = useState<HeartRow[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const load = async () => {
+      try {
+        const postsQuery = new URLSearchParams({
+          depth: '0',
+          draft: 'false',
+          limit: '200',
+          pagination: 'false',
+          'select[title]': 'true',
+          'where[_status][equals]': 'published',
+          sort: '-publishedAt',
+        })
+
+        const [postsRes, heartsRes] = await Promise.all([
+          fetch(`/api/posts?${postsQuery.toString()}`, { credentials: 'include' }),
+          fetch('/api/globals/hearts', { credentials: 'include' }),
+        ])
+
+        if (!postsRes.ok) throw new Error('Could not load posts')
+        if (!heartsRes.ok) throw new Error('Could not load hearts')
+
+        const postsJson = (await postsRes.json()) as {
+          docs?: Array<{ id: number; title?: string }>
+        }
+        const heartsJson = (await heartsRes.json()) as { counts?: unknown }
+        const counts = parseHeartCounts(heartsJson.counts)
+
+        const ranked = (postsJson.docs ?? [])
+          .map((post) => ({
+            id: post.id,
+            title: post.title?.trim() || 'untitled',
+            count: getHeartCount(counts, post.id),
+          }))
+          .sort((a, b) => {
+            if (a.count === 0 && b.count !== 0) return 1
+            if (b.count === 0 && a.count !== 0) return -1
+            if (b.count !== a.count) return b.count - a.count
+            return a.title.localeCompare(b.title)
+          })
+
+        if (!cancelled) setRows(ranked)
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Could not load hearts')
+        }
+      }
+    }
+
+    void load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
     <div className={baseClass}>
-      <Banner className={`${baseClass}__banner`} type="success">
-        <h4>Welcome to your dashboard!</h4>
-      </Banner>
-      Here&apos;s what to do next:
-      <ul className={`${baseClass}__instructions`}>
-        <li>
-          <SeedButton />
-          {' with a few pages, posts, and projects to jump-start your new site, then '}
-          <a href="/" target="_blank">
-            visit your website
-          </a>
-          {' to see the results.'}
-        </li>
-        <li>
-          If you created this repo using Payload Cloud, head over to GitHub and clone it to your
-          local machine. It will be under the <i>GitHub Scope</i> that you selected when creating
-          this project.
-        </li>
-        <li>
-          {'Modify your '}
-          <a
-            href="https://payloadcms.com/docs/configuration/collections"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            collections
-          </a>
-          {' and add more '}
-          <a
-            href="https://payloadcms.com/docs/fields/overview"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            fields
-          </a>
-          {' as needed. If you are new to Payload, we also recommend you check out the '}
-          <a
-            href="https://payloadcms.com/docs/getting-started/what-is-payload"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Getting Started
-          </a>
-          {' docs.'}
-        </li>
-        <li>
-          Commit and push your changes to the repository to trigger a redeployment of your project.
-        </li>
-      </ul>
-      {'Pro Tip: This block is a '}
-      <a
-        href="https://payloadcms.com/docs/custom-components/overview"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        custom component
-      </a>
-      , you can remove it at any time by updating your <strong>payload.config</strong>.
+      <p className={`${baseClass}__label`}>// hearts</p>
+      {error ? <p className={`${baseClass}__empty`}>{error}</p> : null}
+      {rows === null && !error ? <p className={`${baseClass}__empty`}>Loading...</p> : null}
+      {rows && rows.length === 0 ? (
+        <p className={`${baseClass}__empty`}>No published posts yet.</p>
+      ) : null}
+      {rows && rows.length > 0 ? (
+        <ol className={`${baseClass}__list`}>
+          {rows.map((row) => (
+            <li key={row.id} className={`${baseClass}__row`}>
+              <a className={`${baseClass}__title`} href={`/admin/collections/posts/${row.id}`}>
+                {row.title}
+              </a>
+              <span className={`${baseClass}__count`}>{row.count}</span>
+            </li>
+          ))}
+        </ol>
+      ) : null}
     </div>
   )
 }
-
-export default BeforeDashboard

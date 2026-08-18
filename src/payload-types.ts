@@ -111,11 +111,13 @@ export interface Config {
     header: Header;
     footer: Footer;
     'site-settings': SiteSetting;
+    hearts: Heart;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    hearts: HeartsSelect<false> | HeartsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -2088,6 +2090,29 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
+ * Anonymous post heart counts. Edited by the public heart endpoint, not by hand.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hearts".
+ */
+export interface Heart {
+  id: number;
+  /**
+   * Map of post id to heart count.
+   */
+  counts?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
@@ -2141,6 +2166,16 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   aboutHeadline?: T;
   aboutBio?: T;
   aboutPhoto?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hearts_select".
+ */
+export interface HeartsSelect<T extends boolean = true> {
+  counts?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

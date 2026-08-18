@@ -2,6 +2,7 @@ import { RelatedPosts } from '@/components/blocks/RelatedPosts/Component'
 import { ImageMedia } from '@/components/Media/ImageMedia'
 import { Media } from '@/components/Media'
 import { PostBodyRichText } from '@/components/RichText/PostBodyRichText'
+import { PostHeartShare } from '@/components/templates/PostArticle/PostHeartShare'
 import type { LexicalHeadingOutlineItem } from '@/utilities/extractLexicalHeadings'
 import { formatPostDateLong } from '@/utilities/formatPostDate'
 import { tagPillClasses } from '@/utilities/tagPillClasses'
@@ -172,10 +173,12 @@ export function PostArticle({
   post,
   siteSettings,
   outline,
+  heartCount,
 }: {
   post: Post
   siteSettings: SiteSetting
   outline: LexicalHeadingOutlineItem[]
+  heartCount: number
 }) {
   const hero = post.heroImage
   const excerptText = post.excerpt?.trim() ?? ''
@@ -253,6 +256,15 @@ export function PostArticle({
           <PostContentsAside outline={outline} />
         </aside>
       </div>
+
+      {post._status === 'published' && post.slug ? (
+        <PostHeartShare
+          postId={post.id}
+          slug={post.slug}
+          title={post.title}
+          initialCount={heartCount}
+        />
+      ) : null}
 
       <PostAuthorSection siteSettings={siteSettings} />
 

@@ -2,23 +2,56 @@
 
 .dashboard .before-dashboard {
   margin-bottom: base(1.5);
+  max-width: 36rem;
 
-  &__banner {
-    & h4 {
-      margin: 0;
+  &__label {
+    margin: 0 0 base(0.5);
+    color: var(--theme-elevation-500);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+  }
+
+  &__empty {
+    margin: 0;
+    color: var(--theme-elevation-600);
+    font-size: 0.875rem;
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--theme-elevation-150);
+  }
+
+  &__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: base(1);
+    padding: base(0.4) base(0.6);
+    border-bottom: 1px solid var(--theme-elevation-100);
+
+    &:last-child {
+      border-bottom: 0;
     }
   }
 
-  &__instructions {
-    list-style: decimal;
-    margin-bottom: base(0.5);
+  &__title {
+    min-width: 0;
+    color: var(--theme-text);
+    text-decoration: none;
 
-    & li {
-      width: 100%;
+    &:hover {
+      text-decoration: underline;
     }
   }
 
-  & a:hover {
-    opacity: 0.85;
+  &__count {
+    flex-shrink: 0;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--theme-elevation-800);
   }
 }

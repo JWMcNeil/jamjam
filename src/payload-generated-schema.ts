@@ -1274,6 +1274,7 @@ export const mux_video = pgTable(
   },
   (columns) => [
     uniqueIndex('mux_video_title_idx').on(columns.title),
+    uniqueIndex('mux_video_asset_id_idx').on(columns.assetId),
     index('mux_video_updated_at_idx').on(columns.updatedAt),
     index('mux_video_created_at_idx').on(columns.createdAt),
   ],
@@ -2140,13 +2141,17 @@ export const site_settings = pgTable(
     statusText: varchar('status_text').notNull().default('available for work'),
     email: varchar('email').notNull().default('jamie@jamjam.dev'),
     location: varchar('location').notNull().default('Melbourne, Australia'),
-    contactHeadline: varchar('contact_headline').notNull().default("Let's work together."),
+    contactHeadline: varchar('contact_headline')
+      .notNull()
+      .default('Reach out about a project or role.'),
     contactIntro: varchar('contact_intro')
       .notNull()
       .default(
-        "Whether it's a new project, a job opportunity, or just a question — my inbox is open.",
+        'Freelance builds, full-time roles, and one-off questions all start here. Use the form or email me directly; I read every message.',
       ),
-    contactResponseTime: varchar('contact_response_time').notNull().default('usually within 24hrs'),
+    contactResponseTime: varchar('contact_response_time')
+      .notNull()
+      .default('Usually within one business day'),
     homeIntro: jsonb('home_intro'),
     aboutSectionLabel: varchar('about_section_label').notNull().default('// about'),
     aboutHeadline: varchar('about_headline')
@@ -2167,6 +2172,13 @@ export const site_settings = pgTable(
   },
   (columns) => [index('site_settings_about_photo_idx').on(columns.aboutPhoto)],
 )
+
+export const hearts = pgTable('hearts', {
+  id: serial('id').primaryKey(),
+  counts: jsonb('counts').default(sql`'{}'::jsonb`),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 }),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 }),
+})
 
 export const relations_users_sessions = relations(users_sessions, ({ one }) => ({
   _parentID: one(users, {
@@ -2838,6 +2850,7 @@ export const relations_site_settings = relations(site_settings, ({ one }) => ({
     relationName: 'aboutPhoto',
   }),
 }))
+export const relations_hearts = relations(hearts, () => ({}))
 
 type DatabaseSchema = {
   enum_tags_colour: typeof enum_tags_colour
@@ -2927,6 +2940,7 @@ type DatabaseSchema = {
   header_rels: typeof header_rels
   footer: typeof footer
   site_settings: typeof site_settings
+  hearts: typeof hearts
   relations_users_sessions: typeof relations_users_sessions
   relations_users: typeof relations_users
   relations_media: typeof relations_media
@@ -2984,6 +2998,7 @@ type DatabaseSchema = {
   relations_header: typeof relations_header
   relations_footer: typeof relations_footer
   relations_site_settings: typeof relations_site_settings
+  relations_hearts: typeof relations_hearts
 }
 
 declare module '@payloadcms/db-postgres' {

@@ -56,6 +56,12 @@ typography:
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: "normal"
+  post-title:
+    fontFamily: "'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif"
+    fontSize: "2.125rem"
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: "normal"
 rounded:
   sm: "0.25rem"
   md: "0.375rem"
@@ -161,6 +167,7 @@ A restrained dark neutral base with one green accent family and a teal primary f
 ### Hierarchy
 
 - **Display** (900, `clamp(2.25rem, 5vw, 4.5rem)`, line-height 1.1): Home hero and page-defining headlines. Max visual weight on the site.
+- **Post title** (700, `2.125rem` at large breakpoints, line-height 1.2): Article `h1` on `/posts/[slug]`. Between headline and display so the post is a document, not a marketing hero.
 - **Headline** (600, 1.125–1.5rem, line-height 1.375): Project titles, section headings within cards.
 - **Body** (400, 1rem, line-height 1.625): Prose, excerpts, form labels. Cap line length at 65–75ch for long-form posts.
 - **Label** (400, 0.75rem mono): Section eyebrows (`// featured projects`), lifecycle badges, tag pills. Lowercase or hash-prefixed; not all-caps tracked eyebrows on every section.

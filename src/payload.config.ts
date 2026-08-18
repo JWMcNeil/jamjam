@@ -14,6 +14,7 @@ import { Lab } from './collections/Lab'
 import { Users } from './collections/Users'
 import { Footer } from './components/layout/footer/config'
 import { Header } from './components/layout/header/config'
+import { Hearts } from './globals/Hearts/config'
 import { SiteSettings } from './globals/SiteSettings/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
@@ -74,7 +75,7 @@ export default buildConfig({
     },
     components: {
       beforeLogin: ['@/components/BeforeLogin'],
-      beforeDashboard: [],
+      beforeDashboard: ['@/components/BeforeDashboard'],
     },
     importMap: {
       baseDir: path.resolve(dirname),
@@ -114,7 +115,7 @@ export default buildConfig({
   // Order matters for schema push: tables with FKs (e.g. uploads) must come after their targets.
   collections: [Users, Media, Tags, Lab, Posts, Projects],
   cors: getPayloadCorsOrigins(),
-  globals: [Header, Footer, SiteSettings],
+  globals: [Header, Footer, SiteSettings, Hearts],
   plugins: [
     ...plugins,
   ],

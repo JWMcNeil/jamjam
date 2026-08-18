@@ -12,6 +12,7 @@ import type { SiteSetting } from '@/payload-types'
 
 import { generateMeta } from '@/utilities/generateMeta'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { getHeartCount, parseHeartCounts } from '@/lib/hearts'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -45,9 +46,10 @@ export default async function Post({ params: paramsPromise }: Args) {
   const decodedSlug = decodeURIComponent(slug)
   const url = '/posts/' + decodedSlug
 
-  const [post, siteSettings] = await Promise.all([
+  const [post, siteSettings, hearts] = await Promise.all([
     queryPostBySlug({ slug: decodedSlug }),
     querySiteSettings(),
+    queryHearts(),
   ])
 
   if (!post) return <PayloadRedirects url={url} />
@@ -60,7 +62,12 @@ export default async function Post({ params: paramsPromise }: Args) {
 
       {draft && <LivePreviewListener />}
 
-      <PostArticle post={post} siteSettings={siteSettings} outline={outline} />
+      <PostArticle
+        post={post}
+        siteSettings={siteSettings}
+        outline={outline}
+        heartCount={getHeartCount(parseHeartCounts(hearts.counts), post.id)}
+      />
     </article>
   )
 }
@@ -103,4 +110,12 @@ const querySiteSettings = cache(async (): Promise<SiteSetting> => {
     depth: 1,
   })
   return doc as SiteSetting
+})
+
+const queryHearts = cache(async () => {
+  const payload = await getPayload({ config: configPromise })
+  return payload.findGlobal({
+    slug: 'hearts',
+    overrideAccess: true,
+  })
 })
