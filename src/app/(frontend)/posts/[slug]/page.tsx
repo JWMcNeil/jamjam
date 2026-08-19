@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { JsonLd } from '@/components/JsonLd'
 import { PostArticle } from '@/components/templates/PostArticle'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
@@ -11,8 +12,11 @@ import React, { cache } from 'react'
 import type { SiteSetting } from '@/payload-types'
 
 import { generateMeta } from '@/utilities/generateMeta'
+import { jsonLdForDoc } from '@/utilities/jsonLd'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { getHeartCount, parseHeartCounts } from '@/lib/hearts'
+
+export const revalidate = 600
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -58,6 +62,7 @@ export default async function Post({ params: paramsPromise }: Args) {
 
   return (
     <article className="pt-4 md:pt-10">
+      <JsonLd data={jsonLdForDoc({ kind: 'post', doc: post, siteSettings })} />
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}

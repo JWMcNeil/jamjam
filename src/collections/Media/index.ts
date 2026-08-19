@@ -79,6 +79,10 @@ export const Media: CollectionConfig<'media'> = {
         width: 1200,
         height: 630,
         crop: 'center',
+        formatOptions: {
+          format: 'jpeg',
+          options: { quality: 78 },
+        },
       },
     ],
   },

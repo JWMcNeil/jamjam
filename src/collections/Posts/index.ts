@@ -158,6 +158,10 @@ export const Posts: CollectionConfig<'posts'> = {
         {
           name: 'meta',
           label: 'SEO',
+          admin: {
+            description:
+              'Optional overrides. Generate fills title from the post title, description from the excerpt, and image from the hero. The site adds canonical, Open Graph, Twitter, and JSON-LD automatically.',
+          },
           fields: [
             OverviewField({
               titlePath: 'meta.title',
@@ -168,9 +172,12 @@ export const Posts: CollectionConfig<'posts'> = {
               hasGenerateFn: true,
             }),
             MetaImageField({
+              hasGenerateFn: true,
               relationTo: 'media',
             }),
-            MetaDescriptionField({}),
+            MetaDescriptionField({
+              hasGenerateFn: true,
+            }),
             PreviewField({
               hasGenerateFn: true,
               titlePath: 'meta.title',

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next/types'
 
 import { PostsIndexView } from '@/components/PostsIndexView'
+import { pageMeta } from '@/utilities/generateMeta'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
@@ -43,8 +44,11 @@ export default async function PostsPage() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
+  return pageMeta({
+    path: '/posts',
     title: 'Posts — jamjam.dev',
     description: 'Blog posts about web development, AI, and building things.',
-  }
+    imageTitle: 'Posts',
+    imageType: 'post',
+  })
 }

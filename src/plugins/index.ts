@@ -7,7 +7,12 @@ import { searchPlugin } from '@payloadcms/plugin-search'
 import { type Field, type Plugin } from 'payload'
 import { muxVideoPlugin } from '@oversightstudio/mux-video'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
-import type { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
+import type {
+  GenerateDescription,
+  GenerateImage,
+  GenerateTitle,
+  GenerateURL,
+} from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { searchFields } from '@/search/fieldOverrides'
 import { beforeSyncWithSearch } from '@/search/beforeSync'
@@ -19,7 +24,25 @@ import { getMuxCorsOrigin, getServerSideURL } from '@/utilities/getURL'
 import { iconOptions } from '@/utilities/icons'
 
 const generateTitle: GenerateTitle<Post | Project | Lab> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | jamjam.dev` : 'jamjam.dev'
+  return doc?.title?.trim() || 'jamjam.dev'
+}
+
+const generateDescription: GenerateDescription<Post | Project | Lab> = ({ doc }) => {
+  if ('excerpt' in doc && typeof doc.excerpt === 'string' && doc.excerpt.trim()) {
+    return doc.excerpt.trim()
+  }
+  if ('description' in doc && typeof doc.description === 'string' && doc.description.trim()) {
+    return doc.description.trim()
+  }
+  return doc?.title?.trim() || 'jamjam.dev'
+}
+
+const generateImage: GenerateImage<Post | Project | Lab> = ({ doc }) => {
+  if (!('heroImage' in doc) || doc.heroImage == null) return ''
+  const hero = doc.heroImage
+  if (typeof hero === 'number') return hero
+  if (typeof hero === 'object' && 'id' in hero) return hero.id
+  return ''
 }
 
 const generateURL: GenerateURL<Post | Project | Lab> = ({ doc, collectionSlug }) => {
@@ -74,6 +97,8 @@ export const plugins: Plugin[] = [
   }),
   seoPlugin({
     generateTitle,
+    generateDescription,
+    generateImage,
     generateURL,
   }),
   formBuilderPlugin({

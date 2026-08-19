@@ -10,8 +10,9 @@ import { BracketLink } from '@/components/ui/bracket-link'
 import { Button } from '@/components/ui/button'
 import type { SiteSetting } from '@/payload-types'
 import { getCachedGlobal } from '@/utilities/getGlobals'
-import { generatedOgImageUrl } from '@/utilities/generateMeta'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { pageMeta } from '@/utilities/generateMeta'
+import { JsonLd } from '@/components/JsonLd'
+import { jsonLdForWebsite } from '@/utilities/jsonLd'
 import { getPayload } from 'payload'
 
 export const revalidate = 600
@@ -22,15 +23,11 @@ export async function generateMetadata(): Promise<Metadata> {
     siteSettings.aboutBio?.trim() ||
     'Creative developer building websites, web apps, and AI-powered tools in Melbourne.'
 
-  return {
+  return pageMeta({
+    path: '/',
     title: 'jamjam.dev',
     description,
-    openGraph: mergeOpenGraph({
-      title: 'jamjam.dev',
-      description,
-      images: [{ url: generatedOgImageUrl({ title: 'jamjam.dev' }) }],
-    }),
-  }
+  })
 }
 
 export default async function HomePage() {
@@ -67,6 +64,7 @@ export default async function HomePage() {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4">
+      <JsonLd data={jsonLdForWebsite(siteSettings)} />
       {/* Hero */}
       <section className="py-16 md:py-16">
         <h1 className="text-display font-black text-text-heading motion-safe:animate-subtle-fade">

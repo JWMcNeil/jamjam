@@ -1,6 +1,7 @@
 import type { Metadata } from 'next/types'
 
 import { ProjectsFilteredGrid } from '@/components/ProjectsFilteredGrid'
+import { pageMeta } from '@/utilities/generateMeta'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
@@ -44,8 +45,11 @@ export default async function ProjectsPage() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
+  return pageMeta({
+    path: '/projects',
     title: 'Projects — jamjam.dev',
     description: 'Selected web and AI projects, with build notes and links.',
-  }
+    imageTitle: 'Projects',
+    imageType: 'project',
+  })
 }

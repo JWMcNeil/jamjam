@@ -116,7 +116,18 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   redirects: async () => {
-    return (await redirects()) as Awaited<ReturnType<NonNullable<NextConfig['redirects']>>>
+    const fromCms = (await redirects()) as Awaited<
+      ReturnType<NonNullable<NextConfig['redirects']>>
+    >
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.jamjam.dev' }],
+        destination: 'https://jamjam.dev/:path*',
+        permanent: true,
+      },
+      ...fromCms,
+    ]
   },
   async headers() {
     // Re-read env at header generation so R2_PUBLIC_URL from the runtime env applies.

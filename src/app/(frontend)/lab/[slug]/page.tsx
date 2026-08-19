@@ -5,17 +5,25 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
 import RichText from '@/components/RichText'
+import { JsonLd } from '@/components/JsonLd'
 import { ResetToolButton } from '@/components/lab/ResetToolButton'
 import { generateMeta } from '@/utilities/generateMeta'
+import { jsonLdForDoc } from '@/utilities/jsonLd'
 import { resolveLabToolBySlug } from '@/lib/lab/resolveTools'
 
 type ToolPageProps = {
   params: Promise<{ slug: string }>
 }
 
+export const revalidate = 600
+
 export default async function ToolPage({ params }: ToolPageProps) {
   const { slug } = await params
-  const tool = await resolveLabToolBySlug(slug)
+  const decodedSlug = decodeURIComponent(slug)
+  const [tool, labDoc] = await Promise.all([
+    resolveLabToolBySlug(slug),
+    queryLabBySlug({ slug: decodedSlug }),
+  ])
 
   if (!tool) {
     notFound()
@@ -26,13 +34,14 @@ export default async function ToolPage({ params }: ToolPageProps) {
 
   return (
     <div className="flex h-full flex-col">
+      {labDoc ? <JsonLd data={jsonLdForDoc({ kind: 'lab', doc: labDoc })} /> : null}
       <header className="flex flex-col gap-3 border-b border-border-subtle px-4 py-4 sm:px-6 lg:h-[4.75rem] lg:flex-row lg:items-center lg:justify-between lg:py-0">
         <div className="min-w-0">
           <h1 className="text-base font-semibold text-text-heading">{tool.name}</h1>
           <p className="text-xs leading-relaxed text-text-secondary sm:truncate">{tool.description}</p>
         </div>
         <div className="flex w-full items-center justify-between gap-2 lg:w-auto lg:shrink-0 lg:justify-end">
-          <div className="min-w-0 truncate font-mono text-[10px] text-text-muted">
+          <div className="min-w-0 truncate font-mono text-xs text-text-muted">
             {tool.model ? `${tool.model} · streaming` : 'client only'}
           </div>
           <ResetToolButton toolSlug={tool.toolKey} />

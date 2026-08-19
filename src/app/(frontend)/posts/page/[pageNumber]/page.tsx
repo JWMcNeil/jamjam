@@ -1,6 +1,7 @@
 import type { Metadata } from 'next/types'
 
 import { redirect } from 'next/navigation'
+import { pageMeta } from '@/utilities/generateMeta'
 
 export const revalidate = 600
 
@@ -13,8 +14,11 @@ export default async function PostsPaginatedRedirect() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
+  return pageMeta({
+    path: '/posts',
     title: 'Posts — jamjam.dev',
     description: 'Blog posts about web development, AI, and building things.',
-  }
+    imageTitle: 'Posts',
+    imageType: 'post',
+  })
 }

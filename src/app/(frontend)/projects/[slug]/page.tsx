@@ -22,6 +22,10 @@ import type { Project } from '@/payload-types'
 import type { ProjectShowcaseSlide } from '@/types/projectShowcase'
 import { generateMeta } from '@/utilities/generateMeta'
 import { populateProjectGalleryMuxVideos } from '@/utilities/populateProjectGalleryMux'
+import { JsonLd } from '@/components/JsonLd'
+import { jsonLdForDoc } from '@/utilities/jsonLd'
+
+export const revalidate = 600
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -63,6 +67,7 @@ export default async function ProjectPage({ params: paramsPromise }: Args) {
 
   return (
     <article className="mx-auto w-full max-w-[1100px] px-4 py-6 md:px-10 md:py-14">
+      <JsonLd data={jsonLdForDoc({ kind: 'project', doc: project })} />
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}

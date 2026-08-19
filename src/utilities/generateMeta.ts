@@ -2,7 +2,14 @@ import type { Metadata } from 'next'
 
 import type { Lab, Media, Post, Project } from '../payload-types'
 
-import { mergeOpenGraph } from './mergeOpenGraph'
+import {
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_MAX_BYTES,
+  OG_IMAGE_WIDTH,
+  SITE_NAME,
+  TWITTER_HANDLE,
+  mergeOpenGraph,
+} from './mergeOpenGraph'
 import { getServerSideURL } from './getURL'
 
 export type MetaDocKind = 'post' | 'project' | 'lab'
@@ -27,22 +34,17 @@ export const generatedOgImageUrl = (args: {
   return `${getServerSideURL()}/og?${params.toString()}`
 }
 
-const canonicalPath = (kind: MetaDocKind, slug: string | undefined): string => {
+export const canonicalPath = (kind: MetaDocKind, slug: string | undefined): string => {
   if (!slug) return '/'
   if (kind === 'post') return `/posts/${slug}`
   if (kind === 'project') return `/projects/${slug}`
   return `/lab/${slug}`
 }
 
-const heroOgImageUrl = (doc: MetaDoc): string | null => {
-  if (!doc || !('heroImage' in doc)) return null
-  const image = doc.heroImage
-  if (!image || typeof image !== 'object' || !('url' in image)) return null
-
-  const media = image as Media
-  const raw = media.sizes?.og?.url || media.url
-  if (!raw) return null
-  return toAbsoluteUrl(raw)
+export const withTitleSuffix = (raw: string): string => {
+  const trimmed = raw.trim() || SITE_NAME
+  if (trimmed === SITE_NAME || trimmed.includes(SITE_NAME)) return trimmed
+  return `${trimmed} | ${SITE_NAME}`
 }
 
 const cardTitle = (doc: MetaDoc): string => {
@@ -50,13 +52,98 @@ const cardTitle = (doc: MetaDoc): string => {
   if (doc && 'title' in doc && typeof doc.title === 'string' && doc.title.trim()) {
     return doc.title.trim()
   }
-  return 'jamjam.dev'
+  return SITE_NAME
+}
+
+const metaDescription = (doc: MetaDoc): string | undefined => {
+  const fromMeta = doc?.meta?.description?.trim()
+  if (fromMeta) return fromMeta
+  if (doc && 'excerpt' in doc && typeof doc.excerpt === 'string' && doc.excerpt.trim()) {
+    return doc.excerpt.trim()
+  }
+  if (doc && 'description' in doc && typeof doc.description === 'string' && doc.description.trim()) {
+    return doc.description.trim()
+  }
+  return undefined
+}
+
+const ogImageAlt = (doc: MetaDoc, media: Media | null): string => {
+  const fromMedia = media?.alt?.trim()
+  if (fromMedia) return fromMedia
+  return cardTitle(doc)
+}
+
+const isOgSizeSafe = (filesize: number | null | undefined): boolean => {
+  if (filesize == null) return true
+  return filesize < OG_IMAGE_MAX_BYTES
+}
+
+const heroOgImage = (doc: MetaDoc): { url: string; alt: string } | null => {
+  if (!doc || !('heroImage' in doc)) return null
+  const image = doc.heroImage
+  if (!image || typeof image !== 'object' || !('url' in image)) return null
+
+  const media = image as Media
+  const og = media.sizes?.og
+  if (!og?.url || !isOgSizeSafe(og.filesize)) return null
+
+  return { url: toAbsoluteUrl(og.url), alt: ogImageAlt(doc, media) }
 }
 
 const inferKind = (doc: MetaDoc): MetaDocKind => {
   if (doc && 'toolKey' in doc) return 'lab'
   if (doc && 'lifecycle' in doc) return 'project'
   return 'post'
+}
+
+export const ogImageFields = (
+  url: string,
+  alt: string,
+): NonNullable<NonNullable<Metadata['openGraph']>['images']> => [
+  {
+    url,
+    width: OG_IMAGE_WIDTH,
+    height: OG_IMAGE_HEIGHT,
+    alt,
+  },
+]
+
+export const pageMeta = (args: {
+  path: string
+  title: string
+  description: string
+  imageTitle?: string
+  imageType?: string
+  imageSlug?: string
+}): Metadata => {
+  const title = withTitleSuffix(args.title)
+  const imageAlt = args.imageTitle?.trim() || args.title
+  const imageUrl = generatedOgImageUrl({
+    title: imageAlt,
+    type: args.imageType,
+    slug: args.imageSlug,
+  })
+  const images = ogImageFields(imageUrl, imageAlt)
+
+  return {
+    title,
+    description: args.description,
+    alternates: { canonical: args.path },
+    openGraph: mergeOpenGraph({
+      title,
+      description: args.description,
+      url: args.path,
+      images,
+    }),
+    twitter: {
+      card: 'summary_large_image',
+      site: TWITTER_HANDLE,
+      creator: TWITTER_HANDLE,
+      title,
+      description: args.description,
+      images,
+    },
+  }
 }
 
 export const generateMeta = async (args: {
@@ -66,27 +153,45 @@ export const generateMeta = async (args: {
   const { doc } = args
   const kind = args.kind ?? inferKind(doc)
   const slug = typeof doc?.slug === 'string' ? doc.slug : undefined
-  const title = doc?.meta?.title ? `${doc.meta.title} | jamjam.dev` : 'jamjam.dev'
-  const ogImage =
-    heroOgImageUrl(doc) ??
-    generatedOgImageUrl({
-      title: cardTitle(doc),
+  const path = canonicalPath(kind, slug)
+  const displayTitle = cardTitle(doc)
+  const title = withTitleSuffix(displayTitle)
+  const description = metaDescription(doc)
+  const hero = heroOgImage(doc)
+  const ogImage = hero ?? {
+    url: generatedOgImageUrl({
+      title: displayTitle,
       type: kind,
       slug,
-    })
+    }),
+    alt: displayTitle,
+  }
+  const images = ogImageFields(ogImage.url, ogImage.alt)
 
   return {
-    description: doc?.meta?.description,
+    description,
+    alternates: { canonical: path },
     openGraph: mergeOpenGraph({
-      description: doc?.meta?.description || '',
-      images: [
-        {
-          url: ogImage,
-        },
-      ],
+      description: description || '',
+      images,
       title,
-      url: canonicalPath(kind, slug),
+      url: path,
+      type: kind === 'post' ? 'article' : 'website',
+      ...(kind === 'post' && doc && 'publishedAt' in doc && doc.publishedAt
+        ? { publishedTime: doc.publishedAt }
+        : {}),
+      ...(kind === 'post' && doc && 'updatedAt' in doc && typeof doc.updatedAt === 'string'
+        ? { modifiedTime: doc.updatedAt }
+        : {}),
     }),
     title,
+    twitter: {
+      card: 'summary_large_image',
+      site: TWITTER_HANDLE,
+      creator: TWITTER_HANDLE,
+      title,
+      description,
+      images,
+    },
   }
 }

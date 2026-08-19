@@ -3,12 +3,21 @@ import { generateMeta } from '@/utilities/generateMeta'
 import { getServerSideURL } from '@/utilities/getURL'
 import { describe, expect, it } from 'vitest'
 
-const ogImageUrl = (meta: Awaited<ReturnType<typeof generateMeta>>): string => {
+const ogImage = (meta: Awaited<ReturnType<typeof generateMeta>>) => {
   const images = meta.openGraph?.images
   const first = Array.isArray(images) ? images[0] : images
-  if (typeof first === 'string' || first instanceof URL) return String(first)
-  if (first && typeof first === 'object' && 'url' in first) return String(first.url)
-  return ''
+  if (typeof first === 'string' || first instanceof URL) {
+    return { url: String(first), width: undefined, height: undefined, alt: undefined }
+  }
+  if (first && typeof first === 'object' && 'url' in first) {
+    return {
+      url: String(first.url),
+      width: 'width' in first ? first.width : undefined,
+      height: 'height' in first ? first.height : undefined,
+      alt: 'alt' in first ? first.alt : undefined,
+    }
+  }
+  return { url: '', width: undefined, height: undefined, alt: undefined }
 }
 
 describe('generateMeta', () => {
@@ -25,19 +34,53 @@ describe('generateMeta', () => {
       },
       heroImage: {
         url: '/media/hero.jpg',
+        alt: 'Hero alt',
         sizes: {
           og: {
             url: '/media/hero-og.webp',
+            filesize: 120_000,
           },
         },
       },
     } as unknown as Partial<Post>
 
     const meta = await generateMeta({ doc, kind: 'post' })
+    const image = ogImage(meta)
 
-    expect(ogImageUrl(meta)).toBe(`${getServerSideURL()}/media/hero-og.webp`)
-    expect(ogImageUrl(meta)).not.toContain('seo-meta.jpg')
+    expect(image.url).toBe(`${getServerSideURL()}/media/hero-og.webp`)
+    expect(image.url).not.toContain('seo-meta.jpg')
+    expect(image.width).toBe(1200)
+    expect(image.height).toBe(630)
+    expect(image.alt).toBe('Hero alt')
     expect(meta.openGraph?.url).toBe('/posts/hello-world')
+    expect(meta.alternates?.canonical).toBe('/posts/hello-world')
+    expect(meta.openGraph?.locale).toBe('en_US')
+    expect((meta.openGraph as { type?: string } | undefined)?.type).toBe('article')
+    expect(meta.twitter).toMatchObject({ site: '@jamjamdev', creator: '@jamjamdev' })
+  })
+
+  it('falls back to the generated /og card when the og crop is over 500 KB', async () => {
+    const doc = {
+      slug: 'heavy-hero',
+      title: 'Heavy hero',
+      meta: { title: 'Heavy hero' },
+      heroImage: {
+        url: 'https://media.example.com/huge.png',
+        sizes: {
+          og: {
+            url: 'https://media.example.com/huge-og.png',
+            filesize: 1_680_000,
+          },
+        },
+      },
+    } as unknown as Partial<Post>
+
+    const meta = await generateMeta({ doc, kind: 'post' })
+    const parsed = new URL(ogImage(meta).url)
+
+    expect(parsed.pathname).toBe('/og')
+    expect(parsed.searchParams.get('slug')).toBe('heavy-hero')
+    expect(ogImage(meta).url).not.toContain('huge')
   })
 
   it('leaves an absolute R2 og URL unprefixed', async () => {
@@ -56,8 +99,10 @@ describe('generateMeta', () => {
 
     const meta = await generateMeta({ doc, kind: 'project' })
 
-    expect(ogImageUrl(meta)).toBe('https://media.example.com/hero-og.webp')
+    expect(ogImage(meta).url).toBe('https://media.example.com/hero-og.webp')
     expect(meta.openGraph?.url).toBe('/projects/portfolio-site')
+    expect((meta.openGraph as { type?: string } | undefined)?.type).toBe('website')
+    expect(meta.alternates?.canonical).toBe('/projects/portfolio-site')
   })
 
   it('falls back to the generated /og card for lab tools', async () => {
@@ -74,14 +119,14 @@ describe('generateMeta', () => {
     } as unknown as Partial<Lab>
 
     const meta = await generateMeta({ doc, kind: 'lab' })
-    const image = ogImageUrl(meta)
-    const parsed = new URL(image)
+    const image = ogImage(meta)
+    const parsed = new URL(image.url)
 
     expect(parsed.origin + parsed.pathname).toBe(`${getServerSideURL()}/og`)
     expect(parsed.searchParams.get('title')).toBe('Roast my website')
     expect(parsed.searchParams.get('type')).toBe('lab')
     expect(parsed.searchParams.get('slug')).toBe('roast-my-website')
-    expect(image).not.toContain('unused-seo.jpg')
+    expect(image.url).not.toContain('unused-seo.jpg')
     expect(meta.openGraph?.url).toBe('/lab/roast-my-website')
   })
 
@@ -93,7 +138,7 @@ describe('generateMeta', () => {
     } as unknown as Partial<Lab>
 
     const meta = await generateMeta({ doc })
-    const parsed = new URL(ogImageUrl(meta))
+    const parsed = new URL(ogImage(meta).url)
 
     expect(parsed.searchParams.get('type')).toBe('lab')
     expect(meta.openGraph?.url).toBe('/lab/memory-card-storage-calc')
@@ -107,7 +152,7 @@ describe('generateMeta', () => {
     } as unknown as Partial<Post>
 
     const meta = await generateMeta({ doc, kind: 'post' })
-    const parsed = new URL(ogImageUrl(meta))
+    const parsed = new URL(ogImage(meta).url)
 
     expect(parsed.pathname).toBe('/og')
     expect(parsed.searchParams.get('type')).toBe('post')
