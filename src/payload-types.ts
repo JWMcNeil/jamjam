@@ -73,6 +73,7 @@ export interface Config {
     lab: Lab;
     posts: Post;
     projects: Project;
+    'board-items': BoardItem;
     'mux-video': MuxVideo;
     redirects: Redirect;
     forms: Form;
@@ -92,6 +93,7 @@ export interface Config {
     lab: LabSelect<false> | LabSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'board-items': BoardItemsSelect<false> | BoardItemsSelect<true>;
     'mux-video': MuxVideoSelect<false> | MuxVideoSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -182,7 +184,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Images and files used across Posts, Projects, and Lab.
+ * Images and files used across Posts, Projects, Lab, and Board items.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
@@ -438,6 +440,9 @@ export interface Post {
    * Tags for filtering on the posts page.
    */
   tags?: (number | Tag)[] | null;
+  /**
+   * Optional overrides. Generate fills title from the post title, description from the excerpt, and image from the hero. The site adds canonical, Open Graph, Twitter, and JSON-LD automatically.
+   */
   meta?: {
     title?: string | null;
     /**
@@ -623,6 +628,64 @@ export interface MuxVideo {
     | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Photography and graphics tiles on /board. Context shows in a modal, not a case study.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "board-items".
+ */
+export interface BoardItem {
+  id: number;
+  /**
+   * Shown as the quiet caption under the still, and used for the share URL slug.
+   */
+  title: string;
+  /**
+   * Board kind. Video and Music come later; they are not selectable here.
+   */
+  kind: 'photography' | 'graphics';
+  /**
+   * The still on the Board tile and the Open Graph image when this tile is shared.
+   */
+  cover: number | Media;
+  /**
+   * Optional extra stills for this tile. Empty means a single still.
+   */
+  stills?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * How extra stills open. Ignored when there are no extra stills.
+   */
+  setLayout?: ('carousel' | 'coverModal') | null;
+  /**
+   * A short scrap of context in the modal. Not a case study.
+   */
+  context?: string | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  /**
+   * Auto-set on first publish. Can be overridden.
+   */
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1346,6 +1409,10 @@ export interface PayloadLockedDocument {
         value: number | Project;
       } | null)
     | ({
+        relationTo: 'board-items';
+        value: number | BoardItem;
+      } | null)
+    | ({
         relationTo: 'mux-video';
         value: number | MuxVideo;
       } | null)
@@ -1647,6 +1714,36 @@ export interface ProjectsSelect<T extends boolean = true> {
   tags?: T;
   featured?: T;
   order?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "board-items_select".
+ */
+export interface BoardItemsSelect<T extends boolean = true> {
+  title?: T;
+  kind?: T;
+  cover?: T;
+  stills?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  setLayout?: T;
+  context?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  publishedAt?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
@@ -1979,7 +2076,7 @@ export interface Header {
                 relationTo: 'projects';
                 value: number | Project;
               } | null);
-          sitePage?: ('home' | 'posts' | 'projects' | 'lab' | 'contact') | null;
+          sitePage?: ('home' | 'posts' | 'projects' | 'board' | 'lab' | 'contact') | null;
           url?: string | null;
           label?: string | null;
           /**
@@ -2210,6 +2307,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'projects';
           value: number | Project;
+        } | null)
+      | ({
+          relationTo: 'board-items';
+          value: number | BoardItem;
         } | null);
     global?: string | null;
     user?: (number | null) | User;

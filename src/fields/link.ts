@@ -39,7 +39,7 @@ type LinkType = (options?: {
   /** Default selected appearance for new links (header often uses `link`). */
   appearanceDefault?: LinkAppearances
   disableLabel?: boolean
-  /** Adds “Site page” (home, posts, projects, contact) as an internal link target. */
+  /** Adds “Site page” (home, posts, projects, board, lab, contact) as an internal link target. */
   enableSitePages?: boolean
   sizes?: LinkSize[] | false
   overrides?: Partial<GroupField>

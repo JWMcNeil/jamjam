@@ -17,7 +17,7 @@ Web or app work with a full page — the ceremonial, case-study-like record. Pro
 _Avoid_: Content project, using Project for photography, videography, graphics, or music
 
 **Board**:
-The single route that holds selected non-web work. Nothing on the Board has its own page; context lives in a modal.
+The single browse route (`/board`) that holds selected non-web work. Context lives in a modal. `/board/[slug]` restores that modal for sharing; it is not a case study.
 _Avoid_: Content, Media, treating Board items as Projects
 
 **Board item**:

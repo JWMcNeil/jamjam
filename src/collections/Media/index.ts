@@ -24,7 +24,7 @@ export const Media: CollectionConfig<'media'> = {
   },
   admin: {
     group: 'Organise',
-    description: 'Images and files used across Posts, Projects, and Lab.',
+    description: 'Images and files used across Posts, Projects, Lab, and Board items.',
     defaultColumns: ['filename', 'alt', 'filesize', 'updatedAt'],
   },
   fields: [

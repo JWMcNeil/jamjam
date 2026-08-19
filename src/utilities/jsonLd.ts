@@ -1,10 +1,11 @@
-import type { Lab, Post, Project, SiteSetting } from '@/payload-types'
+import type { BoardItem, Lab, Post, Project, SiteSetting } from '@/payload-types'
 
 import { SITE_NAME } from './mergeOpenGraph'
 import { canonicalPath, type MetaDocKind } from './generateMeta'
 import { getServerSideURL } from './getURL'
 
 type JsonLdObject = Record<string, unknown>
+type JsonLdDoc = Partial<Post> | Partial<Project> | Partial<Lab> | Partial<BoardItem>
 
 const absoluteUrl = (path: string): string => {
   const base = getServerSideURL().replace(/\/$/, '')
@@ -30,9 +31,9 @@ const publisher = (): JsonLdObject => ({
   },
 })
 
-const imageUrlFromDoc = (doc: Partial<Post> | Partial<Project> | Partial<Lab> | null): string | undefined => {
-  if (!doc || !('heroImage' in doc)) return undefined
-  const image = doc.heroImage
+const imageUrlFromDoc = (doc: JsonLdDoc | null): string | undefined => {
+  if (!doc) return undefined
+  const image = 'cover' in doc && doc.cover != null ? doc.cover : 'heroImage' in doc ? doc.heroImage : null
   if (!image || typeof image !== 'object') return undefined
   const og = 'sizes' in image ? image.sizes?.og?.url : undefined
   const raw = og || ('url' in image ? image.url : undefined)
@@ -42,7 +43,7 @@ const imageUrlFromDoc = (doc: Partial<Post> | Partial<Project> | Partial<Lab> | 
 
 export const jsonLdForDoc = (args: {
   kind: MetaDocKind
-  doc: Partial<Post> | Partial<Project> | Partial<Lab>
+  doc: JsonLdDoc
   description?: string | null
   siteSettings?: SiteSetting | null
 }): JsonLdObject => {
@@ -57,6 +58,7 @@ export const jsonLdForDoc = (args: {
     description?.trim() ||
     doc.meta?.description?.trim() ||
     ('excerpt' in doc && typeof doc.excerpt === 'string' ? doc.excerpt.trim() : undefined) ||
+    ('context' in doc && typeof doc.context === 'string' ? doc.context.trim() : undefined) ||
     ('description' in doc && typeof doc.description === 'string' ? doc.description.trim() : undefined)
   const image = imageUrlFromDoc(doc)
 
@@ -92,6 +94,14 @@ export const jsonLdForDoc = (args: {
     }
   }
 
+  if (kind === 'board') {
+    const item = doc as Partial<BoardItem>
+    return {
+      ...shared,
+      '@type': item.kind === 'graphics' ? 'VisualArtwork' : 'Photograph',
+    }
+  }
+
   return {
     ...shared,
     '@type': 'WebApplication',
@@ -106,3 +116,23 @@ export const jsonLdForWebsite = (siteSettings?: SiteSetting | null): JsonLdObjec
   url: absoluteUrl('/'),
   publisher: person(siteSettings),
 })
+
+export const jsonLdForBoard = (args: {
+  items: Array<Pick<BoardItem, 'title' | 'slug' | 'cover'>>
+  siteSettings?: SiteSetting | null
+}): JsonLdObject => {
+  const url = absoluteUrl('/board')
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Board',
+    url,
+    author: person(args.siteSettings),
+    hasPart: args.items.map((item) => ({
+      '@type': 'ImageObject',
+      name: item.title,
+      url: absoluteUrl(`/board/${item.slug}`),
+      ...(imageUrlFromDoc(item) ? { image: imageUrlFromDoc(item) } : {}),
+    })),
+  }
+}
