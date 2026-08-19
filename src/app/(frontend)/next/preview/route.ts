@@ -4,30 +4,40 @@ import { NextResponse } from 'next/server'
 import { getPreviewSecret } from '@/utilities/previewSecret'
 import { getServerSideURL } from '@/utilities/getURL'
 
+function isInternalBindHost(hostname: string): boolean {
+  return hostname === '0.0.0.0' || hostname === '::' || hostname === '[::]'
+}
+
 /**
- * Base URL for redirects. Never use `request.url` as the base: behind Docker/reverse proxies
- * the internal host can be `0.0.0.0:3000`, which would send users to an invalid Location.
+ * Keep the draft-mode redirect on the origin the admin iframe actually requested.
+ * Preferring `NEXT_PUBLIC_SITE_URL` when it is production (e.g. jamjam.dev) while
+ * you are on localhost or a Vercel preview makes Chrome block the iframe:
+ * "This content is blocked. Contact the site owner to fix the issue."
+ *
+ * Still skip internal bind addresses (`0.0.0.0`) from Docker/`request.url`.
  */
 function redirectOrigin(request: Request): string {
-  const envBase = getServerSideURL()
+  const forwardedHost = request.headers.get('x-forwarded-host')
+  const forwardedProto =
+    request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() || 'http'
+  if (forwardedHost) {
+    const host = forwardedHost.split(',')[0].trim()
+    if (host && !isInternalBindHost(host.split(':')[0] ?? '')) {
+      return `${forwardedProto}://${host}`
+    }
+  }
+
   try {
-    const u = new URL(envBase)
-    const h = u.hostname
-    if (h !== 'localhost' && h !== '127.0.0.1' && h !== '0.0.0.0') {
-      return u.origin
+    const fromRequest = new URL(request.url)
+    if (!isInternalBindHost(fromRequest.hostname)) {
+      return fromRequest.origin
     }
   } catch {
     /* fall through */
   }
-  const forwardedHost = request.headers.get('x-forwarded-host')
-  const forwardedProto =
-    request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() || 'https'
-  if (forwardedHost) {
-    const host = forwardedHost.split(',')[0].trim()
-    return `${forwardedProto}://${host}`
-  }
+
   try {
-    return new URL(request.url).origin
+    return new URL(getServerSideURL()).origin
   } catch {
     return 'http://localhost:3000'
   }

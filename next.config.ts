@@ -200,8 +200,9 @@ const nextConfig: NextConfig = {
         headers: isDev
           ? [
               ...sharedHeaders,
-              // Dev: no CSP; keep classic framing guard (admin + iframe are usually same origin).
-              { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+              // Dev: no CSP (Mux uploads). Do not send X-Frame-Options — SAMEORIGIN
+              // blocks Payload live preview when admin is localhost and the iframe
+              // is 127.0.0.1 (or Tailscale), which Chrome reports as blocked content.
             ]
           : [
               ...sharedHeaders,
