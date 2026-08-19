@@ -1,5 +1,5 @@
-import type { Post, SiteSetting } from '@/payload-types'
-import { jsonLdForDoc, jsonLdForWebsite } from '@/utilities/jsonLd'
+import type { BoardItem, Post, SiteSetting } from '@/payload-types'
+import { jsonLdForBoard, jsonLdForDoc, jsonLdForWebsite } from '@/utilities/jsonLd'
 import { getServerSideURL } from '@/utilities/getURL'
 import { describe, expect, it } from 'vitest'
 
@@ -25,5 +25,44 @@ describe('jsonLdForDoc', () => {
     const data = jsonLdForWebsite({ name: 'Jamie McNeil' } as SiteSetting)
     expect(data['@type']).toBe('WebSite')
     expect(data.url).toBe(getServerSideURL())
+  })
+
+  it('emits Photograph for board items', () => {
+    const doc = {
+      slug: 'harbour-dawn',
+      title: 'Harbour dawn',
+      kind: 'photography',
+      context: 'Shot on a walk.',
+      cover: {
+        url: '/media/harbour.jpg',
+        sizes: { og: { url: '/media/harbour-og.webp' } },
+      },
+    } as unknown as Partial<BoardItem>
+
+    const data = jsonLdForDoc({ kind: 'board', doc })
+
+    expect(data['@type']).toBe('Photograph')
+    expect(data.url).toBe(`${getServerSideURL()}/board/harbour-dawn`)
+    expect(data.description).toBe('Shot on a walk.')
+  })
+})
+
+describe('jsonLdForBoard', () => {
+  it('emits CollectionPage for /board', () => {
+    const data = jsonLdForBoard({
+      items: [
+        {
+          title: 'Harbour dawn',
+          slug: 'harbour-dawn',
+          cover: {
+            url: '/media/harbour.jpg',
+          } as BoardItem['cover'],
+        },
+      ],
+    })
+
+    expect(data['@type']).toBe('CollectionPage')
+    expect(data.url).toBe(`${getServerSideURL()}/board`)
+    expect(Array.isArray(data.hasPart)).toBe(true)
   })
 })

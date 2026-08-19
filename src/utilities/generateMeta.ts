@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import type { Lab, Media, Post, Project } from '../payload-types'
+import type { BoardItem, Lab, Media, Post, Project } from '../payload-types'
 
 import {
   OG_IMAGE_HEIGHT,
@@ -12,9 +12,9 @@ import {
 } from './mergeOpenGraph'
 import { getServerSideURL } from './getURL'
 
-export type MetaDocKind = 'post' | 'project' | 'lab'
+export type MetaDocKind = 'post' | 'project' | 'lab' | 'board'
 
-type MetaDoc = Partial<Post> | Partial<Project> | Partial<Lab> | null
+type MetaDoc = Partial<Post> | Partial<Project> | Partial<Lab> | Partial<BoardItem> | null
 
 const toAbsoluteUrl = (url: string): string => {
   if (url.startsWith('http://') || url.startsWith('https://')) return url
@@ -38,6 +38,7 @@ export const canonicalPath = (kind: MetaDocKind, slug: string | undefined): stri
   if (!slug) return '/'
   if (kind === 'post') return `/posts/${slug}`
   if (kind === 'project') return `/projects/${slug}`
+  if (kind === 'board') return `/board/${slug}`
   return `/lab/${slug}`
 }
 
@@ -61,6 +62,9 @@ const metaDescription = (doc: MetaDoc): string | undefined => {
   if (doc && 'excerpt' in doc && typeof doc.excerpt === 'string' && doc.excerpt.trim()) {
     return doc.excerpt.trim()
   }
+  if (doc && 'context' in doc && typeof doc.context === 'string' && doc.context.trim()) {
+    return doc.context.trim()
+  }
   if (doc && 'description' in doc && typeof doc.description === 'string' && doc.description.trim()) {
     return doc.description.trim()
   }
@@ -78,12 +82,17 @@ const isOgSizeSafe = (filesize: number | null | undefined): boolean => {
   return filesize < OG_IMAGE_MAX_BYTES
 }
 
-const heroOgImage = (doc: MetaDoc): { url: string; alt: string } | null => {
-  if (!doc || !('heroImage' in doc)) return null
-  const image = doc.heroImage
+const mediaFromDoc = (doc: MetaDoc): Media | null => {
+  if (!doc) return null
+  const image = 'cover' in doc && doc.cover != null ? doc.cover : 'heroImage' in doc ? doc.heroImage : null
   if (!image || typeof image !== 'object' || !('url' in image)) return null
+  return image as Media
+}
 
-  const media = image as Media
+const heroOgImage = (doc: MetaDoc): { url: string; alt: string } | null => {
+  const media = mediaFromDoc(doc)
+  if (!media) return null
+
   const og = media.sizes?.og
   if (!og?.url || !isOgSizeSafe(og.filesize)) return null
 
@@ -93,6 +102,7 @@ const heroOgImage = (doc: MetaDoc): { url: string; alt: string } | null => {
 const inferKind = (doc: MetaDoc): MetaDocKind => {
   if (doc && 'toolKey' in doc) return 'lab'
   if (doc && 'lifecycle' in doc) return 'project'
+  if (doc && 'cover' in doc) return 'board'
   return 'post'
 }
 

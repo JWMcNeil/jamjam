@@ -19,25 +19,35 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 import { revalidateContactForm } from '@/hooks/revalidateContactForm'
 import { r2StoragePlugin } from '@/plugins/r2Storage'
 
-import type { Lab, Post, Project } from '@/payload-types'
+import type { BoardItem, Lab, Post, Project } from '@/payload-types'
 import { getMuxCorsOrigin, getServerSideURL } from '@/utilities/getURL'
 import { iconOptions } from '@/utilities/icons'
 
-const generateTitle: GenerateTitle<Post | Project | Lab> = ({ doc }) => {
+type SeoDoc = Post | Project | Lab | BoardItem
+
+const generateTitle: GenerateTitle<SeoDoc> = ({ doc }) => {
   return doc?.title?.trim() || 'jamjam.dev'
 }
 
-const generateDescription: GenerateDescription<Post | Project | Lab> = ({ doc }) => {
+const generateDescription: GenerateDescription<SeoDoc> = ({ doc }) => {
   if ('excerpt' in doc && typeof doc.excerpt === 'string' && doc.excerpt.trim()) {
     return doc.excerpt.trim()
   }
   if ('description' in doc && typeof doc.description === 'string' && doc.description.trim()) {
     return doc.description.trim()
   }
+  if ('context' in doc && typeof doc.context === 'string' && doc.context.trim()) {
+    return doc.context.trim()
+  }
   return doc?.title?.trim() || 'jamjam.dev'
 }
 
-const generateImage: GenerateImage<Post | Project | Lab> = ({ doc }) => {
+const generateImage: GenerateImage<SeoDoc> = ({ doc }) => {
+  if ('cover' in doc && doc.cover != null) {
+    const cover = doc.cover
+    if (typeof cover === 'number') return cover
+    if (typeof cover === 'object' && 'id' in cover) return cover.id
+  }
   if (!('heroImage' in doc) || doc.heroImage == null) return ''
   const hero = doc.heroImage
   if (typeof hero === 'number') return hero
@@ -45,13 +55,14 @@ const generateImage: GenerateImage<Post | Project | Lab> = ({ doc }) => {
   return ''
 }
 
-const generateURL: GenerateURL<Post | Project | Lab> = ({ doc, collectionSlug }) => {
+const generateURL: GenerateURL<SeoDoc> = ({ doc, collectionSlug }) => {
   const base = getServerSideURL()
   if (!doc?.slug) return base
 
   if (collectionSlug === 'posts') return `${base}/posts/${doc.slug}`
   if (collectionSlug === 'projects') return `${base}/projects/${doc.slug}`
   if (collectionSlug === 'lab') return `${base}/lab/${doc.slug}`
+  if (collectionSlug === 'board-items') return `${base}/board/${doc.slug}`
 
   return `${base}/${doc.slug}`
 }

@@ -1,4 +1,4 @@
-import type { Lab, Post, Project } from '@/payload-types'
+import type { Lab, Post, Project, BoardItem } from '@/payload-types'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getServerSideURL } from '@/utilities/getURL'
 import { describe, expect, it } from 'vitest'
@@ -157,5 +157,47 @@ describe('generateMeta', () => {
     expect(parsed.pathname).toBe('/og')
     expect(parsed.searchParams.get('type')).toBe('post')
     expect(parsed.searchParams.get('slug')).toBe('draft-notes')
+  })
+
+  it('uses the cover og crop for board items', async () => {
+    const doc = {
+      slug: 'harbour-dawn',
+      title: 'Harbour dawn',
+      kind: 'photography',
+      cover: {
+        url: '/media/harbour.jpg',
+        alt: 'Harbour',
+        sizes: {
+          og: {
+            url: '/media/harbour-og.webp',
+            filesize: 80_000,
+          },
+        },
+      },
+      context: 'Shot on a walk.',
+    } as unknown as Partial<BoardItem>
+
+    const meta = await generateMeta({ doc, kind: 'board' })
+    const image = ogImage(meta)
+
+    expect(image.url).toBe(`${getServerSideURL()}/media/harbour-og.webp`)
+    expect(image.alt).toBe('Harbour')
+    expect(meta.openGraph?.url).toBe('/board/harbour-dawn')
+    expect(meta.alternates?.canonical).toBe('/board/harbour-dawn')
+    expect((meta.openGraph as { type?: string } | undefined)?.type).toBe('website')
+  })
+
+  it('infers board when kind is omitted and cover is present', async () => {
+    const doc = {
+      slug: 'poster',
+      title: 'Poster',
+      cover: {
+        url: '/media/poster.jpg',
+        sizes: { og: { url: '/media/poster-og.webp' } },
+      },
+    } as unknown as Partial<BoardItem>
+
+    const meta = await generateMeta({ doc })
+    expect(meta.openGraph?.url).toBe('/board/poster')
   })
 })

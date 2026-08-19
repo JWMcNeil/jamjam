@@ -42,6 +42,7 @@ const getPagesSitemap = unstable_cache(
       { loc: `${SITE_URL}/`, lastmod: dateFallback },
       { loc: `${SITE_URL}/projects`, lastmod: dateFallback },
       { loc: `${SITE_URL}/posts`, lastmod: dateFallback },
+      { loc: `${SITE_URL}/board`, lastmod: dateFallback },
       { loc: `${SITE_URL}/contact`, lastmod: dateFallback },
       ...projectSitemap,
     ]

@@ -100,6 +100,24 @@ export const enum__projects_v_version_status = pgEnum('enum__projects_v_version_
   'draft',
   'published',
 ])
+export const enum_board_items_kind = pgEnum('enum_board_items_kind', ['photography', 'graphics'])
+export const enum_board_items_set_layout = pgEnum('enum_board_items_set_layout', [
+  'carousel',
+  'coverModal',
+])
+export const enum_board_items_status = pgEnum('enum_board_items_status', ['draft', 'published'])
+export const enum__board_items_v_version_kind = pgEnum('enum__board_items_v_version_kind', [
+  'photography',
+  'graphics',
+])
+export const enum__board_items_v_version_set_layout = pgEnum(
+  'enum__board_items_v_version_set_layout',
+  ['carousel', 'coverModal'],
+)
+export const enum__board_items_v_version_status = pgEnum('enum__board_items_v_version_status', [
+  'draft',
+  'published',
+])
 export const enum_mux_video_playback_options_playback_policy = pgEnum(
   'enum_mux_video_playback_options_playback_policy',
   ['signed', 'public'],
@@ -456,6 +474,7 @@ export const enum_header_nav_items_link_site_page = pgEnum('enum_header_nav_item
   'home',
   'posts',
   'projects',
+  'board',
   'lab',
   'contact',
 ])
@@ -1234,6 +1253,150 @@ export const _projects_v_rels = pgTable(
   ],
 )
 
+export const board_items_stills = pgTable(
+  'board_items_stills',
+  {
+    _order: integer('_order').notNull(),
+    _parentID: integer('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    image: integer('image_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+  },
+  (columns) => [
+    index('board_items_stills_order_idx').on(columns._order),
+    index('board_items_stills_parent_id_idx').on(columns._parentID),
+    index('board_items_stills_image_idx').on(columns.image),
+    foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [board_items.id],
+      name: 'board_items_stills_parent_id_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
+export const board_items = pgTable(
+  'board_items',
+  {
+    id: serial('id').primaryKey(),
+    title: varchar('title'),
+    kind: enum_board_items_kind('kind'),
+    cover: integer('cover_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+    setLayout: enum_board_items_set_layout('set_layout').default('carousel'),
+    context: varchar('context'),
+    meta_title: varchar('meta_title'),
+    meta_image: integer('meta_image_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+    meta_description: varchar('meta_description'),
+    publishedAt: timestamp('published_at', { mode: 'string', withTimezone: true, precision: 3 }),
+    generateSlug: boolean('generate_slug').default(true),
+    slug: varchar('slug'),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    _status: enum_board_items_status('_status').default('draft'),
+  },
+  (columns) => [
+    index('board_items_cover_idx').on(columns.cover),
+    index('board_items_meta_meta_image_idx').on(columns.meta_image),
+    uniqueIndex('board_items_slug_idx').on(columns.slug),
+    index('board_items_updated_at_idx').on(columns.updatedAt),
+    index('board_items_created_at_idx').on(columns.createdAt),
+    index('board_items__status_idx').on(columns._status),
+  ],
+)
+
+export const _board_items_v_version_stills = pgTable(
+  '_board_items_v_version_stills',
+  {
+    _order: integer('_order').notNull(),
+    _parentID: integer('_parent_id').notNull(),
+    id: serial('id').primaryKey(),
+    image: integer('image_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+    _uuid: varchar('_uuid'),
+  },
+  (columns) => [
+    index('_board_items_v_version_stills_order_idx').on(columns._order),
+    index('_board_items_v_version_stills_parent_id_idx').on(columns._parentID),
+    index('_board_items_v_version_stills_image_idx').on(columns.image),
+    foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [_board_items_v.id],
+      name: '_board_items_v_version_stills_parent_id_fk',
+    }).onDelete('cascade'),
+  ],
+)
+
+export const _board_items_v = pgTable(
+  '_board_items_v',
+  {
+    id: serial('id').primaryKey(),
+    parent: integer('parent_id').references(() => board_items.id, {
+      onDelete: 'set null',
+    }),
+    version_title: varchar('version_title'),
+    version_kind: enum__board_items_v_version_kind('version_kind'),
+    version_cover: integer('version_cover_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+    version_setLayout:
+      enum__board_items_v_version_set_layout('version_set_layout').default('carousel'),
+    version_context: varchar('version_context'),
+    version_meta_title: varchar('version_meta_title'),
+    version_meta_image: integer('version_meta_image_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+    version_meta_description: varchar('version_meta_description'),
+    version_publishedAt: timestamp('version_published_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version_generateSlug: boolean('version_generate_slug').default(true),
+    version_slug: varchar('version_slug'),
+    version_updatedAt: timestamp('version_updated_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version_createdAt: timestamp('version_created_at', {
+      mode: 'string',
+      withTimezone: true,
+      precision: 3,
+    }),
+    version__status: enum__board_items_v_version_status('version__status').default('draft'),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    latest: boolean('latest'),
+    autosave: boolean('autosave'),
+  },
+  (columns) => [
+    index('_board_items_v_parent_idx').on(columns.parent),
+    index('_board_items_v_version_version_cover_idx').on(columns.version_cover),
+    index('_board_items_v_version_meta_version_meta_image_idx').on(columns.version_meta_image),
+    index('_board_items_v_version_version_slug_idx').on(columns.version_slug),
+    index('_board_items_v_version_version_updated_at_idx').on(columns.version_updatedAt),
+    index('_board_items_v_version_version_created_at_idx').on(columns.version_createdAt),
+    index('_board_items_v_version_version__status_idx').on(columns.version__status),
+    index('_board_items_v_created_at_idx').on(columns.createdAt),
+    index('_board_items_v_updated_at_idx').on(columns.updatedAt),
+    index('_board_items_v_latest_idx').on(columns.latest),
+    index('_board_items_v_autosave_idx').on(columns.autosave),
+  ],
+)
+
 export const mux_video_playback_options = pgTable(
   'mux_video_playback_options',
   {
@@ -1908,6 +2071,7 @@ export const payload_locked_documents_rels = pgTable(
     labID: integer('lab_id'),
     postsID: integer('posts_id'),
     projectsID: integer('projects_id'),
+    'board-itemsID': integer('board_items_id'),
     'mux-videoID': integer('mux_video_id'),
     redirectsID: integer('redirects_id'),
     formsID: integer('forms_id'),
@@ -1924,6 +2088,7 @@ export const payload_locked_documents_rels = pgTable(
     index('payload_locked_documents_rels_lab_id_idx').on(columns.labID),
     index('payload_locked_documents_rels_posts_id_idx').on(columns.postsID),
     index('payload_locked_documents_rels_projects_id_idx').on(columns.projectsID),
+    index('payload_locked_documents_rels_board_items_id_idx').on(columns['board-itemsID']),
     index('payload_locked_documents_rels_mux_video_id_idx').on(columns['mux-videoID']),
     index('payload_locked_documents_rels_redirects_id_idx').on(columns.redirectsID),
     index('payload_locked_documents_rels_forms_id_idx').on(columns.formsID),
@@ -1965,6 +2130,11 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns['projectsID']],
       foreignColumns: [projects.id],
       name: 'payload_locked_documents_rels_projects_fk',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [columns['board-itemsID']],
+      foreignColumns: [board_items.id],
+      name: 'payload_locked_documents_rels_board_items_fk',
     }).onDelete('cascade'),
     foreignKey({
       columns: [columns['mux-videoID']],
@@ -2471,6 +2641,68 @@ export const relations__projects_v = relations(_projects_v, ({ one, many }) => (
     relationName: '_rels',
   }),
 }))
+export const relations_board_items_stills = relations(board_items_stills, ({ one }) => ({
+  _parentID: one(board_items, {
+    fields: [board_items_stills._parentID],
+    references: [board_items.id],
+    relationName: 'stills',
+  }),
+  image: one(media, {
+    fields: [board_items_stills.image],
+    references: [media.id],
+    relationName: 'image',
+  }),
+}))
+export const relations_board_items = relations(board_items, ({ one, many }) => ({
+  cover: one(media, {
+    fields: [board_items.cover],
+    references: [media.id],
+    relationName: 'cover',
+  }),
+  stills: many(board_items_stills, {
+    relationName: 'stills',
+  }),
+  meta_image: one(media, {
+    fields: [board_items.meta_image],
+    references: [media.id],
+    relationName: 'meta_image',
+  }),
+}))
+export const relations__board_items_v_version_stills = relations(
+  _board_items_v_version_stills,
+  ({ one }) => ({
+    _parentID: one(_board_items_v, {
+      fields: [_board_items_v_version_stills._parentID],
+      references: [_board_items_v.id],
+      relationName: 'version_stills',
+    }),
+    image: one(media, {
+      fields: [_board_items_v_version_stills.image],
+      references: [media.id],
+      relationName: 'image',
+    }),
+  }),
+)
+export const relations__board_items_v = relations(_board_items_v, ({ one, many }) => ({
+  parent: one(board_items, {
+    fields: [_board_items_v.parent],
+    references: [board_items.id],
+    relationName: 'parent',
+  }),
+  version_cover: one(media, {
+    fields: [_board_items_v.version_cover],
+    references: [media.id],
+    relationName: 'version_cover',
+  }),
+  version_stills: many(_board_items_v_version_stills, {
+    relationName: 'version_stills',
+  }),
+  version_meta_image: one(media, {
+    fields: [_board_items_v.version_meta_image],
+    references: [media.id],
+    relationName: 'version_meta_image',
+  }),
+}))
 export const relations_mux_video_playback_options = relations(
   mux_video_playback_options,
   ({ one }) => ({
@@ -2754,6 +2986,11 @@ export const relations_payload_locked_documents_rels = relations(
       references: [projects.id],
       relationName: 'projects',
     }),
+    'board-itemsID': one(board_items, {
+      fields: [payload_locked_documents_rels['board-itemsID']],
+      references: [board_items.id],
+      relationName: 'board-items',
+    }),
     'mux-videoID': one(mux_video, {
       fields: [payload_locked_documents_rels['mux-videoID']],
       references: [mux_video.id],
@@ -2872,6 +3109,12 @@ type DatabaseSchema = {
   enum__projects_v_version_type: typeof enum__projects_v_version_type
   enum__projects_v_version_lifecycle: typeof enum__projects_v_version_lifecycle
   enum__projects_v_version_status: typeof enum__projects_v_version_status
+  enum_board_items_kind: typeof enum_board_items_kind
+  enum_board_items_set_layout: typeof enum_board_items_set_layout
+  enum_board_items_status: typeof enum_board_items_status
+  enum__board_items_v_version_kind: typeof enum__board_items_v_version_kind
+  enum__board_items_v_version_set_layout: typeof enum__board_items_v_version_set_layout
+  enum__board_items_v_version_status: typeof enum__board_items_v_version_status
   enum_mux_video_playback_options_playback_policy: typeof enum_mux_video_playback_options_playback_policy
   enum_redirects_to_type: typeof enum_redirects_to_type
   enum_forms_blocks_chips_options_icon: typeof enum_forms_blocks_chips_options_icon
@@ -2904,6 +3147,10 @@ type DatabaseSchema = {
   _projects_v_version_tech_stack: typeof _projects_v_version_tech_stack
   _projects_v: typeof _projects_v
   _projects_v_rels: typeof _projects_v_rels
+  board_items_stills: typeof board_items_stills
+  board_items: typeof board_items
+  _board_items_v_version_stills: typeof _board_items_v_version_stills
+  _board_items_v: typeof _board_items_v
   mux_video_playback_options: typeof mux_video_playback_options
   mux_video: typeof mux_video
   redirects: typeof redirects
@@ -2962,6 +3209,10 @@ type DatabaseSchema = {
   relations__projects_v_version_tech_stack: typeof relations__projects_v_version_tech_stack
   relations__projects_v_rels: typeof relations__projects_v_rels
   relations__projects_v: typeof relations__projects_v
+  relations_board_items_stills: typeof relations_board_items_stills
+  relations_board_items: typeof relations_board_items
+  relations__board_items_v_version_stills: typeof relations__board_items_v_version_stills
+  relations__board_items_v: typeof relations__board_items_v
   relations_mux_video_playback_options: typeof relations_mux_video_playback_options
   relations_mux_video: typeof relations_mux_video
   relations_redirects_rels: typeof relations_redirects_rels

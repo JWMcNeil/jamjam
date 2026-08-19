@@ -3,6 +3,7 @@ export const SITE_PAGE_PATHS = {
   home: '/',
   posts: '/posts',
   projects: '/projects',
+  board: '/board',
   lab: '/lab',
   contact: '/contact',
 } as const
@@ -13,6 +14,7 @@ export const SITE_PAGE_OPTIONS: { label: string; value: SitePageSlug }[] = [
   { label: 'Home', value: 'home' },
   { label: 'Posts', value: 'posts' },
   { label: 'Projects', value: 'projects' },
+  { label: 'Board', value: 'board' },
   { label: 'Lab', value: 'lab' },
   { label: 'Contact', value: 'contact' },
 ]
