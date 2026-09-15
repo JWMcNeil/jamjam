@@ -30,7 +30,7 @@
   "dependencies": {
     "@floating-ui/react": "^0.27.20",
     "@heroicons/react": "^2.2.0",
-    "@mux/mux-player-react": "^3.13.2",
+    "@mux/mux-player-react": "^3.13.3",
     "@oversightstudio/mux-video": "^1.4.1",
     "@payloadcms/admin-bar": "3.88.0",
     "@payloadcms/db-postgres": "3.88.0",
@@ -89,7 +89,7 @@
     "eslint-config-next": "16.2.12",
     "jsdom": "26.1.0",
     "playwright": "1.62.1",
-    "postcss": "^8.5.26",
+    "postcss": "^8.5.28",
     "prettier": "^3.9.6",
     "tailwindcss": "^4.3.3",
     "typescript": "5.7.3",
