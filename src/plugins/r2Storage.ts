@@ -14,7 +14,8 @@ export const r2StoragePlugin = s3Storage({
       // is registered and /api/media/file falls back to disk. generateFileURL still
       // uses R2_PUBLIC_URL for public URLs.
       generateFileURL: ({ filename, prefix }) => {
-        const key = prefix ? `${prefix}/${filename}` : filename
+        const encodedFilename = encodeURIComponent(filename)
+        const key = prefix ? `${prefix}/${encodedFilename}` : encodedFilename
         const base = (process.env.R2_PUBLIC_URL ?? '').replace(/\/$/, '')
         return `${base}/${key}`
       },
