@@ -2174,7 +2174,50 @@ export interface SiteSetting {
    */
   contactResponseTime: string;
   /**
-   * Optional intro paragraph on the home page, shown below jamjam:~$ and the status.
+   * One line under the headline.
+   */
+  heroSubheading: string;
+  heroWeb?: {
+    /**
+     * Web chip still. Shown by default and used as the fallback. Crop wide (about 2.3:1).
+     */
+    image?: (number | null) | Media;
+    /**
+     * Optional short, silent Mux clip (3-4s). Plays as a looping preview on hover, and automatically on touch devices.
+     */
+    video?: (number | null) | MuxVideo;
+  };
+  heroAi?: {
+    /**
+     * Ai chip still. Shown by default and used as the fallback. Crop wide (about 2.3:1).
+     */
+    image?: (number | null) | Media;
+    /**
+     * Optional short, silent Mux clip (3-4s). Plays as a looping preview on hover, and automatically on touch devices.
+     */
+    video?: (number | null) | MuxVideo;
+  };
+  heroFilm?: {
+    /**
+     * Film chip still. Shown by default and used as the fallback. Crop wide (about 2.3:1).
+     */
+    image?: (number | null) | Media;
+    /**
+     * Optional short, silent Mux clip (3-4s). Plays as a looping preview on hover, and automatically on touch devices.
+     */
+    video?: (number | null) | MuxVideo;
+  };
+  /**
+   * Two or three stills that cross-fade in the photography chip. Crop wide.
+   */
+  heroPhotos?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * No longer shown on the home page (replaced by the hero subheading). Kept for now.
    */
   homeIntro?: {
     root: {
@@ -2282,6 +2325,31 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   contactHeadline?: T;
   contactIntro?: T;
   contactResponseTime?: T;
+  heroSubheading?: T;
+  heroWeb?:
+    | T
+    | {
+        image?: T;
+        video?: T;
+      };
+  heroAi?:
+    | T
+    | {
+        image?: T;
+        video?: T;
+      };
+  heroFilm?:
+    | T
+    | {
+        image?: T;
+        video?: T;
+      };
+  heroPhotos?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
   homeIntro?: T;
   aboutSectionLabel?: T;
   aboutHeadline?: T;

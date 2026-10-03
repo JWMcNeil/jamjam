@@ -48,3 +48,22 @@ export const queryBoardItemBySlug = cache(async (slug: string) => {
 
   return (result.docs[0] as BoardItem | undefined) ?? null
 })
+
+export const queryFeaturedBoardItems = cache(async (limit = 4) => {
+  const payload = await getPayload({ config: configPromise })
+
+  const result = await payload.find({
+    collection: 'board-items',
+    draft: false,
+    depth: 1,
+    limit,
+    pagination: false,
+    sort: ['featuredOrder', '-publishedAt'],
+    where: {
+      and: [publishedBoardWhere, { featured: { equals: true } }],
+    },
+    select: boardItemSelect,
+  })
+
+  return result.docs as BoardItem[]
+})
