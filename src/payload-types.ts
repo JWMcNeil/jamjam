@@ -185,7 +185,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Images and files used across Posts, Projects, Lab, and Board items.
+ * Images and files used across Posts, Projects, Lab, and Gallery items.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
@@ -632,7 +632,7 @@ export interface MuxVideo {
   createdAt: string;
 }
 /**
- * Photography and graphics tiles on /board. Context shows in a modal, not a case study.
+ * Photography, film and graphics tiles on /gallery. Context shows in a modal, not a case study.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "board-items".
@@ -640,17 +640,25 @@ export interface MuxVideo {
 export interface BoardItem {
   id: number;
   /**
-   * Shown as the quiet caption under the still, and used for the share URL slug.
+   * Shown as the quiet caption under the tile, and used for the share URL slug.
    */
   title: string;
   /**
-   * Board kind. Video and Music come later; they are not selectable here.
+   * Gallery kind. Music comes later; it is not selectable here.
    */
-  kind: 'photography' | 'graphics';
+  kind: 'photography' | 'video' | 'graphics';
   /**
-   * The still on the Board tile and the Open Graph image when this tile is shared.
+   * Mux-hosted clip. Plays in the modal; the tile shows the cover still and previews on hover.
+   */
+  video?: (number | null) | MuxVideo;
+  /**
+   * The still on the Gallery tile and the Open Graph image when shared. For video, use a strong poster frame.
    */
   cover: number | Media;
+  /**
+   * What it shows. Used to filter the Gallery.
+   */
+  subjects?: ('motorcycles' | 'tractors' | 'cars' | 'other')[] | null;
   /**
    * Optional extra stills for this tile. Empty means a single still.
    */
@@ -680,6 +688,14 @@ export interface BoardItem {
    * Auto-set on first publish. Can be overridden.
    */
   publishedAt?: string | null;
+  /**
+   * Show on the home page selection.
+   */
+  featured?: boolean | null;
+  /**
+   * Lower numbers come first on the home page. Leave empty to sort by date.
+   */
+  featuredOrder?: number | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -1731,7 +1747,9 @@ export interface ProjectsSelect<T extends boolean = true> {
 export interface BoardItemsSelect<T extends boolean = true> {
   title?: T;
   kind?: T;
+  video?: T;
   cover?: T;
+  subjects?: T;
   stills?:
     | T
     | {
@@ -1748,6 +1766,8 @@ export interface BoardItemsSelect<T extends boolean = true> {
         description?: T;
       };
   publishedAt?: T;
+  featured?: T;
+  featuredOrder?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;

@@ -62,7 +62,7 @@ const generateURL: GenerateURL<SeoDoc> = ({ doc, collectionSlug }) => {
   if (collectionSlug === 'posts') return `${base}/posts/${doc.slug}`
   if (collectionSlug === 'projects') return `${base}/projects/${doc.slug}`
   if (collectionSlug === 'lab') return `${base}/lab/${doc.slug}`
-  if (collectionSlug === 'board-items') return `${base}/board/${doc.slug}`
+  if (collectionSlug === 'board-items') return `${base}/gallery/${doc.slug}`
 
   return `${base}/${doc.slug}`
 }

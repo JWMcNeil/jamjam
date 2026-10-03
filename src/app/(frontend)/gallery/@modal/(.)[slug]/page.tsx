@@ -6,14 +6,14 @@ type Args = {
   params: Promise<{ slug?: string }>
 }
 
-export default async function BoardModalSlot({ params: paramsPromise }: Args) {
+export default async function InterceptedGalleryItem({ params: paramsPromise }: Args) {
   const { slug = '' } = await paramsPromise
   const decodedSlug = decodeURIComponent(slug)
   const item = await queryBoardItemBySlug(decodedSlug)
 
   if (!item) {
-    return <PayloadRedirects url={`/board/${decodedSlug}`} />
+    return <PayloadRedirects url={`/gallery/${decodedSlug}`} />
   }
 
-  return <BoardModal item={item} closeMode="page" />
+  return <BoardModal item={item} closeMode="intercept" />
 }

@@ -3,6 +3,7 @@ import * as migration_20260419_044851 from './20260419_044851';
 import * as migration_20260818_064100 from './20260818_064100';
 import * as migration_20260819_075411 from './20260819_075411';
 import * as migration_20260922_021300_add_reset_password_requested_at from './20260922_021300_add_reset_password_requested_at';
+import * as migration_20261003_043245_gallery_video_subjects_featured from './20261003_043245_gallery_video_subjects_featured';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20260922_021300_add_reset_password_requested_at.up,
     down: migration_20260922_021300_add_reset_password_requested_at.down,
-    name: '20260922_021300_add_reset_password_requested_at'
+    name: '20260922_021300_add_reset_password_requested_at',
+  },
+  {
+    up: migration_20261003_043245_gallery_video_subjects_featured.up,
+    down: migration_20261003_043245_gallery_video_subjects_featured.down,
+    name: '20261003_043245_gallery_video_subjects_featured'
   },
 ];

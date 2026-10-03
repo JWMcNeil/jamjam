@@ -4,7 +4,7 @@ import { BoardTile } from './BoardTile'
 
 export function BoardGrid({ items }: { items: BoardItem[] }) {
   if (items.length === 0) {
-    return <p className="font-mono text-sm text-text-muted">ls: board/: no items</p>
+    return <p className="font-mono text-sm text-text-muted">ls: gallery/: no items</p>
   }
 
   return (

@@ -32,11 +32,11 @@ type Args = {
   params: Promise<{ slug?: string }>
 }
 
-export default async function BoardItemPage({ params: paramsPromise }: Args) {
+export default async function GalleryItemPage({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
   const decodedSlug = decodeURIComponent(slug)
-  const url = `/board/${decodedSlug}`
+  const url = `/gallery/${decodedSlug}`
 
   const [item, items] = await Promise.all([
     queryBoardItemBySlug(decodedSlug),

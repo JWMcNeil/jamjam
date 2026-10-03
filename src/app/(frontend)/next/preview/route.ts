@@ -54,7 +54,7 @@ function buildPreviewPath(collection: PreviewCollection, slug: string): string {
   const segment = encodeURIComponent(slug)
   if (collection === 'posts') return `/posts/${segment}`
   if (collection === 'projects') return `/projects/${segment}`
-  return `/board/${segment}`
+  return `/gallery/${segment}`
 }
 
 export async function GET(request: Request): Promise<Response> {

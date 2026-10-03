@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-export default function BoardLayout({
+export default function GalleryLayout({
   children,
   modal,
 }: {

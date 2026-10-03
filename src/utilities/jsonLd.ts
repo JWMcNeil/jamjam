@@ -98,7 +98,8 @@ export const jsonLdForDoc = (args: {
     const item = doc as Partial<BoardItem>
     return {
       ...shared,
-      '@type': item.kind === 'graphics' ? 'VisualArtwork' : 'Photograph',
+      '@type':
+        item.kind === 'graphics' ? 'VisualArtwork' : item.kind === 'video' ? 'VideoObject' : 'Photograph',
     }
   }
 
@@ -121,17 +122,17 @@ export const jsonLdForBoard = (args: {
   items: Array<Pick<BoardItem, 'title' | 'slug' | 'cover'>>
   siteSettings?: SiteSetting | null
 }): JsonLdObject => {
-  const url = absoluteUrl('/board')
+  const url = absoluteUrl('/gallery')
   return {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: 'Board',
+    name: 'Gallery',
     url,
     author: person(args.siteSettings),
     hasPart: args.items.map((item) => ({
       '@type': 'ImageObject',
       name: item.title,
-      url: absoluteUrl(`/board/${item.slug}`),
+      url: absoluteUrl(`/gallery/${item.slug}`),
       ...(imageUrlFromDoc(item) ? { image: imageUrlFromDoc(item) } : {}),
     })),
   }
