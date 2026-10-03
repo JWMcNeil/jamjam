@@ -19,11 +19,11 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 import { revalidateContactForm } from '@/hooks/revalidateContactForm'
 import { r2StoragePlugin } from '@/plugins/r2Storage'
 
-import type { BoardItem, Lab, Post, Project } from '@/payload-types'
+import type { BoardItem, Lab, Page, Post, Project } from '@/payload-types'
 import { getMuxCorsOrigin, getServerSideURL } from '@/utilities/getURL'
 import { iconOptions } from '@/utilities/icons'
 
-type SeoDoc = Post | Project | Lab | BoardItem
+type SeoDoc = Post | Project | Lab | BoardItem | Page
 
 const generateTitle: GenerateTitle<SeoDoc> = ({ doc }) => {
   return doc?.title?.trim() || 'jamjam.dev'

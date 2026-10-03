@@ -7,6 +7,7 @@ import { buildConfig, type PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { BoardItems } from './collections/BoardItems'
+import { Pages } from './collections/Pages'
 import { Media } from './collections/Media'
 import { Posts } from './collections/Posts'
 import { Projects } from './collections/Projects'
@@ -114,7 +115,7 @@ export default buildConfig({
     generateSchemaOutputFile: path.resolve(dirname, 'payload-generated-schema.ts'),
   }),
   // Order matters for schema push: tables with FKs (e.g. uploads) must come after their targets.
-  collections: [Users, Media, Tags, Lab, Posts, Projects, BoardItems],
+  collections: [Users, Media, Tags, Lab, Posts, Projects, BoardItems, Pages],
   cors: getPayloadCorsOrigins(),
   globals: [Header, Footer, SiteSettings, Hearts],
   plugins: [
