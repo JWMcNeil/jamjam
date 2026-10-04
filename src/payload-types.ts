@@ -692,13 +692,9 @@ export interface BoardItem {
    */
   publishedAt?: string | null;
   /**
-   * Show on the home page selection.
+   * Show on the home page selection, in the same order as the gallery (drag rows in the list to reorder).
    */
   featured?: boolean | null;
-  /**
-   * Lower numbers come first on the home page. Leave empty to sort by date.
-   */
-  featuredOrder?: number | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -1883,7 +1879,6 @@ export interface BoardItemsSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   featured?: T;
-  featuredOrder?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;

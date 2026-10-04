@@ -19,7 +19,6 @@ export const boardItemSelect = {
   video: true,
   subjects: true,
   featured: true,
-  featuredOrder: true,
   cover: true,
   stills: true,
   setLayout: true,

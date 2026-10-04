@@ -34,7 +34,6 @@ export const BoardItems: CollectionConfig<'board-items'> = {
     video: true,
     subjects: true,
     featured: true,
-    featuredOrder: true,
     cover: true,
     stills: true,
     setLayout: true,
@@ -228,16 +227,7 @@ export const BoardItems: CollectionConfig<'board-items'> = {
       defaultValue: false,
       admin: {
         position: 'sidebar',
-        description: 'Show on the home page selection.',
-      },
-    },
-    {
-      name: 'featuredOrder',
-      type: 'number',
-      admin: {
-        position: 'sidebar',
-        description: 'Lower numbers come first on the home page. Leave empty to sort by date.',
-        condition: (data) => Boolean(data?.featured),
+        description: 'Show on the home page selection, in the same order as the gallery (drag rows in the list to reorder).',
       },
     },
     slugField({

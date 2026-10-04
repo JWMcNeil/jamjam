@@ -62,7 +62,7 @@ export const queryFeaturedBoardItems = cache(async (limit = 4) => {
     depth: 1,
     limit,
     pagination: false,
-    sort: ['featuredOrder', '-publishedAt'],
+    sort: ['_order', '-publishedAt'],
     where: {
       and: [publishedBoardWhere, { featured: { equals: true } }],
     },
