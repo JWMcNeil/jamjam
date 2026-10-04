@@ -112,6 +112,8 @@ export default buildConfig({
       connectionString:
         process.env.DATABASE_URL || 'postgresql://payload:payload@localhost:5432/jamjam',
     },
+    // Schema changes go through migrations (pnpm migrate:create), never dev-mode push.
+    push: false,
     generateSchemaOutputFile: path.resolve(dirname, 'payload-generated-schema.ts'),
   }),
   // Order matters for schema push: tables with FKs (e.g. uploads) must come after their targets.
