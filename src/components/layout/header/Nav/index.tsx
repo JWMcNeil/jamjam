@@ -40,39 +40,25 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   }, [onMobileMenuOpenChange, pathname])
 
   /**
-   * Lock scroll: `useLayoutEffect` runs before paint so layout matches before the sheet measures.
-   * Apply to `documentElement` (not `body`) — works more reliably on mobile with sticky headers.
+   * Lock scroll with `overflow: hidden` on `html` only (setting it on `body` too makes body a scroll container and un-sticks the header). Pinning `html` with `position: fixed` detached the sticky
+   * header from the viewport (worst at the bottom of the page), so the sheet measured an
+   * off-screen anchor and the menu could neither show nor be closed.
    */
   useLayoutEffect(() => {
     if (!isMobileMenuOpen) return
 
-    const scrollY = window.scrollY || document.documentElement.scrollTop
     const html = document.documentElement
-
     const prev = {
-      overflow: html.style.overflow,
-      position: html.style.position,
-      top: html.style.top,
-      left: html.style.left,
-      right: html.style.right,
-      width: html.style.width,
+      htmlOverflow: html.style.overflow,
+      htmlOverscroll: html.style.overscrollBehavior,
     }
 
     html.style.overflow = 'hidden'
-    html.style.position = 'fixed'
-    html.style.top = `-${scrollY}px`
-    html.style.left = '0'
-    html.style.right = '0'
-    html.style.width = '100%'
+    html.style.overscrollBehavior = 'none'
 
     return () => {
-      html.style.overflow = prev.overflow
-      html.style.position = prev.position
-      html.style.top = prev.top
-      html.style.left = prev.left
-      html.style.right = prev.right
-      html.style.width = prev.width
-      window.scrollTo(0, scrollY)
+      html.style.overflow = prev.htmlOverflow
+      html.style.overscrollBehavior = prev.htmlOverscroll
     }
   }, [isMobileMenuOpen])
 
