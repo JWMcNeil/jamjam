@@ -6,6 +6,7 @@ function terminalPath(type: string | undefined, slug: string | undefined): strin
   if (type === 'contact') return '~/contact'
   if (type === 'lab' && slug) return `~/lab/${slug}`
   if (type === 'project' && slug) return `~/projects/${slug}`
+  if (type === 'gallery') return slug ? `~/gallery/${slug}` : '~/gallery'
   if (slug) return `~/posts/${slug}`
   return '~/jamjam.dev'
 }

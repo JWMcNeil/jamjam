@@ -43,7 +43,7 @@ function redirectOrigin(request: Request): string {
   }
 }
 
-const allowedCollections = ['posts', 'projects', 'board-items'] as const
+const allowedCollections = ['posts', 'projects', 'board-items', 'pages'] as const
 type PreviewCollection = (typeof allowedCollections)[number]
 
 function isPreviewCollection(value: string): value is PreviewCollection {
@@ -54,7 +54,8 @@ function buildPreviewPath(collection: PreviewCollection, slug: string): string {
   const segment = encodeURIComponent(slug)
   if (collection === 'posts') return `/posts/${segment}`
   if (collection === 'projects') return `/projects/${segment}`
-  return `/board/${segment}`
+  if (collection === 'pages') return `/${segment}`
+  return `/gallery/${segment}`
 }
 
 export async function GET(request: Request): Promise<Response> {

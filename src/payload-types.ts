@@ -74,6 +74,7 @@ export interface Config {
     posts: Post;
     projects: Project;
     'board-items': BoardItem;
+    pages: Page;
     'mux-video': MuxVideo;
     redirects: Redirect;
     forms: Form;
@@ -94,6 +95,7 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     'board-items': BoardItemsSelect<false> | BoardItemsSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     'mux-video': MuxVideoSelect<false> | MuxVideoSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -185,7 +187,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Images and files used across Posts, Projects, Lab, and Board items.
+ * Images and files used across Posts, Projects, Lab, and Gallery items.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
@@ -632,7 +634,7 @@ export interface MuxVideo {
   createdAt: string;
 }
 /**
- * Photography and graphics tiles on /board. Context shows in a modal, not a case study.
+ * Photography, film and graphics tiles on /gallery. Context shows in a modal, not a case study.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "board-items".
@@ -640,17 +642,25 @@ export interface MuxVideo {
 export interface BoardItem {
   id: number;
   /**
-   * Shown as the quiet caption under the still, and used for the share URL slug.
+   * Shown as the quiet caption under the tile, and used for the share URL slug.
    */
   title: string;
   /**
-   * Board kind. Video and Music come later; they are not selectable here.
+   * Gallery kind. Music comes later; it is not selectable here.
    */
-  kind: 'photography' | 'graphics';
+  kind: 'photography' | 'video' | 'graphics';
   /**
-   * The still on the Board tile and the Open Graph image when this tile is shared.
+   * Mux-hosted clip. Plays in the modal; the tile shows the cover still and previews on hover.
+   */
+  video?: (number | null) | MuxVideo;
+  /**
+   * The still on the Gallery tile and the Open Graph image when shared. For video, use a strong poster frame.
    */
   cover: number | Media;
+  /**
+   * What it shows. Used to filter the Gallery.
+   */
+  subjects?: ('motorcycles' | 'tractors' | 'cars' | 'other')[] | null;
   /**
    * Optional extra stills for this tile. Empty means a single still.
    */
@@ -681,9 +691,125 @@ export interface BoardItem {
    */
   publishedAt?: string | null;
   /**
+   * Show on the home page selection.
+   */
+  featured?: boolean | null;
+  /**
+   * Lower numbers come first on the home page. Leave empty to sort by date.
+   */
+  featuredOrder?: number | null;
+  /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Standalone pages. Today the only layout is /what-i-do (slug "what-i-do"): heading, lede, reel, capability rows and closing block. The portrait, bio and status in the aside come from Identity > About.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  /**
+   * The page heading (H1).
+   */
+  title: string;
+  /**
+   * Sentence under the heading.
+   */
+  lede?: string | null;
+  /**
+   * The reel clip (Mux). Plays muted and looped under the heading.
+   */
+  reelVideo?: (number | null) | MuxVideo;
+  /**
+   * Poster still shown before the clip loads and under reduced motion. Crop wide (about 21:9).
+   */
+  reelPoster?: (number | null) | Media;
+  /**
+   * Mono tag in the caption strip.
+   */
+  reelTag?: string | null;
+  /**
+   * Caption under the reel.
+   */
+  reelCaption?: string | null;
+  /**
+   * Small mono label above the capability rows.
+   */
+  indexLabel?: string | null;
+  /**
+   * One row per thing you do. Drag to reorder. Leave empty to fall back to the built-in rows.
+   */
+  rows?:
+    | {
+        /**
+         * One word works best, e.g. web, content, ai.
+         */
+        name: string;
+        /**
+         * Short description shown beside the name.
+         */
+        line?: string | null;
+        /**
+         * The paragraph shown when the row is open.
+         */
+        body?: string | null;
+        /**
+         * Comma separated, e.g. next.js, cms. Shown as #tags.
+         */
+        tags?: string | null;
+        /**
+         * Open on first load. If none is ticked, the first row opens.
+         */
+        openByDefault?: boolean | null;
+        /**
+         * Up to three stills or clips shown when the row is open. The first also follows the cursor on hover.
+         */
+        proof?:
+          | {
+              slideType: 'media' | 'mux';
+              image?: (number | null) | Media;
+              /**
+               * Short clip. Plays muted and looped when the row is open; previews on hover when closed.
+               */
+              video?: (number | null) | MuxVideo;
+              /**
+               * Optional poster still. Empty uses the Mux poster frame.
+               */
+              poster?: (number | null) | Media;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  closingHeadline?: string | null;
+  closingLine?: string | null;
+  /**
+   * Button text.
+   */
+  closingCtaLabel?: string | null;
+  /**
+   * Internal path or full URL.
+   */
+  closingCtaHref?: string | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  /**
+   * URL path. Only "what-i-do" has a layout today, so leave it as is.
+   */
   slug: string;
   updatedAt: string;
   createdAt: string;
@@ -1415,6 +1541,10 @@ export interface PayloadLockedDocument {
         value: number | BoardItem;
       } | null)
     | ({
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
         relationTo: 'mux-video';
         value: number | MuxVideo;
       } | null)
@@ -1731,7 +1861,9 @@ export interface ProjectsSelect<T extends boolean = true> {
 export interface BoardItemsSelect<T extends boolean = true> {
   title?: T;
   kind?: T;
+  video?: T;
   cover?: T;
+  subjects?: T;
   stills?:
     | T
     | {
@@ -1748,7 +1880,56 @@ export interface BoardItemsSelect<T extends boolean = true> {
         description?: T;
       };
   publishedAt?: T;
+  featured?: T;
+  featuredOrder?: T;
   generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  lede?: T;
+  reelVideo?: T;
+  reelPoster?: T;
+  reelTag?: T;
+  reelCaption?: T;
+  indexLabel?: T;
+  rows?:
+    | T
+    | {
+        name?: T;
+        line?: T;
+        body?: T;
+        tags?: T;
+        openByDefault?: T;
+        proof?:
+          | T
+          | {
+              slideType?: T;
+              image?: T;
+              video?: T;
+              poster?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  closingHeadline?: T;
+  closingLine?: T;
+  closingCtaLabel?: T;
+  closingCtaHref?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2080,7 +2261,7 @@ export interface Header {
                 relationTo: 'projects';
                 value: number | Project;
               } | null);
-          sitePage?: ('home' | 'posts' | 'projects' | 'board' | 'lab' | 'contact') | null;
+          sitePage?: ('home' | 'whatIDo' | 'posts' | 'projects' | 'board' | 'lab' | 'contact') | null;
           url?: string | null;
           label?: string | null;
           /**
@@ -2154,7 +2335,50 @@ export interface SiteSetting {
    */
   contactResponseTime: string;
   /**
-   * Optional intro paragraph on the home page, shown below jamjam:~$ and the status.
+   * One line under the headline.
+   */
+  heroSubheading: string;
+  heroWeb?: {
+    /**
+     * Web chip still. Shown by default and used as the fallback. Crop wide (about 2.3:1).
+     */
+    image?: (number | null) | Media;
+    /**
+     * Optional short, silent Mux clip (3-4s). Plays as a looping preview on hover, and automatically on touch devices.
+     */
+    video?: (number | null) | MuxVideo;
+  };
+  heroAi?: {
+    /**
+     * Ai chip still. Shown by default and used as the fallback. Crop wide (about 2.3:1).
+     */
+    image?: (number | null) | Media;
+    /**
+     * Optional short, silent Mux clip (3-4s). Plays as a looping preview on hover, and automatically on touch devices.
+     */
+    video?: (number | null) | MuxVideo;
+  };
+  heroFilm?: {
+    /**
+     * Film chip still. Shown by default and used as the fallback. Crop wide (about 2.3:1).
+     */
+    image?: (number | null) | Media;
+    /**
+     * Optional short, silent Mux clip (3-4s). Plays as a looping preview on hover, and automatically on touch devices.
+     */
+    video?: (number | null) | MuxVideo;
+  };
+  /**
+   * Two or three stills that cross-fade in the photography chip. Crop wide.
+   */
+  heroPhotos?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * No longer shown on the home page (replaced by the hero subheading). Kept for now.
    */
   homeIntro?: {
     root: {
@@ -2262,6 +2486,31 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   contactHeadline?: T;
   contactIntro?: T;
   contactResponseTime?: T;
+  heroSubheading?: T;
+  heroWeb?:
+    | T
+    | {
+        image?: T;
+        video?: T;
+      };
+  heroAi?:
+    | T
+    | {
+        image?: T;
+        video?: T;
+      };
+  heroFilm?:
+    | T
+    | {
+        image?: T;
+        video?: T;
+      };
+  heroPhotos?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
   homeIntro?: T;
   aboutSectionLabel?: T;
   aboutHeadline?: T;
@@ -2315,6 +2564,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'board-items';
           value: number | BoardItem;
+        } | null)
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
         } | null);
     global?: string | null;
     user?: {

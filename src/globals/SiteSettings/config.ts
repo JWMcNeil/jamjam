@@ -1,4 +1,4 @@
-import type { GlobalConfig } from 'payload'
+import type { Field, GlobalConfig } from 'payload'
 import {
   FixedToolbarFeature,
   InlineToolbarFeature,
@@ -6,6 +6,27 @@ import {
 } from '@payloadcms/richtext-lexical'
 
 import { revalidateSiteSettings } from './hooks/revalidateSiteSettings'
+
+
+const heroChipFields = (label: string): Field[] => [
+  {
+    name: 'image',
+    type: 'upload',
+    relationTo: 'media',
+    admin: {
+      description: `${label} chip still. Shown by default and used as the fallback. Crop wide (about 2.3:1).`,
+    },
+  },
+  {
+    name: 'video',
+    type: 'relationship',
+    relationTo: 'mux-video',
+    admin: {
+      description:
+        'Optional short, silent Mux clip (3-4s). Plays as a looping preview on hover, and automatically on touch devices.',
+    },
+  },
+]
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
@@ -109,9 +130,54 @@ export const SiteSettings: GlobalConfig = {
         {
           label: 'Home',
           admin: {
-            description: 'Optional copy on the home page below the terminal status line.',
+            description:
+              'Home page hero: subheading, the media chips inside the headline, and copy. Selected work comes from Gallery items marked featured.',
           },
           fields: [
+            {
+              name: 'heroSubheading',
+              type: 'text',
+              required: true,
+              defaultValue: 'Web, AI and video work, with a soft spot for anything with an engine.',
+              admin: {
+                description: 'One line under the headline.',
+              },
+            },
+            {
+              name: 'heroWeb',
+              type: 'group',
+              label: 'Hero chip: web',
+              fields: heroChipFields('Web'),
+            },
+            {
+              name: 'heroAi',
+              type: 'group',
+              label: 'Hero chip: Ai',
+              fields: heroChipFields('Ai'),
+            },
+            {
+              name: 'heroFilm',
+              type: 'group',
+              label: 'Hero chip: film',
+              fields: heroChipFields('Film'),
+            },
+            {
+              name: 'heroPhotos',
+              type: 'array',
+              label: 'Hero chip: photography',
+              maxRows: 3,
+              admin: {
+                description: 'Two or three stills that cross-fade in the photography chip. Crop wide.',
+              },
+              fields: [
+                {
+                  name: 'image',
+                  type: 'upload',
+                  relationTo: 'media',
+                  required: true,
+                },
+              ],
+            },
             {
               name: 'homeIntro',
               type: 'richText',
@@ -125,7 +191,7 @@ export const SiteSettings: GlobalConfig = {
               }),
               admin: {
                 description:
-                  'Optional intro paragraph on the home page, shown below jamjam:~$ and the status.',
+                  'No longer shown on the home page (replaced by the hero subheading). Kept for now.',
               },
             },
           ],

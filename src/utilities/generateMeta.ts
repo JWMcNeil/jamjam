@@ -38,7 +38,7 @@ export const canonicalPath = (kind: MetaDocKind, slug: string | undefined): stri
   if (!slug) return '/'
   if (kind === 'post') return `/posts/${slug}`
   if (kind === 'project') return `/projects/${slug}`
-  if (kind === 'board') return `/board/${slug}`
+  if (kind === 'board') return `/gallery/${slug}`
   return `/lab/${slug}`
 }
 

@@ -4,15 +4,15 @@ import configPromise from '@payload-config'
 import { About } from '@/components/About'
 import { LatestPosts } from '@/components/LatestPosts'
 import { ProjectCard } from '@/components/ProjectCard'
-import RichText from '@/components/RichText'
-import { StatusDot } from '@/components/StatusDot'
-import { BracketLink } from '@/components/ui/bracket-link'
+import { HeroHeadline } from '@/components/home/HeroHeadline'
+import { SelectedWork } from '@/components/home/SelectedWork'
 import { Button } from '@/components/ui/button'
 import type { SiteSetting } from '@/payload-types'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { pageMeta } from '@/utilities/generateMeta'
 import { JsonLd } from '@/components/JsonLd'
 import { jsonLdForWebsite } from '@/utilities/jsonLd'
+import { queryFeaturedBoardItems } from '@/lib/board/fetch'
 import { getPayload } from 'payload'
 
 export const revalidate = 600
@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
 
-  const [featuredProjects, latestPosts, siteSettings] = await Promise.all([
+  const [featuredProjects, latestPosts, siteSettings, featuredWork] = await Promise.all([
     payload.find({
       collection: 'projects',
       where: {
@@ -60,40 +60,39 @@ export default async function HomePage() {
       },
     }),
     getCachedGlobal('site-settings', 1)() as Promise<SiteSetting>,
+    queryFeaturedBoardItems(4),
   ])
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4">
       <JsonLd data={jsonLdForWebsite(siteSettings)} />
       {/* Hero */}
-      <section className="py-16 md:py-16">
-        <h1 className="text-display font-black text-text-heading motion-safe:animate-subtle-fade">
-          Runs on curiosity, mostly.
-          <br />
-          <span>Making</span>{' '}
-          <span className="text-text-secondary">web & Ai</span>{' '}
-          <span>things out of it.</span>
-        </h1>
-        <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
-          <p className="flex flex-wrap items-center gap-x-1 font-mono text-xs lg:text-sm">
-            <span className="text-text-muted">jamjam:~$&nbsp;</span>
-            <span className="text-accent">{siteSettings.statusText}</span>
-            <StatusDot />
+      <section className="pb-10 pt-10 text-center md:pb-12 md:pt-14">
+        <HeroHeadline
+          heroWeb={siteSettings.heroWeb}
+          heroAi={siteSettings.heroAi}
+          heroFilm={siteSettings.heroFilm}
+          heroPhotos={siteSettings.heroPhotos}
+        />
+        {siteSettings.heroSubheading ? (
+          <p className="mx-auto mt-7 max-w-2xl text-balance text-lg text-text-secondary md:text-xl">
+            {siteSettings.heroSubheading}
           </p>
-          <BracketLink href="/contact">say hello</BracketLink>
+        ) : null}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Button href="/contact" variant="default" size="lg">
+            <span aria-hidden className="text-text-prompt">
+              $
+            </span>{' '}
+            say hello
+          </Button>
+          <Button href="/what-i-do" variant="outline" size="lg" showArrow>
+            what I do
+          </Button>
         </div>
-        {siteSettings.homeIntro && (
-          <div className="mt-10 min-w-0 max-w-2xl text-pretty">
-            <RichText
-              data={siteSettings.homeIntro}
-              enableGutter={false}
-              proseInvert={false}
-              proseLayout="flush"
-              className="min-w-0 text-lg text-text-muted prose-p:mt-0 prose-p:text-text-secondary prose-strong:text-text-heading prose-a:text-accent prose-a:no-underline hover:prose-a:underline max-w-none text-pretty"
-            />
-          </div>
-        )}
       </section>
+
+      <SelectedWork items={featuredWork} />
 
       <LatestPosts posts={latestPosts.docs} totalDocs={latestPosts.totalDocs} />
 

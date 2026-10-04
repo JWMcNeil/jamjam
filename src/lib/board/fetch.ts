@@ -13,7 +13,9 @@ export const queryPublishedBoardItems = cache(async () => {
   const result = await payload.find({
     collection: 'board-items',
     draft,
-    overrideAccess: draft,
+    // Public reads are scoped by the explicit published/kind filters below. Access is skipped so
+    // linked Mux videos populate (mux-video is admin-read only).
+    overrideAccess: true,
     depth: 1,
     limit: 1000,
     pagination: false,
@@ -32,7 +34,9 @@ export const queryBoardItemBySlug = cache(async (slug: string) => {
   const result = await payload.find({
     collection: 'board-items',
     draft,
-    overrideAccess: draft,
+    // Public reads are scoped by the explicit published/kind filters below. Access is skipped so
+    // linked Mux videos populate (mux-video is admin-read only).
+    overrideAccess: true,
     depth: 1,
     limit: 1,
     pagination: false,
@@ -47,4 +51,23 @@ export const queryBoardItemBySlug = cache(async (slug: string) => {
   })
 
   return (result.docs[0] as BoardItem | undefined) ?? null
+})
+
+export const queryFeaturedBoardItems = cache(async (limit = 4) => {
+  const payload = await getPayload({ config: configPromise })
+
+  const result = await payload.find({
+    collection: 'board-items',
+    draft: false,
+    depth: 1,
+    limit,
+    pagination: false,
+    sort: ['featuredOrder', '-publishedAt'],
+    where: {
+      and: [publishedBoardWhere, { featured: { equals: true } }],
+    },
+    select: boardItemSelect,
+  })
+
+  return result.docs as BoardItem[]
 })

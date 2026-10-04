@@ -4,9 +4,9 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 import type { BoardItem } from '../../../payload-types'
 
 function revalidateBoardPaths(slug: string | null | undefined) {
-  revalidatePath('/board', 'page')
+  revalidatePath('/gallery', 'page')
   if (slug) {
-    revalidatePath(`/board/${slug}`, 'page')
+    revalidatePath(`/gallery/${slug}`, 'page')
   }
   revalidateTag('pages-sitemap', 'max')
 }
@@ -18,12 +18,12 @@ export const revalidateBoardItem: CollectionAfterChangeHook<BoardItem> = ({
 }) => {
   if (!context.disableRevalidate) {
     if (doc._status === 'published') {
-      payload.logger.info(`Revalidating board item at /board/${doc.slug}`)
+      payload.logger.info(`Revalidating board item at /gallery/${doc.slug}`)
       revalidateBoardPaths(doc.slug)
     }
 
     if (previousDoc._status === 'published' && doc._status !== 'published') {
-      payload.logger.info(`Revalidating unpublished board item at /board/${previousDoc.slug}`)
+      payload.logger.info(`Revalidating unpublished board item at /gallery/${previousDoc.slug}`)
       revalidateBoardPaths(previousDoc.slug)
     }
 

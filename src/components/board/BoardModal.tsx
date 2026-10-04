@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 
 import type { BoardItem, Media } from '@/payload-types'
@@ -16,7 +17,11 @@ import {
 import { boardKindHash } from '@/lib/board/labels'
 import { boardCarouselStills, boardCover, boardExtraStills } from '@/lib/board/media'
 import { isPublicBoardKind } from '@/lib/board/query'
+import { boardVideo } from '@/lib/board/video'
+import { getMuxPlayback } from '@/utilities/muxPlayback'
 import { getClientSideURL } from '@/utilities/getURL'
+
+const MuxPlayer = dynamic(() => import('@mux/mux-player-react'), { ssr: false })
 
 type CloseMode = 'intercept' | 'page'
 
@@ -27,6 +32,8 @@ export function BoardModal({ item, closeMode }: { item: BoardItem; closeMode: Cl
   const layout = hasSet && item.setLayout === 'coverModal' ? 'coverModal' : 'carousel'
   const carousel = useMemo(() => boardCarouselStills(item), [item])
   const cover = boardCover(item)
+  const video = boardVideo(item)
+  const playback = getMuxPlayback(video)
 
   const [index, setIndex] = useState(0)
   const [shareLabel, setShareLabel] = useState('Share')
@@ -40,7 +47,7 @@ export function BoardModal({ item, closeMode }: { item: BoardItem; closeMode: Cl
       router.back()
       return
     }
-    router.push('/board')
+    router.push('/gallery')
   }, [closeMode, router])
 
   const step = useCallback(
@@ -61,7 +68,7 @@ export function BoardModal({ item, closeMode }: { item: BoardItem; closeMode: Cl
   }, [step])
 
   const share = useCallback(async () => {
-    const url = `${getClientSideURL()}/board/${item.slug}`
+    const url = `${getClientSideURL()}/gallery/${item.slug}`
     try {
       if (typeof navigator.share === 'function') {
         await navigator.share({ title: item.title, url })
@@ -111,7 +118,17 @@ export function BoardModal({ item, closeMode }: { item: BoardItem; closeMode: Cl
         </div>
 
         <div className="relative min-h-0 flex-1 overflow-y-auto">
-          {current ? (
+          {playback.playbackId ? (
+            <MuxPlayer
+              playbackId={playback.playbackId}
+              poster={playback.posterUrl}
+              streamType="on-demand"
+              playsInline
+              title={item.title}
+              accentColor="hsl(127.66, 19.34%, 47.65%)"
+              className="mx-auto block max-h-[70vh] w-full"
+            />
+          ) : current ? (
             <MediaEl
               resource={current}
               htmlElement={null}
@@ -121,7 +138,7 @@ export function BoardModal({ item, closeMode }: { item: BoardItem; closeMode: Cl
             />
           ) : null}
 
-          {layout === 'carousel' && slides.length > 1 ? (
+          {!playback.playbackId && layout === 'carousel' && slides.length > 1 ? (
             <div className="pointer-events-none absolute inset-y-0 flex w-full items-center justify-between px-2">
               <button
                 type="button"
@@ -142,7 +159,7 @@ export function BoardModal({ item, closeMode }: { item: BoardItem; closeMode: Cl
             </div>
           ) : null}
 
-          {layout === 'coverModal' && extras.length > 0 ? (
+          {!playback.playbackId && layout === 'coverModal' && extras.length > 0 ? (
             <ul className="mt-3 flex gap-2 overflow-x-auto px-3 pb-3">
               {slides.map((still, i) => (
                 <li key={still.id ?? i} className="shrink-0">
@@ -173,7 +190,7 @@ export function BoardModal({ item, closeMode }: { item: BoardItem; closeMode: Cl
             {item.context}
           </DialogDescription>
         ) : (
-          <DialogDescription className="sr-only">Board still</DialogDescription>
+          <DialogDescription className="sr-only">Gallery still</DialogDescription>
         )}
       </DialogContent>
     </Dialog>

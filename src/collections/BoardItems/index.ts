@@ -17,8 +17,8 @@ import { revalidateBoardItem, revalidateDeleteBoardItem } from './hooks/revalida
 export const BoardItems: CollectionConfig<'board-items'> = {
   slug: 'board-items',
   labels: {
-    singular: 'Board item',
-    plural: 'Board items',
+    singular: 'Gallery item',
+    plural: 'Gallery items',
   },
   access: {
     create: authenticated,
@@ -30,6 +30,10 @@ export const BoardItems: CollectionConfig<'board-items'> = {
     title: true,
     slug: true,
     kind: true,
+    video: true,
+    subjects: true,
+    featured: true,
+    featuredOrder: true,
     cover: true,
     stills: true,
     setLayout: true,
@@ -41,7 +45,7 @@ export const BoardItems: CollectionConfig<'board-items'> = {
   },
   admin: {
     group: 'Content',
-    description: 'Photography and graphics tiles on /board. Context shows in a modal, not a case study.',
+    description: 'Photography, film and graphics tiles on /gallery. Context shows in a modal, not a case study.',
     defaultColumns: ['title', 'kind', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data }) =>
@@ -69,7 +73,7 @@ export const BoardItems: CollectionConfig<'board-items'> = {
               type: 'text',
               required: true,
               admin: {
-                description: 'Shown as the quiet caption under the still, and used for the share URL slug.',
+                description: 'Shown as the quiet caption under the tile, and used for the share URL slug.',
               },
             },
             {
@@ -78,10 +82,26 @@ export const BoardItems: CollectionConfig<'board-items'> = {
               required: true,
               options: [
                 { label: 'Photography', value: 'photography' },
+                { label: 'Video', value: 'video' },
                 { label: 'Graphics', value: 'graphics' },
               ],
               admin: {
-                description: 'Board kind. Video and Music come later; they are not selectable here.',
+                description: 'Gallery kind. Music comes later; it is not selectable here.',
+              },
+            },
+            {
+              name: 'video',
+              type: 'relationship',
+              relationTo: 'mux-video',
+              admin: {
+                description: 'Mux-hosted clip. Plays in the modal; the tile shows the cover still and previews on hover.',
+                condition: (_, siblingData) => siblingData?.kind === 'video',
+              },
+              validate: (value: unknown, { siblingData }: { siblingData?: { kind?: string } }) => {
+                if (siblingData?.kind === 'video' && !value) {
+                  return 'Pick a Mux video for a Video item.'
+                }
+                return true
               },
             },
             {
@@ -90,7 +110,22 @@ export const BoardItems: CollectionConfig<'board-items'> = {
               relationTo: 'media',
               required: true,
               admin: {
-                description: 'The still on the Board tile and the Open Graph image when this tile is shared.',
+                description:
+                  'The still on the Gallery tile and the Open Graph image when shared. For video, use a strong poster frame.',
+              },
+            },
+            {
+              name: 'subjects',
+              type: 'select',
+              hasMany: true,
+              options: [
+                { label: 'Motorcycles', value: 'motorcycles' },
+                { label: 'Tractors', value: 'tractors' },
+                { label: 'Cars', value: 'cars' },
+                { label: 'Other', value: 'other' },
+              ],
+              admin: {
+                description: 'What it shows. Used to filter the Gallery.',
               },
             },
             {
@@ -183,6 +218,24 @@ export const BoardItems: CollectionConfig<'board-items'> = {
             return value
           },
         ],
+      },
+    },
+    {
+      name: 'featured',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description: 'Show on the home page selection.',
+      },
+    },
+    {
+      name: 'featuredOrder',
+      type: 'number',
+      admin: {
+        position: 'sidebar',
+        description: 'Lower numbers come first on the home page. Leave empty to sort by date.',
+        condition: (data) => Boolean(data?.featured),
       },
     },
     slugField({

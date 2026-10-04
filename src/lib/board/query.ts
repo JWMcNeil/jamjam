@@ -1,6 +1,6 @@
 import type { Where } from 'payload'
 
-export const PUBLIC_BOARD_KINDS = ['photography', 'graphics'] as const
+export const PUBLIC_BOARD_KINDS = ['photography', 'video', 'graphics'] as const
 
 export type PublicBoardKind = (typeof PUBLIC_BOARD_KINDS)[number]
 
@@ -16,6 +16,10 @@ export const boardItemSelect = {
   slug: true,
   title: true,
   kind: true,
+  video: true,
+  subjects: true,
+  featured: true,
+  featuredOrder: true,
   cover: true,
   stills: true,
   setLayout: true,

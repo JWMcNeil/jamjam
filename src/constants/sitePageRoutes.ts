@@ -1,9 +1,10 @@
 /** Fixed marketing routes selectable as “Site page” in the link field (e.g. Header nav). */
 export const SITE_PAGE_PATHS = {
   home: '/',
+  whatIDo: '/what-i-do',
   posts: '/posts',
   projects: '/projects',
-  board: '/board',
+  board: '/gallery',
   lab: '/lab',
   contact: '/contact',
 } as const
@@ -12,9 +13,10 @@ export type SitePageSlug = keyof typeof SITE_PAGE_PATHS
 
 export const SITE_PAGE_OPTIONS: { label: string; value: SitePageSlug }[] = [
   { label: 'Home', value: 'home' },
+  { label: 'What I do', value: 'whatIDo' },
   { label: 'Posts', value: 'posts' },
   { label: 'Projects', value: 'projects' },
-  { label: 'Board', value: 'board' },
+  { label: 'Gallery', value: 'board' },
   { label: 'Lab', value: 'lab' },
   { label: 'Contact', value: 'contact' },
 ]
