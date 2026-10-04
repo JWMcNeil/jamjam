@@ -99,7 +99,7 @@ export function CapabilityIndex({ rows }: { rows: CapabilityRow[] }) {
                 onMouseEnter={() => canHover.current && setHoverId(row.id)}
                 onMouseLeave={() => setHoverId(null)}
                 onMouseMove={move}
-                className="group grid w-full cursor-pointer grid-cols-[2rem_minmax(0,1fr)_1.5rem] items-baseline gap-4 px-1 py-5 text-left font-mono focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:grid-cols-[3rem_12rem_minmax(0,1fr)_1.5rem]"
+                className="group grid w-full cursor-pointer grid-cols-[2rem_minmax(0,1fr)_1.5rem] items-baseline gap-4 px-1 py-5 text-left font-mono focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:grid-cols-[3rem_clamp(11rem,21vw,18.5rem)_minmax(0,1fr)_1.5rem]"
               >
                 <span className="text-xs text-text-muted">{String(index + 1).padStart(2, '0')}</span>
                 <span
