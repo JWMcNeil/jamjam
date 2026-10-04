@@ -1,5 +1,9 @@
 # JamJam Portfolio & Blog
 
+## Deploying
+
+Vercel's build command is `pnpm run ci`, which runs `payload migrate` and then `pnpm build`. Use `run`: bare `pnpm ci` is a built-in pnpm command that isn't implemented and fails the build. Migrations apply to whatever `DATABASE_URL` the environment has, so commit new migrations (`pnpm migrate:create`) with the code that needs them.
+
 ## Core Setup
 
 - [x] Switch SQLite → Postgres (completed - using Docker)
