@@ -79,7 +79,7 @@ export function HeroHeadline({ heroWeb, heroAi, heroFilm, heroPhotos }: Props) {
   return (
     <h1
       aria-label="Making web, Ai, film and photography."
-      className="pt-[0.5em] text-center text-[clamp(2.5rem,8.6vw,8.25rem)] font-black leading-[1.5] tracking-[-0.035em] text-text-heading motion-safe:animate-subtle-fade"
+      className="pt-[0.2em] text-center text-[clamp(2.5rem,8.6vw,8.25rem)] font-black leading-[1.5] tracking-[-0.035em] text-text-heading motion-safe:animate-subtle-fade"
     >
       <Word>Making</Word>{' '}
       <span className="relative inline-block">
