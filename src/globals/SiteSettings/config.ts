@@ -84,7 +84,7 @@ export const SiteSettings: GlobalConfig = {
               name: 'location',
               type: 'text',
               required: true,
-              defaultValue: 'Melbourne, Australia',
+              defaultValue: 'North-east Victoria, Australia',
               admin: {
                 description: 'Your location shown on the contact page and about section.',
               },
@@ -215,7 +215,7 @@ export const SiteSettings: GlobalConfig = {
               name: 'aboutHeadline',
               type: 'text',
               required: true,
-              defaultValue: 'Full-stack developer based in Melbourne.',
+              defaultValue: 'I build the site, then shoot what it’s selling.',
               admin: {
                 description: 'Main headline inside the about card.',
               },
@@ -225,7 +225,7 @@ export const SiteSettings: GlobalConfig = {
               type: 'textarea',
               required: true,
               defaultValue:
-                'I build websites, web apps, and AI-powered tools. Comfortable across the stack — from design systems to deployment. Currently looking for my next role.',
+                'Web developer, photographer and filmmaker in north-east Victoria. I build sites and AI tools, shoot the photos and footage that go with them, and lean towards motorcycles and cars. Open to freelance and full-time.',
               admin: {
                 description: 'Supporting paragraph below the headline.',
               },

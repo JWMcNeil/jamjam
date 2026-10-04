@@ -28,16 +28,16 @@ export type CapabilityRow = {
 export const WHAT_I_DO_DEFAULTS = {
   slug: 'what-i-do',
   title: 'What I can do for you.',
-  lede: 'I build the website, shoot the footage and make them work together. Mostly for motorcycles, tractors and cars.',
+  lede: 'I build the website, shoot the footage and make them work together. Mostly for motorcycles and cars.',
   indexLabel: '// ls what-i-do/',
   reelTag: '#film',
-  reelCaption: 'The reel: bikes, tractors, cars, and the sites that sell them',
+  reelCaption: 'The reel: bikes, cars, and the sites that sell them',
   closingHeadline: 'Got something to show off?',
   closingLine: 'Tell me what it is and when you need it.',
   closingCtaLabel: 'say hello',
   closingCtaHref: '/contact',
   metaDescription:
-    'Web, content and AI work for motorcycles, tractors and cars. Websites, footage and campaigns from one person.',
+    'Web, content and AI work for motorcycles and cars. Websites, footage and campaigns from one person.',
   rows: [
     {
       name: 'web',

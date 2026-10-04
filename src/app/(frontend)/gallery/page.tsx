@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMeta({
     path: '/gallery',
     title: 'Gallery — jamjam.dev',
-    description: 'Photography, film and graphics by Jamie McNeil — motorcycles, tractors, cars and more.',
+    description: 'Photography, film and graphics by Jamie McNeil — motorcycles, cars and more.',
     imageTitle: 'Gallery',
     imageType: 'gallery',
   })

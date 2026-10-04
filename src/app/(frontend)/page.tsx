@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteSettings = (await getCachedGlobal('site-settings', 0)()) as SiteSetting
   const description =
     siteSettings.aboutBio?.trim() ||
-    'Creative developer building websites, web apps, and AI-powered tools in Melbourne.'
+    'Web developer, photographer and filmmaker in north-east Victoria. Sites, AI tools and footage, mostly for motorcycles and cars. Open to freelance and full-time.'
 
   return pageMeta({
     path: '/',
