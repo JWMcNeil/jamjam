@@ -19,7 +19,7 @@ export const queryPublishedBoardItems = cache(async () => {
     depth: 1,
     limit: 1000,
     pagination: false,
-    sort: '-publishedAt',
+    sort: ['_order', '-publishedAt'],
     where: draft ? { kind: { in: [...PUBLIC_BOARD_KINDS] } } : publishedBoardWhere,
     select: boardItemSelect,
   })

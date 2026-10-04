@@ -634,13 +634,14 @@ export interface MuxVideo {
   createdAt: string;
 }
 /**
- * Photography, film and graphics tiles on /gallery. Context shows in a modal, not a case study.
+ * Photography, film and graphics tiles on /gallery. Drag rows in the list to set the order they appear. Context shows in a modal, not a case study.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "board-items".
  */
 export interface BoardItem {
   id: number;
+  _order?: string | null;
   /**
    * Shown as the quiet caption under the tile, and used for the share URL slug.
    */
@@ -1859,6 +1860,7 @@ export interface ProjectsSelect<T extends boolean = true> {
  * via the `definition` "board-items_select".
  */
 export interface BoardItemsSelect<T extends boolean = true> {
+  _order?: T;
   title?: T;
   kind?: T;
   video?: T;

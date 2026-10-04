@@ -16,6 +16,7 @@ import { revalidateBoardItem, revalidateDeleteBoardItem } from './hooks/revalida
 
 export const BoardItems: CollectionConfig<'board-items'> = {
   slug: 'board-items',
+  orderable: true,
   labels: {
     singular: 'Gallery item',
     plural: 'Gallery items',
@@ -45,7 +46,8 @@ export const BoardItems: CollectionConfig<'board-items'> = {
   },
   admin: {
     group: 'Content',
-    description: 'Photography, film and graphics tiles on /gallery. Context shows in a modal, not a case study.',
+    description:
+      'Photography, film and graphics tiles on /gallery. Drag rows in the list to set the order they appear. Context shows in a modal, not a case study.',
     defaultColumns: ['title', 'kind', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data }) =>

@@ -6,6 +6,7 @@ import * as migration_20260922_021300_add_reset_password_requested_at from './20
 import * as migration_20261003_043245_gallery_video_subjects_featured from './20261003_043245_gallery_video_subjects_featured';
 import * as migration_20261003_044503_home_hero_chips from './20261003_044503_home_hero_chips';
 import * as migration_20261003_051754_pages_collection from './20261003_051754_pages_collection';
+import * as migration_20261004_052729_gallery_orderable from './20261004_052729_gallery_orderable';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20261003_051754_pages_collection.up,
     down: migration_20261003_051754_pages_collection.down,
-    name: '20261003_051754_pages_collection'
+    name: '20261003_051754_pages_collection',
+  },
+  {
+    up: migration_20261004_052729_gallery_orderable.up,
+    down: migration_20261004_052729_gallery_orderable.down,
+    name: '20261004_052729_gallery_orderable'
   },
 ];
