@@ -137,6 +137,8 @@ const nextConfig: NextConfig = {
       'data:',
       'blob:',
       ...(media ? [media.origin] : []),
+      // Mux stills, posters and animated hover previews (image.mux.com)
+      'https://image.mux.com',
     ].join(' ')
     const connectSrc = [
       "'self'",
